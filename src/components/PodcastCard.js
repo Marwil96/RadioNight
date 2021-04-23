@@ -4,12 +4,16 @@ import colors from "../variables/color";
 import { Span } from './Span';
 
 const Wrapper = styled.TouchableOpacity`
+  padding: 0 16px;
+  margin-bottom: 24px;
+`
+
+const Content = styled.View`
   display: flex;
   flex-direction: column;
   background-color: ${colors.secondary};
   border-radius: 12px;
   padding: 12px;
-  margin-bottom: 24px;
 `
 
 const CardHeader = styled.View`
@@ -59,18 +63,20 @@ const MetaItem = styled.Text`
 const PodcastCard = ({onPress, title, image, subtitle, desc, meta1, meta2, style }) => {
   return (
     <Wrapper onPress={onPress} style={style}>
-      <CardHeader>
-        <CoverArt source={{ uri: image }} />
-        <TitleContainer>
-          <Title>{title}</Title>
-          <Subtitle>{subtitle}</Subtitle>
-        </TitleContainer>
-      </CardHeader>
-      <Span style={{ fontSize: 14, marginBottom: 16 }}>{desc} </Span>
-      <BottomRow>
-        <MetaItem>{meta1}</MetaItem>
-        <MetaItem>{meta2}</MetaItem>
-      </BottomRow>
+      <Content>
+        <CardHeader>
+          <CoverArt source={{ uri: image }} />
+          <TitleContainer>
+            <Title>{title}</Title>
+            <Subtitle>{subtitle}</Subtitle>
+          </TitleContainer>
+        </CardHeader>
+        <Span style={{ fontSize: 14, marginBottom: 16 }}>{desc} </Span>
+        <BottomRow>
+          <MetaItem>{meta1}</MetaItem>
+          <MetaItem>{meta2}</MetaItem>
+        </BottomRow>
+      </Content>
     </Wrapper>
   );
 }

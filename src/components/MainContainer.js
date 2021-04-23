@@ -15,7 +15,7 @@ export const MainContainerStyle = styled.ScrollView`
   flex-direction: column;
   background: ${colors.background};
   font-family: "Manrope_400Regular";
-  padding: 48px 16px;
+  padding: 48px 0;
   min-height: 100%;
 `;
 
@@ -25,7 +25,7 @@ const wait = (timeout) => {
   });
 };
 
-const MainContainer = ({ children, noAuth, style }) => {
+const MainContainer = ({ children, noAuth, style, player }) => {
   const navigation = useNavigation();
 
   const [refreshing, setRefreshing] = useState(false);
@@ -64,11 +64,11 @@ const MainContainer = ({ children, noAuth, style }) => {
           children
         )}
       </MainContainerStyle>
-      <MiniPlayer
+      {player && <MiniPlayer
         title="Welcome to Jurassic Ar..."
         subtitle="99% Invisible"
         image="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTy7v2Vrnp5LhNS7JoKB12kyK9_gxyCjbGFdDf7MkMmXEfvo8XY"
-      />
+      />}
     </View>
   );
 };

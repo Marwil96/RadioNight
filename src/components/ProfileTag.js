@@ -6,7 +6,7 @@ import styled from "styled-components/native";
 const ProfileCircle = styled.View`
   width: 30px;
   height: 30px;
-  border-radius: 1000;
+  border-radius: 1000px;
   background-color: ${colors.primary};
   display: flex;
   justify-content: center;

@@ -1,4 +1,5 @@
 import React from "react";
+import colors from "../variables/color";
 import InputField from "../components/InputField";
 import { MainContainer } from "../components/MainContainer";
 import PodcastCard from "../components/PodcastCard";
@@ -11,6 +12,8 @@ const PodcastDetails = () => {
     <MainContainer>
       <TopNav />
       <PodcastDetailsHeader
+        bgColor={colors.background}
+        textColor={colors.text}
         title="Planet Money"
         image="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSeQypKxL8Qzjf0n28K0uUD-iVMtxcHx-G_NspdBSTCJcZv-YWh"
         subtitle="Business & Comedy"

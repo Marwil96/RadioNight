@@ -6,10 +6,15 @@ import { Span } from "./Span";
 import StyledButton from "./StyledButton";
 
 const Wrapper = styled.TouchableOpacity`
+  padding: 0 16px;
+  margin-bottom: 32px;
+  background-color: ${props => props.bgColor};
+`;
+
+const Content = styled.View`
   display: flex;
   flex-direction: column;
-  margin-bottom: 32px;
-`;
+`
 
 const CardHeader = styled.View`
   display: flex;
@@ -34,13 +39,13 @@ const Title = styled.Text`
   font-size: 24px;
   font-family: "Manrope_500Medium";
   margin-bottom: 8px;
-  color: ${colors.text};
+  color: ${props => props.textColor};
   flex-shrink: 1;
 `;
 const Subtitle = styled.Text`
   font-size: 16px;
   font-family: "Manrope_400Regular";
-  color: ${colors.text};
+  color: ${props => props.textColor};
 `;
 
 const BottomRow = styled.View`
@@ -57,29 +62,33 @@ const PodcastDetailsHeader = ({
   subtitle,
   desc,
   style,
-  isFollowed
+  isFollowed,
+  bgColor,
+  textColor
 }) => {
 
   const [followingPodcast, setFollowingPodcast] = useState(isFollowed);
   return (
-    <Wrapper onPress={onPress} style={style}>
-      <CardHeader>
-        <CoverArt source={{ uri: image }} />
-        <TitleContainer>
-          <Title>{title}</Title>
-          <Subtitle>{subtitle}</Subtitle>
-        </TitleContainer>
-      </CardHeader>
-      <Span style={{ fontSize: 14, marginBottom: 16 }}>{desc} </Span>
-      <BottomRow>
-        <StyledButton
-          style={{ paddingTop: 10, paddingBottom: 10 }}
-          borderMode={followingPodcast}
-          onPress={() => setFollowingPodcast(!followingPodcast)}
-        >
-          {followingPodcast ? "Following Podcast" : "Follow Podcast"}
-        </StyledButton>
-      </BottomRow>
+    <Wrapper onPress={onPress} style={style} bgColor={bgColor} textColor={textColor}>
+      <Content>
+        <CardHeader>
+          <CoverArt source={{ uri: image }} />
+          <TitleContainer>
+            <Title textColor={textColor}>{title}</Title>
+            <Subtitle textColor={textColor}>{subtitle}</Subtitle>
+          </TitleContainer>
+        </CardHeader>
+        <Span style={{ fontSize: 14, marginBottom: 16, color:textColor }}>{desc} </Span>
+        <BottomRow>
+          <StyledButton
+            style={{ paddingTop: 10, paddingBottom: 10 }}
+            borderMode={followingPodcast}
+            onPress={() => setFollowingPodcast(!followingPodcast)}
+          >
+            {followingPodcast ? "Following Podcast" : "Follow Podcast"}
+          </StyledButton>
+        </BottomRow>
+      </Content>
     </Wrapper>
   );
 };

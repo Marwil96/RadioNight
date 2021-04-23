@@ -7,4 +7,5 @@ export const Title = styled.Text`
   margin-bottom: 24px;
   color: ${colors.text};
   font-family: "Manrope_500Medium";
+  margin-left: 16px;
 `;

@@ -15,6 +15,7 @@ import SetupProfile from './src/views/SetupProfile';
 import Discover from './src/views/Discover';
 import Following from './src/views/Following';
 import PodcastDetails from './src/views/PodcastDetails';
+import EpisodeView from './src/views/EpisodeView';
 
 const HomeStack = createStackNavigator();
 const DiscoverStack = createStackNavigator();
@@ -23,9 +24,10 @@ const NavigationStack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const HomeStackScreen = () => (
-  <HomeStack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
+  <HomeStack.Navigator initialRouteName="EpisodeView" screenOptions={{ headerShown: false }}>
     <HomeStack.Screen name="Home" component={Home} />
     <HomeStack.Screen name="PodcastDetails" component={PodcastDetails} />
+    <HomeStack.Screen name="EpisodeView" component={EpisodeView} />
   </HomeStack.Navigator>
 );
 

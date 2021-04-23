@@ -4,12 +4,16 @@ import styled from "styled-components/native";
 import colors from "../variables/color";
 
 const Wrapper = styled.View`
+  padding: 0 16px;
+`;
+
+const Content = styled.View`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   background-color: ${colors.secondary};
   border-radius: 6px;
-`;
+`
 
 const ToggleItem = styled.TouchableOpacity`
   width: ${props => `${100 / props.amountOfItems}%`};
@@ -32,7 +36,9 @@ const ToggleBar = ({items, onChange}) => {
   
   return (
     <Wrapper>
-      {items.map((title, index) => <ToggleItem key={index} amountOfItems={items.length} focussed={selected === index} onPress={() => {setSelected(index), onChange(title)}}><ToggleItemText>{title}</ToggleItemText></ToggleItem> )}
+      <Content>
+        {items.map((title, index) => <ToggleItem key={index} amountOfItems={items.length} focussed={selected === index} onPress={() => {setSelected(index), onChange(title)}}><ToggleItemText>{title}</ToggleItemText></ToggleItem> )}
+      </Content>
     </Wrapper>
   );
 };

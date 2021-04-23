@@ -5,17 +5,21 @@ import styled from "styled-components/native";
 import colors from "../variables/color";
 
 const Wrapper = styled.View`
-  display: flex;
-  flex-direction: row;
-  padding: 10px 16px;
-  align-items: center;
-  justify-content: space-between;
+  padding: 0 16px;
   background: ${colors.smoothBlack};
   position: absolute;
   bottom: 0;
   right: 0;
   width: 100%;
 `;
+
+const Content = styled.View`
+  display: flex;
+  flex-direction: row;
+  padding: 10px 16px;
+  align-items: center;
+  justify-content: space-between;
+`
 
 const LeftColumn = styled.View`
   display: flex;
@@ -49,19 +53,21 @@ const Subtitle = styled.Text`
   color: ${colors.text};
 `;
 
-const MiniPlayer = ({image, title, subtitle}) => {
+const MiniPlayer = ({image, title, subtitle, style}) => {
   return (
-    <Wrapper style={{  borderBottomColor: '#000', borderBottomWidth: 2}}>
-      <LeftColumn>
-        <CoverArt source={{ uri: image }} />
-        <TitleContainer>
-          <Title>{title}</Title>
-          <Subtitle>{subtitle}</Subtitle>
-        </TitleContainer>
-      </LeftColumn>
-      <TouchableOpacity style={{padding: 10, position: 'absolute', right: 6}}>
-        <Ionicons name="ios-pause" size={24} color="white" />
-      </TouchableOpacity>
+    <Wrapper style={{  borderBottomColor: '#000', borderBottomWidth: 2}, style}>
+      <Content>
+        <LeftColumn>
+          <CoverArt source={{ uri: image }} />
+          <TitleContainer>
+            <Title>{title}</Title>
+            <Subtitle>{subtitle}</Subtitle>
+          </TitleContainer>
+        </LeftColumn>
+        <TouchableOpacity style={{padding: 10, position: 'absolute', right: 6}}>
+          <Ionicons name="ios-pause" size={24} color="white" />
+        </TouchableOpacity>
+      </Content>
     </Wrapper>
   );
 }
