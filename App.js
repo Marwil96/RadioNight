@@ -14,6 +14,7 @@ import ForgotPassword from './src/views/ForgotPassword';
 import SetupProfile from './src/views/SetupProfile';
 import Discover from './src/views/Discover';
 import Following from './src/views/Following';
+import PodcastDetails from './src/views/PodcastDetails';
 
 const HomeStack = createStackNavigator();
 const DiscoverStack = createStackNavigator();
@@ -24,21 +25,22 @@ const Tab = createBottomTabNavigator();
 const HomeStackScreen = () => (
   <HomeStack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
     <HomeStack.Screen name="Home" component={Home} />
+    <HomeStack.Screen name="PodcastDetails" component={PodcastDetails} />
   </HomeStack.Navigator>
 );
 
 const DiscoverStackScreen = () => (
   <DiscoverStack.Navigator
-    initialRouteName="Home"
+    initialRouteName="Discover"
     screenOptions={{ headerShown: false }}
   >
-    <DiscoverStack.Screen name="Home" component={Discover} />
+    <DiscoverStack.Screen name="Discover" component={Discover} />
   </DiscoverStack.Navigator>
 );
 
 const FollowingStackScreen = () => (
-  <FollowingStack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
-    <FollowingStack.Screen name="Home" component={Following} />
+  <FollowingStack.Navigator initialRouteName="Following" screenOptions={{ headerShown: false }}>
+    <FollowingStack.Screen name="Following" component={Following} />
   </FollowingStack.Navigator>
 );
 

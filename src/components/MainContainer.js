@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import colors from "../variables/color";
 import { useScrollToTop } from "@react-navigation/native";
+import MiniPlayer from "./MiniPlayer";
 
 export const MainContainerStyle = styled.ScrollView`
   display: flex;
@@ -15,6 +16,7 @@ export const MainContainerStyle = styled.ScrollView`
   background: ${colors.background};
   font-family: "Manrope_400Regular";
   padding: 48px 16px;
+  min-height: 100%;
 `;
 
 const wait = (timeout) => {
@@ -38,14 +40,15 @@ const MainContainer = ({ children, noAuth, style }) => {
   useScrollToTop(ref);
 
   return (
-    <MainContainerStyle
-      style={{ ...style }}
-      ref={ref}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
-      {loading || refreshing ? (
+    <View>
+      <MainContainerStyle
+        style={{ ...style }}
+        ref={ref}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        {loading || refreshing ? (
           <View
             style={{
               height: "100%",
@@ -59,9 +62,14 @@ const MainContainer = ({ children, noAuth, style }) => {
           </View>
         ) : (
           children
-        )
-     }
-    </MainContainerStyle>
+        )}
+      </MainContainerStyle>
+      <MiniPlayer
+        title="Welcome to Jurassic Ar..."
+        subtitle="99% Invisible"
+        image="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTy7v2Vrnp5LhNS7JoKB12kyK9_gxyCjbGFdDf7MkMmXEfvo8XY"
+      />
+    </View>
   );
 };
 

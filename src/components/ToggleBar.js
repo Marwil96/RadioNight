@@ -1,4 +1,5 @@
 import React from 'react';
+import { useState } from 'react';
 import styled from "styled-components/native";
 import colors from "../variables/color";
 
@@ -26,10 +27,12 @@ const ToggleItemText = styled.Text`
   color: ${colors.text};
 `
 
-const ToggleBar = ({items}) => {
+const ToggleBar = ({items, onChange}) => {
+  const [selected, setSelected] = useState(0)
+  
   return (
     <Wrapper>
-      {items.map((title, index) => <ToggleItem key={index} amountOfItems={items.length}><ToggleItemText>{title}</ToggleItemText></ToggleItem> )}
+      {items.map((title, index) => <ToggleItem key={index} amountOfItems={items.length} focussed={selected === index} onPress={() => {setSelected(index), onChange(title)}}><ToggleItemText>{title}</ToggleItemText></ToggleItem> )}
     </Wrapper>
   );
 };
