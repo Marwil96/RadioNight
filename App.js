@@ -26,8 +26,6 @@ const Tab = createBottomTabNavigator();
 const HomeStackScreen = () => (
   <HomeStack.Navigator initialRouteName="EpisodeView" screenOptions={{ headerShown: false }}>
     <HomeStack.Screen name="Home" component={Home} />
-    <HomeStack.Screen name="PodcastDetails" component={PodcastDetails} />
-    <HomeStack.Screen name="EpisodeView" component={EpisodeView} />
   </HomeStack.Navigator>
 );
 
@@ -98,6 +96,8 @@ const App = () => {
       >
         <NavigationStack.Screen name="Signup" component={Signup} />
         <NavigationStack.Screen name="Login" component={Login} />
+        <NavigationStack.Screen name="PodcastDetails" component={PodcastDetails} />
+        <NavigationStack.Screen name="EpisodeView" component={EpisodeView} />
         <NavigationStack.Screen name="SetupProfile" component={SetupProfile} />
         <NavigationStack.Screen
           name="ForgotPassword"

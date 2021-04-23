@@ -11,7 +11,7 @@ const Wrapper = styled.View`
 const InputFieldStyle = styled.TextInput`
   width: 100%;
   padding: 12px 10px;
-  font-size: 20px;
+  font-size: 16px;
   border-radius: 12px;
   background: ${colors.secondary};
   border: 0;

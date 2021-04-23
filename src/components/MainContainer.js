@@ -44,9 +44,9 @@ const MainContainer = ({ children, noAuth, style, player }) => {
       <MainContainerStyle
         style={{ ...style }}
         ref={ref}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
+        // refreshControl={
+        //   <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        // }
       >
         {loading || refreshing ? (
           <View

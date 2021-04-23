@@ -7,15 +7,10 @@ import { Title } from '../components/Title';
 import TopNav from '../components/TopNav';
 
 
-const Home = () => {
+const Home = ({ navigation }) => {
   return (
-    <MainContainer>
+    <MainContainer player>
       <TopNav />
-      <MiniPlayer
-        title="Welcome to Jurassic Ar..."
-        subtitle="99% Invisible"
-        image="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTy7v2Vrnp5LhNS7JoKB12kyK9_gxyCjbGFdDf7MkMmXEfvo8XY"
-      />
       <Title style={{ marginBottom: 24 }}>Live Episode Premieres</Title>
       <PodcastCard
         title="Abbi Jacobsond "
@@ -24,6 +19,7 @@ const Home = () => {
         desc="Writer, comedian, and actress Abbi Jacobson feels scrumptious about being Conan O'Brien's friend. Abbi sits down with Conan to... "
         meta1="Started 1 minuts ago"
         meta2="LIVE"
+        onPress={() => navigation.navigate("EpisodeView")}
       />
 
       <PodcastCard
@@ -76,6 +72,6 @@ const Home = () => {
       />
     </MainContainer>
   );
-}
+};
 
 export default Home;

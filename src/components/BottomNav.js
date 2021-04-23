@@ -36,7 +36,7 @@ const BottomNav = ({ state, descriptors, navigation }) => {
     return null;
   }
 
-  if (focusedOptions.screen !== "CreateRecipe") {
+  if (focusedOptions.screen !== "EpisodeView") {
     return (
       <BottomNavWrapper style={{ flexDirection: "row" }}>
         {state.routes.map((route, index) => {
