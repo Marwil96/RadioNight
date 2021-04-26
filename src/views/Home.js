@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Text, View } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
+import { LoginUser } from '../actions';
 import { MainContainer } from '../components/MainContainer';
 import MiniPlayer from '../components/MiniPlayer';
 import PodcastCard from '../components/PodcastCard';
@@ -8,6 +10,16 @@ import TopNav from '../components/TopNav';
 
 
 const Home = ({ navigation }) => {
+  const dispatch = useDispatch();
+   const {userLoggedIn} = useSelector((state) => state.AuthReducer);
+  useEffect(() => {
+    dispatch(LoginUser({ email: 'william_martinsson', password: 'Wille14' }));
+  }, [])
+
+  useEffect(() => {
+    console.log(userLoggedIn)
+  }, [userLoggedIn])
+
   return (
     <MainContainer player>
       <TopNav />

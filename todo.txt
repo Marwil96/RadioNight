@@ -1,0 +1,5 @@
+2021-04-26 
+- Setup Redux [X]
+- Create Firestore Database []
+- Create Firebase Auth []
+- Figure out the Data Structure []

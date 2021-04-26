@@ -1,5 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
+import { configureStore } from "@reduxjs/toolkit";
+import { Provider, useDispatch, useSelector } from "react-redux";
+import rootReducer from "./src/reducers/index";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -16,6 +19,10 @@ import Discover from './src/views/Discover';
 import Following from './src/views/Following';
 import PodcastDetails from './src/views/PodcastDetails';
 import EpisodeView from './src/views/EpisodeView';
+
+const store = configureStore({
+  reducer: rootReducer,
+});
 
 const HomeStack = createStackNavigator();
 const DiscoverStack = createStackNavigator();
@@ -86,29 +93,37 @@ const App = () => {
    }
    
   return (
-    <NavigationContainer>
-      <NavigationStack.Navigator
-        initialRouteName="Login"
-        screenOptions={{
-          headerShown: false,
-          cardStyle: { backgroundColor: "#000" },
-        }}
-      >
-        <NavigationStack.Screen name="Signup" component={Signup} />
-        <NavigationStack.Screen name="Login" component={Login} />
-        <NavigationStack.Screen name="PodcastDetails" component={PodcastDetails} />
-        <NavigationStack.Screen name="EpisodeView" component={EpisodeView} />
-        <NavigationStack.Screen name="SetupProfile" component={SetupProfile} />
-        <NavigationStack.Screen
-          name="ForgotPassword"
-          component={ForgotPassword}
-        />
-        <NavigationStack.Screen
-          name="TabNavigation"
-          component={TabNavigation}
-        />
-      </NavigationStack.Navigator>
-    </NavigationContainer>
+    <Provider store={store}>
+      <NavigationContainer>
+        <NavigationStack.Navigator
+          initialRouteName="Login"
+          screenOptions={{
+            headerShown: false,
+            cardStyle: { backgroundColor: "#000" },
+          }}
+        >
+          <NavigationStack.Screen name="Signup" component={Signup} />
+          <NavigationStack.Screen name="Login" component={Login} />
+          <NavigationStack.Screen
+            name="PodcastDetails"
+            component={PodcastDetails}
+          />
+          <NavigationStack.Screen name="EpisodeView" component={EpisodeView} />
+          <NavigationStack.Screen
+            name="SetupProfile"
+            component={SetupProfile}
+          />
+          <NavigationStack.Screen
+            name="ForgotPassword"
+            component={ForgotPassword}
+          />
+          <NavigationStack.Screen
+            name="TabNavigation"
+            component={TabNavigation}
+          />
+        </NavigationStack.Navigator>
+      </NavigationContainer>
+    </Provider>
   );
 }
 
