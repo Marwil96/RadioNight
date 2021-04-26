@@ -7,7 +7,7 @@ import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useFonts, Manrope_400Regular, Manrope_500Medium, Manrope_700Bold } from "@expo-google-fonts/manrope";
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, LogBox } from "react-native";
 import styled from "styled-components/native";
 import Home from './src/views/Home';
 import BottomNav from './src/components/BottomNav';
@@ -81,9 +81,9 @@ const TabNavigation = () => (
 
 
 const App = () => {
-  YellowBox.ignoreWarnings(["Setting a timer"]);
-  YellowBox.ignoreWarnings(["ImmutableStateInvariantMiddleware"]);
-  
+  LogBox.ignoreLogs(["Setting a timer"]);
+  LogBox.ignoreLogs(["ImmutableStateInvariantMiddleware"]);
+
    let [fontsLoaded] = useFonts({
      Manrope_400Regular,
      Manrope_500Medium,
