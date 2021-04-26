@@ -21,7 +21,7 @@ const AuthReducer = (
       };
     case CREATE_USER:
       return {
-       baba: 'baba'
+        userLoggedIn: action.payload.userLoggedIn,
       };
     default:
       return state;

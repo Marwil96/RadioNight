@@ -34,8 +34,13 @@ const MainContainer = ({ children, noAuth, style, player }) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!userLoggedIn && !noAuth) navigation.navigate("Login");
-    console.log(userLoggedIn)
+    if (!userLoggedIn && !noAuth) {
+      navigation.navigate("Login");
+    }
+
+    // if (userLoggedIn && noAuth) {
+    //   navigation.navigate("TabNavigation");
+    // }
   }, [userLoggedIn]);
 
   const onRefresh = useCallback(() => {

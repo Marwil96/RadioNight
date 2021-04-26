@@ -1,5 +1,5 @@
-import { Link } from '@react-navigation/native';
-import React, { useEffect } from 'react';
+import { Link, useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from "styled-components/native";
@@ -19,23 +19,23 @@ const HelperText = styled.Text`
 
 const Login = ({navigation}) => {
   const dispatch = useDispatch();
-  const {userLoggedIn} = useSelector((state) => state.AuthReducer);
-  
-  useEffect(() => {
-    dispatch(LoginUser({ email: 'william_martinsson', password: 'Wille14' }));
-  }, [])
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const { userLoggedIn } = useSelector((state) => state.AuthReducer);
 
   useEffect(() => {
-    console.log(userLoggedIn)
+    if (userLoggedIn) {
+      navigation.navigate("TabNavigation");
+    }
   }, [userLoggedIn])
 
   return (
-    <MainContainer>
+    <MainContainer noAuth>
       <Wrapper>
         <Title style={{ fontSize: 32, marginTop: 48 }}>Login</Title>
-        <InputField placeholder="Email" style={{ marginBottom: 16 }} />
-        <InputField placeholder="Password" style={{ marginBottom: 24 }} />
-        <StyledButton primary style={{marginBottom: 16}} onPress={() => navigation.navigate("TabNavigation")}> Login </StyledButton>
+        <InputField placeholder="Email" style={{ marginBottom: 16 }} onChangeText={(text) => setEmail(text)} />
+        <InputField placeholder="Password" style={{ marginBottom: 24 }} onChangeText={(text) => setPassword(text)}  />
+        <StyledButton primary style={{marginBottom: 16}} onPress={() => { dispatch(LoginUser({ email: email, password: password }))}}> Login </StyledButton>
         <StyledButton style={{marginBottom: 16}} onPress={() => navigation.navigate("Signup")}> Create Account </StyledButton>
         <HelperText>I forgot my password. <Link to='/ForgotPassword' style={{fontFamily: 'Manrope_500Medium', textDecorationStyle: 'solid', textDecorationColor: '#fff', textDecorationLine: 'underline'}}>Reset Password.</Link></HelperText>
       </Wrapper>

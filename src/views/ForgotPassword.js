@@ -9,7 +9,7 @@ import { Wrapper } from "../components/Wrapper";
 
 const ForgotPassword = ({ navigation }) => {
   return (
-    <MainContainer>
+    <MainContainer noAuth>
       <Wrapper>
         <Title style={{ fontSize: 32, marginTop: 48 }}>Reset Password</Title>
         <InputField placeholder="Email" style={{ marginBottom: 16 }} />

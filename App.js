@@ -81,6 +81,9 @@ const TabNavigation = () => (
 
 
 const App = () => {
+  YellowBox.ignoreWarnings(["Setting a timer"]);
+  YellowBox.ignoreWarnings(["ImmutableStateInvariantMiddleware"]);
+  
    let [fontsLoaded] = useFonts({
      Manrope_400Regular,
      Manrope_500Medium,
