@@ -1,7 +1,9 @@
 import { Link } from '@react-navigation/native';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Text, View } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from "styled-components/native";
+import { LoginUser } from '../actions';
 import InputField from '../components/InputField';
 import { MainContainer } from '../components/MainContainer';
 import StyledButton from "../components/StyledButton";
@@ -16,6 +18,17 @@ const HelperText = styled.Text`
 `;
 
 const Login = ({navigation}) => {
+  const dispatch = useDispatch();
+  const {userLoggedIn} = useSelector((state) => state.AuthReducer);
+  
+  useEffect(() => {
+    dispatch(LoginUser({ email: 'william_martinsson', password: 'Wille14' }));
+  }, [])
+
+  useEffect(() => {
+    console.log(userLoggedIn)
+  }, [userLoggedIn])
+
   return (
     <MainContainer>
       <Wrapper>

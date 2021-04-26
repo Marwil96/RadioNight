@@ -10,16 +10,6 @@ import TopNav from '../components/TopNav';
 
 
 const Home = ({ navigation }) => {
-  const dispatch = useDispatch();
-   const {userLoggedIn} = useSelector((state) => state.AuthReducer);
-  useEffect(() => {
-    dispatch(LoginUser({ email: 'william_martinsson', password: 'Wille14' }));
-  }, [])
-
-  useEffect(() => {
-    console.log(userLoggedIn)
-  }, [userLoggedIn])
-
   return (
     <MainContainer player>
       <TopNav />

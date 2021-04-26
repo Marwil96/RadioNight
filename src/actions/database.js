@@ -4,11 +4,11 @@ import {
   SIGN_OUT_USER,
 } from "./constables";
 
-export const LoginUser = ({email, password}) => {
+export const Signout = ({email, password}) => {
   return (dispatch) => {
     dispatch({
-      type: LOGIN_USER,
-      payload: { userLoggedIn: true },
+      type: SIGN_OUT_USER,
+      payload: { userLoggedIn: false },
     });
   }
 }

@@ -1,14 +1,14 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import styled from "styled-components/native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useScrollToTop } from "@react-navigation/native";
 import {
   View,
   ActivityIndicator,
   RefreshControl,
 } from "react-native";
 import colors from "../variables/color";
-import { useScrollToTop } from "@react-navigation/native";
 import MiniPlayer from "./MiniPlayer";
+import { useDispatch, useSelector } from "react-redux";
 
 export const MainContainerStyle = styled.ScrollView`
   display: flex;
@@ -27,9 +27,16 @@ const wait = (timeout) => {
 
 const MainContainer = ({ children, noAuth, style, player }) => {
   const navigation = useNavigation();
+  const { userLoggedIn } = useSelector((state) => state.AuthReducer);
+  const dispatch = useDispatch();  
 
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!userLoggedIn && !noAuth) navigation.navigate("Login");
+    console.log(userLoggedIn)
+  }, [userLoggedIn]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
