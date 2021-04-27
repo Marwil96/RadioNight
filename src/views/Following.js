@@ -13,8 +13,11 @@ const Following = () => {
   return (
     <MainContainer>
       <TopNav />
-      <Title style={{ marginBottom: 24 }}>Premieres</Title>
-      <ToggleBar items={['Live', 'Upcoming', 'Past']} onChange={(value) => setToggleMode(value)} />
+      <Title style={{ marginLeft: 16, marginBottom: 24 }}>Premieres</Title>
+      <ToggleBar
+        items={["Live", "Upcoming", "Past"]}
+        onChange={(value) => setToggleMode(value)}
+      />
     </MainContainer>
   );
 };

@@ -19,8 +19,8 @@ const HelperText = styled.Text`
 
 const Login = ({navigation}) => {
   const dispatch = useDispatch();
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState('william_martinsson@hotmail.com')
+  const [password, setPassword] = useState('Wille14')
   const { userLoggedIn } = useSelector((state) => state.AuthReducer);
 
   useEffect(() => {
@@ -33,8 +33,8 @@ const Login = ({navigation}) => {
     <MainContainer noAuth>
       <Wrapper>
         <Title style={{ fontSize: 32, marginTop: 48 }}>Login</Title>
-        <InputField placeholder="Email" style={{ marginBottom: 16 }} onChangeText={(text) => setEmail(text)} />
-        <InputField placeholder="Password" style={{ marginBottom: 24 }} onChangeText={(text) => setPassword(text)}  />
+        <InputField placeholder="Email" value={email} style={{ marginBottom: 16 }} onChangeText={(text) => setEmail(text)} />
+        <InputField placeholder="Password" value={password} style={{ marginBottom: 24 }} onChangeText={(text) => setPassword(text)}  />
         <StyledButton primary style={{marginBottom: 16}} onPress={() => { dispatch(LoginUser({ email: email, password: password }))}}> Login </StyledButton>
         <StyledButton style={{marginBottom: 16}} onPress={() => navigation.navigate("Signup")}> Create Account </StyledButton>
         <HelperText>I forgot my password. <Link to='/ForgotPassword' style={{fontFamily: 'Manrope_500Medium', textDecorationStyle: 'solid', textDecorationColor: '#fff', textDecorationLine: 'underline'}}>Reset Password.</Link></HelperText>

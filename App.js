@@ -19,6 +19,9 @@ import Discover from './src/views/Discover';
 import Following from './src/views/Following';
 import PodcastDetails from './src/views/PodcastDetails';
 import EpisodeView from './src/views/EpisodeView';
+import ChooseWayOfCreatingPodcast from './src/views/ChooseWayOfCreatingPodcast';
+import CreatePodcastWithRSS from './src/views/CreatePodcastWithRSS';
+import YourPodcasts from './src/views/YourPodcasts';
 
 const store = configureStore({
   reducer: rootReducer,
@@ -28,6 +31,7 @@ const HomeStack = createStackNavigator();
 const DiscoverStack = createStackNavigator();
 const FollowingStack = createStackNavigator();
 const NavigationStack = createStackNavigator();
+const YourPodcastsStack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const HomeStackScreen = () => (
@@ -35,6 +39,12 @@ const HomeStackScreen = () => (
     <HomeStack.Screen name="Home" component={Home} />
   </HomeStack.Navigator>
 );
+
+const YourPodcastsStackScreen = () => (
+  <YourPodcastsStack.Navigator initialRouteName="YourPodcast" screenOptions={{ headerShown: false }}>
+    <YourPodcastsStack.Screen name="YourPodcast" component={YourPodcasts} />
+  </YourPodcastsStack.Navigator>
+)
 
 const DiscoverStackScreen = () => (
   <DiscoverStack.Navigator
@@ -75,6 +85,12 @@ const TabNavigation = () => (
       name="FollowingStack"
       component={FollowingStackScreen}
     />
+    
+    <Tab.Screen
+      options={{ title: "Admin", icon: "database", screen: "YourPodcasts" }}
+      name="YourPodcastsStack"
+      component={YourPodcastsStackScreen}
+    />
   </Tab.Navigator>
 );
 
@@ -112,6 +128,8 @@ const App = () => {
             component={PodcastDetails}
           />
           <NavigationStack.Screen name="EpisodeView" component={EpisodeView} />
+          <NavigationStack.Screen name="ChooseWayOfCreatingPodcast" component={ChooseWayOfCreatingPodcast} />
+          <NavigationStack.Screen name="CreatePodcastWithRSS" component={CreatePodcastWithRSS} />
           <NavigationStack.Screen
             name="SetupProfile"
             component={SetupProfile}

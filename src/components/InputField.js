@@ -12,7 +12,7 @@ const InputFieldStyle = styled.TextInput`
   width: 100%;
   padding: 12px 10px;
   font-size: 16px;
-  border-radius: 12px;
+  border-radius: 8px;
   background: ${colors.secondary};
   border: 0;
   color: ${colors.text};

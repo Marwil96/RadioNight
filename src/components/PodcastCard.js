@@ -64,18 +64,18 @@ const PodcastCard = ({onPress, title, image, subtitle, desc, meta1, meta2, style
   return (
     <Wrapper onPress={onPress} style={style}>
       <Content>
-        <CardHeader>
+        <CardHeader style={desc === undefined && meta1 === undefined && meta2 === undefined && {marginBottom: 0}}>
           <CoverArt source={{ uri: image }} />
           <TitleContainer>
-            <Title>{title}</Title>
-            <Subtitle>{subtitle}</Subtitle>
+            <Title>{title.length > 40 ? `${title.slice(0, 40)}...` : title}</Title>
+            {subtitle !== undefined && <Subtitle>{subtitle}</Subtitle>}
           </TitleContainer>
         </CardHeader>
-        <Span style={{ fontSize: 14, marginBottom: 16 }}>{desc} </Span>
-        <BottomRow>
+        {desc !== undefined && <Span style={{ fontSize: 14, marginBottom: 16 }}>{desc.length > 150 ? `${desc.slice(0, 150)}...` : desc}</Span>}
+        {meta1 !== undefined && meta2 !== undefined && <BottomRow>
           <MetaItem>{meta1}</MetaItem>
           <MetaItem>{meta2}</MetaItem>
-        </BottomRow>
+        </BottomRow>}
       </Content>
     </Wrapper>
   );

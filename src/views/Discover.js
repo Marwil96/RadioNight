@@ -9,7 +9,7 @@ const Discover = () => {
   return (
     <MainContainer>
       <TopNav />
-      <Title style={{ marginBottom: 24 }}>Search</Title>
+      <Title style={{ marginLeft: 16, marginBottom: 24 }}>Search</Title>
       <Wrapper>
         <InputField
           style={{ marginBottom: 24 }}

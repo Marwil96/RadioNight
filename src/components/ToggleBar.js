@@ -31,11 +31,11 @@ const ToggleItemText = styled.Text`
   color: ${colors.text};
 `
 
-const ToggleBar = ({items, onChange}) => {
+const ToggleBar = ({items, onChange, style}) => {
   const [selected, setSelected] = useState(0)
   
   return (
-    <Wrapper>
+    <Wrapper style={style}>
       <Content>
         {items.map((title, index) => <ToggleItem key={index} amountOfItems={items.length} focussed={selected === index} onPress={() => {setSelected(index), onChange(title)}}><ToggleItemText>{title}</ToggleItemText></ToggleItem> )}
       </Content>

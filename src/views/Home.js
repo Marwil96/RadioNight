@@ -13,7 +13,7 @@ const Home = ({ navigation }) => {
   return (
     <MainContainer player>
       <TopNav />
-      <Title style={{ marginBottom: 24 }}>Live Episode Premieres</Title>
+      <Title style={{ marginLeft: 16, marginBottom: 24 }}>Live Episode Premieres</Title>
       <PodcastCard
         title="Abbi Jacobsond "
         subtitle="Conan O’Brien, Needs a friend"

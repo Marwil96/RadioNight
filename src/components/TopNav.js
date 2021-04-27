@@ -1,4 +1,5 @@
 import { AntDesign, Entypo } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/core';
 import React from 'react';
 import styled from "styled-components/native";
 import colors from "../variables/color";
@@ -25,12 +26,14 @@ const IconWrapper = styled.TouchableOpacity`
 `
 
 const TopNav = () => {
+  const navigation = useNavigation();
+
   return (
     <Wrapper>
       <Content>
         <ProfileTag />
         <RightColumn>
-          <IconWrapper>
+          <IconWrapper onPress={() => navigation.navigate('ChooseWayOfCreatingPodcast')}>
             <Entypo name="radio" size={25} color="white" />
           </IconWrapper>
           <IconWrapper>

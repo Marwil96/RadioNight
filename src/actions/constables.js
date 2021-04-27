@@ -1,3 +1,5 @@
 export const CREATE_USER = "CREATE_USER";
 export const LOGIN_USER = "LOGIN_USER";
 export const SIGN_OUT_USER = "SIGN_OUT_USER";
+export const CREATE_PODCAST = "CREATE_PODCAST";
+export const FETCH_ALL_USER_DATA = "FETCH_ALL_USER_DATA";

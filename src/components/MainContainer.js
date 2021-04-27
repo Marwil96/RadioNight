@@ -9,6 +9,7 @@ import {
 import colors from "../variables/color";
 import MiniPlayer from "./MiniPlayer";
 import { useDispatch, useSelector } from "react-redux";
+import {FetchAllUserData} from '../actions/index';
 
 export const MainContainerStyle = styled.ScrollView`
   display: flex;
@@ -25,17 +26,21 @@ const wait = (timeout) => {
   });
 };
 
-const MainContainer = ({ children, noAuth, style, player }) => {
+const MainContainer = ({ children, noAuth, style, player, loading }) => {
   const navigation = useNavigation();
   const { userLoggedIn } = useSelector((state) => state.AuthReducer);
   const dispatch = useDispatch();  
 
   const [refreshing, setRefreshing] = useState(false);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!userLoggedIn && !noAuth) {
       navigation.navigate("Login");
+    }
+
+    if(userLoggedIn) {
+      dispatch(FetchAllUserData());
     }
 
     // if (userLoggedIn && noAuth) {
