@@ -34,6 +34,7 @@ const InputField = ({
   icon,
   multiline,
   numberOfLines,
+  onPress,
 }) => {
   return (
     <InputFieldStyle
@@ -43,6 +44,7 @@ const InputField = ({
       onChangeText={onChangeText}
       keyboardType={keyboardType}
       textContentType={textContentType}
+      onPress={onPress}
       autoCompleteType={autoCompleteType}
       secureTextEntry={secureTextEntry}
       inlineImageLeft={icon}

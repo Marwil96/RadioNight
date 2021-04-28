@@ -22,6 +22,9 @@ import EpisodeView from './src/views/EpisodeView';
 import ChooseWayOfCreatingPodcast from './src/views/ChooseWayOfCreatingPodcast';
 import CreatePodcastWithRSS from './src/views/CreatePodcastWithRSS';
 import YourPodcasts from './src/views/YourPodcasts';
+import YourPodcast from './src/views/YourPodcast';
+import CreatePodcastPremiere from './src/views/CreatePodcastPremiere';
+import Search from './src/views/Search';
 
 const store = configureStore({
   reducer: rootReducer,
@@ -41,8 +44,10 @@ const HomeStackScreen = () => (
 );
 
 const YourPodcastsStackScreen = () => (
-  <YourPodcastsStack.Navigator initialRouteName="YourPodcast" screenOptions={{ headerShown: false }}>
-    <YourPodcastsStack.Screen name="YourPodcast" component={YourPodcasts} />
+  <YourPodcastsStack.Navigator initialRouteName="YourPodcasts" screenOptions={{ headerShown: false }}>
+    <YourPodcastsStack.Screen name="YourPodcasts" component={YourPodcasts} />
+    <YourPodcastsStack.Screen name="YourPodcast" component={YourPodcast} />
+    <YourPodcastsStack.Screen name="CreatePodcastPremiere" component={CreatePodcastPremiere} />
   </YourPodcastsStack.Navigator>
 )
 
@@ -52,6 +57,7 @@ const DiscoverStackScreen = () => (
     screenOptions={{ headerShown: false }}
   >
     <DiscoverStack.Screen name="Discover" component={Discover} />
+    <DiscoverStack.Screen name="Search" component={Search} />
   </DiscoverStack.Navigator>
 );
 

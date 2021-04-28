@@ -20,10 +20,44 @@ export const FetchAllUserData = () => {
     dispatch({type: FETCH_ALL_USER_DATA, payload: {loading: true}})
     db.collection('users').doc(user.currentUser.uid).get().then((doc) => {
       const data = doc.data();
-      console.log(data)
+
       dispatch({type: FETCH_ALL_USER_DATA, payload: {loading: false, user_data: data }})
     })
   }
+}
+
+export const SchedulePodcastPremiere = async (data) => {
+  const episodeId = getTimeEpoch();
+  const result = await Promise.all(
+    db.collection("episodes").doc(episodeId).set({...data, episode_id:episodeId }).then(() => { 
+      return true
+    }).catch((error) => {
+      return false
+    })
+  )
+
+  return result
+}
+
+export const GetPodcastPremieres = async (id) => {
+  console.log("GetPodcastPremieres");
+  const result = await Promise.all(
+  await db.collection("episodes").where("podcast_id", "==", id)
+    .get()
+    .then((querySnapshot) => {
+      const episodes = [];
+        querySnapshot.forEach((doc) => {
+            // doc.data() is never undefined for query doc snapshots
+            console.log(doc.id, " => ", doc.data());
+            episodes.push(doc.data());
+        });
+
+        return episodes
+    })
+    .catch((error) => {
+        console.log("Error getting documents: ", error);
+    })
+  )
 }
 
 export const FetchYourPodcasts = async (podcast_ids) => {
@@ -78,4 +112,40 @@ export const CreatePodcast = ({data}) => {
     dispatch({type: CREATE_PODCAST, payload: {loading: false, podcast_created: true}})
   })
   }
+};
+
+export const StartFollowingPodcast = (podcastId) => {
+  db.collection("users").doc(user.currentUser.uid).set({
+    followed_podcasts: firebase.firestore.FieldValue.arrayUnion(podcastId)
+  }, {merge: true});
+}
+
+export const StopFollowingPodcast = (podcastId) => {
+  db.collection("users").doc(user.currentUser.uid).set({
+    followed_podcasts: firebase.firestore.FieldValue.arrayRemove(podcastId)
+  }, {merge: true});
+}
+
+
+export const GetAllPodcasts = async () => {
+  const result = await Promise.all( 
+    await db
+    .collection("podcasts")
+    .get()
+    .then((querySnapshot) => {
+      const podcasts = [];
+      querySnapshot.forEach((doc) => {
+        // doc.data() is never undefined for query doc snapshots
+        const data = doc.data()
+        podcasts.push(data);
+      });
+
+      return podcasts;
+    })
+    .catch((error) => {
+      console.log("Error getting document:", error);
+      return false
+    })
+  )
+  return result
 };

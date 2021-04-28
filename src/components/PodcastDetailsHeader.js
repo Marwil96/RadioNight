@@ -5,7 +5,7 @@ import colors from "../variables/color";
 import { Span } from "./Span";
 import StyledButton from "./StyledButton";
 
-const Wrapper = styled.TouchableOpacity`
+const Wrapper = styled.View`
   padding: 0 16px;
   margin-bottom: 32px;
   background-color: ${props => props.bgColor};
@@ -64,7 +64,8 @@ const PodcastDetailsHeader = ({
   style,
   isFollowed,
   bgColor,
-  textColor
+  textColor,
+  onButtonPress,
 }) => {
 
   const [followingPodcast, setFollowingPodcast] = useState(isFollowed);
@@ -75,15 +76,16 @@ const PodcastDetailsHeader = ({
           <CoverArt source={{ uri: image }} />
           <TitleContainer>
             <Title textColor={textColor}>{title}</Title>
-            <Subtitle textColor={textColor}>{subtitle}</Subtitle>
+            {subtitle !== undefined && <Subtitle textColor={textColor}>{subtitle}</Subtitle>}
           </TitleContainer>
         </CardHeader>
         <Span style={{ fontSize: 14, marginBottom: 16, color:textColor }}>{desc} </Span>
         <BottomRow>
           <StyledButton
             style={{ paddingTop: 10, paddingBottom: 10 }}
-            borderMode={followingPodcast}
-            onPress={() => setFollowingPodcast(!followingPodcast)}
+            // borderMode={followingPodcast}
+            primary={!followingPodcast}
+            onPress={() => {setFollowingPodcast(!followingPodcast), onButtonPress(!followingPodcast)}}
           >
             {followingPodcast ? "Following Podcast" : "Follow Podcast"}
           </StyledButton>

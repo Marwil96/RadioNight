@@ -6,7 +6,7 @@ import { MainContainer } from '../components/MainContainer';
 import PodcastCard from '../components/PodcastCard';
 import { Title } from '../components/Title';
 
-const YourPodcasts = () => {
+const YourPodcasts = ({navigation}) => {
   const [podcasts, setPodcasts] = useState([]);
   const { user_data } = useSelector((state) => state.DatabaseReducer);
   useEffect(() => {
@@ -19,13 +19,14 @@ const YourPodcasts = () => {
       FetchData();
     }
   }, [user_data])
-
-  console.log('YOLO', podcasts);
+  
   return (
     <MainContainer>
       <Title style={{ marginLeft: 16 }}>Your Podcasts</Title>
       {podcasts.map((podcast) => (
-        <PodcastCard title={podcast.title} image={podcast.image} />
+        <PodcastCard title={podcast.title} image={podcast.image} onPress={() => navigation.navigate('YourPodcast',{
+           ...podcast
+          })} />
       ))}
     </MainContainer>
   );

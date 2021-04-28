@@ -75,7 +75,7 @@ const MainContainer = ({ children, noAuth, style, player, loading }) => {
               justifyContent: "center",
             }}
           >
-            <ActivityIndicator color="#071B6A" size="large" />
+            <ActivityIndicator color={colors.primary} size="large" />
           </View>
         ) : (
           children
