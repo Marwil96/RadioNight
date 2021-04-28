@@ -10,13 +10,14 @@ import TopNav from "../components/TopNav";
 import { ActivityIndicator, View } from "react-native";
 import StyledButton from "../components/StyledButton";
 import { Wrapper } from "../components/Wrapper";
-import { StartFollowingPodcast, StopFollowingPodcast } from "../actions";
+import { GetPodcastPremieres, StartFollowingPodcast, StopFollowingPodcast } from "../actions";
 import { useSelector } from "react-redux";
 
 const PodcastDetails = ({route}) => {
   const { user_data } = useSelector((state) => state.DatabaseReducer);
   const [loading, setLoading ] = useState(false);
   const [rssEpisodes, setRssEpisodes] = useState([])
+  const [episodes, setEpisodes] = useState([]);
   const [rssFeedLimit, setRssFeedLimit] = useState(20)
   const { title, rss_url, image, id, authors, desc } = route.params;
 
@@ -24,14 +25,16 @@ const PodcastDetails = ({route}) => {
     const FetchData = async () => {
       if (rss_url !== undefined) {
         setLoading(true)
+        const premieresData = await GetPodcastPremieres(id);
         const podcastData = await FetchPodcastFromRSS(rss_url);
+        setEpisodes(premieresData)
         setRssEpisodes(podcastData.items)
         setLoading(false)
       }
     }
 
     FetchData()
-   }, [])
+  }, [])
   return (
     <MainContainer>
       <TopNav />
@@ -52,15 +55,17 @@ const PodcastDetails = ({route}) => {
         desc={desc}
       />
 
-      <Title style={{ marginLeft: 16 }}>Upcoming Episode Premieres</Title>
-      <PodcastCard
-        title="India, Farming, and the Free Market"
-        subtitle="Planet Money"
-        image="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSeQypKxL8Qzjf0n28K0uUD-iVMtxcHx-G_NspdBSTCJcZv-YWh"
-        desc="For decades, India has shielded its agricultural sector from the free market. Now, the government wants to let it in. Millions and millions of farmers..."
-        meta1="Started  3 minuts ago"
-        meta2="LIVE"
-      />
+      {episodes.length > 0 && <Title style={{ marginLeft: 16 }}>Upcoming Episode Premieres</Title>}
+      {loading ? <ActivityIndicator color={colors.primary} size="large" /> :episodes.map((episode, index) => (
+        <PodcastCard
+          PodcastCard
+          title={episode.title}
+          subtitle={episode.podcast_name}
+          key={index}
+          desc={episode.desc}
+          image={episode.image}
+        />
+      )) }
 
       <Title style={{ marginLeft: 16 }}>From RSS Feed</Title>
       {loading ? (

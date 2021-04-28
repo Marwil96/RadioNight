@@ -49,15 +49,18 @@ export const GetPodcastPremieres = async (id) => {
         querySnapshot.forEach((doc) => {
             // doc.data() is never undefined for query doc snapshots
             console.log(doc.id, " => ", doc.data());
-            episodes.push(doc.data());
+            const data = doc.data();
+            episodes.push(data);
         });
 
-        return episodes
+        return episodes;
     })
     .catch((error) => {
         console.log("Error getting documents: ", error);
     })
   )
+
+  return result
 }
 
 export const FetchYourPodcasts = async (podcast_ids) => {

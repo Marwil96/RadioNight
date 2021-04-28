@@ -2,4 +2,6 @@
 - Setup Redux [X]
 - Create Firestore Database [X]
 - Create Firebase Auth [X]
-- Figure out the Data Structure []
+- Figure out the Data Structure [X]
+- Build Your Podcast Page [x]
+- Calculate what the episode is, Upcoming, Live or Past []
