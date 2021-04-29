@@ -29,6 +29,7 @@ const wait = (timeout) => {
 const MainContainer = ({ children, noAuth, style, player, loading }) => {
   const navigation = useNavigation();
   const { userLoggedIn } = useSelector((state) => state.AuthReducer);
+  const { user_data } = useSelector((state) => state.DatabaseReducer);
   const dispatch = useDispatch();  
 
   const [refreshing, setRefreshing] = useState(false);
@@ -39,7 +40,7 @@ const MainContainer = ({ children, noAuth, style, player, loading }) => {
       navigation.navigate("Login");
     }
 
-    if(userLoggedIn) {
+    if(userLoggedIn && user_data?.user_id === undefined) {
       dispatch(FetchAllUserData());
     }
 

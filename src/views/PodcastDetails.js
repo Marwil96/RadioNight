@@ -37,9 +37,10 @@ const PodcastDetails = ({ route, navigation }) => {
         setLoading(false);
       }
     };
-
+    console.log('GETTING PREMIERE DATA AND OTHERSTUFF')
     FetchData();
   }, []);
+
   return (
     <MainContainer>
       <TopNav />

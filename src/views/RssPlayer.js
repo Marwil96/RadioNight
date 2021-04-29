@@ -14,6 +14,8 @@ import PodcastPanel from "../components/PodcastPanel";
 import { Span } from "../components/Span";
 import { TouchableOpacity} from "react-native";
 import Slider from "@react-native-community/slider";
+import { useDispatch, useSelector } from "react-redux";
+import { PlaySound } from "../actions";
 
 const TopBar = styled.View`
   width: 100%;
@@ -38,75 +40,85 @@ const PlayerWrapper = styled.View`
   margin: 0 16px;
 `
 
+const PlayerContainer = styled.View`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+`
+
 const RssPlayer = ({ navigation, route }) => {
   const {podcast, mode, episode} = route.params;
-  const [sound, setSound] = useState(false);
+  const { sound } = useSelector((state) => state.DatabaseReducer);
+  const dispatch = useDispatch()
   const [playing, setPlaying] = useState(false);
   const [startedSound, setStartedSound] = useState(false);
   const [soundDuration, setSoundDuration] = useState(100000);
   const [soundProgress, setSoundProgress] = useState(1);
 
-  const playSound = async () => {
-    console.log("Loading Sound");
-    const { sound } = await Audio.Sound.createAsync({uri: episode.enclosures[0].url});
-    sound.setOnPlaybackStatusUpdate(updateStatus);
-    Audio.setAudioModeAsync({ staysActiveInBackground: true});
-    setSound(sound);
 
-    console.log("Playing Sound");
-    await sound.playAsync();
-    setPlaying(true);
-  }
+  // const playSound = async () => {
+  //   console.log("Loading Sound");
+  //   const { sound } = await Audio.Sound.createAsync({uri: episode.enclosures[0].url});
+  //   sound.setOnPlaybackStatusUpdate(updateStatus);
+  //   Audio.setAudioModeAsync({ staysActiveInBackground: true});
+  //   setSound(sound);
 
-  const updateStatus = (status) => {
-    // console.log(status.positionMillis, status.durationMillis);
-    setSoundDuration(status.durationMillis);
-    setSoundProgress(status.positionMillis)
-  }
+  //   console.log("Playing Sound");
+  //   await sound.playAsync();
+  //   setPlaying(true);
+  // }
 
-  const pauseSound = async () => {
-    await sound.pauseAsync();
-    setPlaying(false);
-  }
+  // const updateStatus = (status) => {
+  //   // console.log(status.positionMillis, status.durationMillis);
+  //   setSoundDuration(status.durationMillis);
+  //   setSoundProgress(status.positionMillis)
+  // }
 
-  const restartSound = async () => {
-    await sound.playAsync();
-    setPlaying(true);
-  };
+  // const pauseSound = async () => {
+  //   await sound.pauseAsync();
+  //   setPlaying(false);
+  // }
 
-  const changeAudioPosition = async (value) => {
-    console.log(value)
-    await sound.pauseAsync();
-    setPlaying(false);
-    setSoundProgress(value);
-    // soundObject.setStatusAsync(statusToSet)
-  }
+  // const restartSound = async () => {
+  //   await sound.playAsync();
+  //   setPlaying(true);
+  // };
 
-  const slidingComplete = async (e) => {
-    console.log("SLIDING COMPLETE")
-    sound.playFromPositionAsync(soundProgress);
-    await sound.playAsync();
-    setPlaying(true);
-  }
+  // const changeAudioPosition = async (value) => {
+  //   console.log(value)
+  //   await sound.pauseAsync();
+  //   setPlaying(false);
+  //   setSoundProgress(value);
+  //   // soundObject.setStatusAsync(statusToSet)
+  // }
+
+  // const slidingComplete = async (e) => {
+  //   console.log("SLIDING COMPLETE")
+  //   sound.playFromPositionAsync(soundProgress);
+  //   await sound.playAsync();
+  //   setPlaying(true);
+  // }
   
-  useEffect(() => {
-    const asyncFunction = async () => {
-      if(sound !== false) {
-        console.log(sound)
-      }
-    }
+  // useEffect(() => {
+  //   const asyncFunction = async () => {
+  //     if(sound !== false) {
+  //       console.log(sound)
+  //     }
+  //   }
 
-    asyncFunction()
-  }, [sound])
+  //   asyncFunction()
+  // }, [sound])
 
-  useEffect(() => {
-    return sound
-      ? () => {
-          console.log("Unloading Sound");
-          sound.unloadAsync();
-        }
-      : undefined;
-  }, [sound]);
+  // useEffect(() => {
+  //   console.log('HEELLOO', sound)
+  //   // return sound
+  //   //   ? () => {
+  //   //       console.log("Unloading Sound");
+  //   //       sound.unloadAsync();
+  //   //     }
+  //   //   : undefined;
+  // }, [sound]);
 
   // console.log('MATH', soundProgress, soundDuration, Math.floor(soundProgress / soundDuration), 0/0);
 
@@ -136,8 +148,8 @@ const RssPlayer = ({ navigation, route }) => {
         />
         <Title style={{ marginBottom: 4 }}>{episode.title}</Title>
         <Span style={{ color: colors.unFocused }}>{podcast.title}</Span>
-        <Slider
-          style={{ width: "100%", alignSelf: "stretch" }}
+        {/* <Slider
+          style={{ width: "100%" }}
           value={soundProgress}
           maximumTrackTintColor={colors.primary}
           minimumTrackTintColor={colors.primary}
@@ -147,15 +159,18 @@ const RssPlayer = ({ navigation, route }) => {
           onValueChange={(value) => changeAudioPosition(value)}
           onSlidingComplete={(e) => slidingComplete(e)}
           minimumValue={0}
-        />
-        <TouchableOpacity
-          style={{ padding: 10 }}
-          onPress={
-            sound === false ? playSound : playing ? pauseSound : restartSound
-          }
-        >
-          <AntDesign name="play" size={48} color="white" />
-        </TouchableOpacity>
+        /> */}
+        <PlayerContainer>
+          <TouchableOpacity
+            style={{ padding: 10 }}
+            // onPress={
+            //   sound === false ? () => dispatch(PlaySound(episode.enclosures[0].url)) : playing ? pauseSound : restartSound
+            // }
+            onPress={() => {console.log('START SOUND'), dispatch(PlaySound(episode.enclosures[0].url))}}
+          >
+            <AntDesign name={playing ? 'pause' : 'play'} size={48} color="white" />
+          </TouchableOpacity>
+          </PlayerContainer>
       </PlayerWrapper>
     </MainContainer>
   );

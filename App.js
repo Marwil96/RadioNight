@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
 import { Provider, useDispatch, useSelector } from "react-redux";
 import rootReducer from "./src/reducers/index";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
@@ -27,8 +27,14 @@ import CreatePodcastPremiere from './src/views/CreatePodcastPremiere';
 import Search from './src/views/Search';
 import RssPlayer from './src/views/RssPlayer';
 
+
+const customizedMiddleware = getDefaultMiddleware({
+    serializableCheck: false
+ });
+
 const store = configureStore({
   reducer: rootReducer,
+  middleware: customizedMiddleware,
 });
 
 const HomeStack = createStackNavigator();

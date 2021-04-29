@@ -1,6 +1,7 @@
-import { CREATE_USER, LOGIN_USER, CREATE_PODCAST, FETCH_ALL_USER_DATA } from "../actions/constables";
+import { CREATE_USER, LOGIN_USER, CREATE_PODCAST, FETCH_ALL_USER_DATA, CREATE_AUDIO_STREAM } from "../actions/constables";
 
-const DatabaseReducer = (state = { podcastCreated: false, user_data: {}, loading: false }, action) => {
+const DatabaseReducer = (state = { podcastCreated: false, user_data: {}, loading: false, sound: {} }, action) => {
+  console.log('ACTION', action)
   switch (action.type) {
     case CREATE_PODCAST:
       return {
@@ -8,8 +9,13 @@ const DatabaseReducer = (state = { podcastCreated: false, user_data: {}, loading
         loading: action.payload.loading,
       };
 
+    case CREATE_AUDIO_STREAM:
+      return Object.assign({}, state, {
+        sound: action.payload.sound,
+      });
+
     case FETCH_ALL_USER_DATA:
-      return {...action.payload};
+      return { user_data: action.payload.user_data, loading: action.payload.loading };
     default:
       return state;
   }
