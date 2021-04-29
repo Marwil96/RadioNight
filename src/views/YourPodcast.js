@@ -3,7 +3,7 @@ import { Link } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components/native";
-import { FetchYourPodcasts } from "../actions";
+import { FetchYourPodcasts, GetPodcastPremieres } from "../actions";
 import { MainContainer } from "../components/MainContainer";
 import PodcastCard from "../components/PodcastCard";
 import StyledButton from "../components/StyledButton";
@@ -27,7 +27,26 @@ const ButtonContainer = styled.TouchableOpacity`
 const YourPodcast = ({ navigation, route }) => {
   const [podcasts, setPodcasts] = useState([]);
   const [allPodcastPremieres, setAllPodcastPremieres] = useState([]);
-  const { title } = route.params;
+  const [upcomingEpisodes, setUpcomingEpisodes] = useState([]);
+  const [liveEpisodes, setLiveEpisodes] = useState([]);
+  const [pastEpisodes, setPastEpisodes] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const { title, id } = route.params;
+
+  
+   useEffect(() => {
+     const FetchData = async () => {
+      setLoading(true);
+      const premieresData = await GetPodcastPremieres(id);
+      console.log(premieresData)
+      setUpcomingEpisodes(premieresData.upcomingEpisodes);
+      setLiveEpisodes(premieresData.liveEpisodes);
+      setPastEpisodes(premieresData.pastEpisodes);
+      setLoading(false);
+     };
+
+     FetchData();
+   }, []);
 
   return (
     <MainContainer>
@@ -46,7 +65,44 @@ const YourPodcast = ({ navigation, route }) => {
         </TopBar>
       </Wrapper>
       <Title style={{ marginLeft: 16 }}>{title}</Title>
-      {allPodcastPremieres.length === 0 && <Title  style={{ marginLeft: 16, fontSize: 20, fontFamily: 'Manrope_400Regular' }}>Empty... You Haven't relased a Episode Premiere yet.</Title>}
+      {liveEpisodes.length > 0 && <Title  style={{ marginLeft: 16, fontSize: 20, fontFamily: 'Manrope_400Regular' }}>Live Episodes</Title>}
+      {liveEpisodes.length > 0 && liveEpisodes.map((episode, index) => 
+        <PodcastCard 
+          title={episode.title}
+          subtitle={episode.podcast_name}
+          key={index}
+          desc={episode.desc}
+          image={episode.image} 
+          meta1={`${new Date(episode.start_date).getFullYear()}-${new Date(episode.start_date).getMonth()}-${new Date(episode.start_date).getDate()}`}
+          meta2={`${new Date(episode.start_date).getHours()}:${new Date(episode.start_date).getMinutes()}:00`}
+        />)
+      }
+      <Title  style={{ marginLeft: 16, fontSize: 20, fontFamily: 'Manrope_400Regular' }}>{upcomingEpisodes.length === 0 ? "Empty... You Haven't Scheduled a Episode Premiere yet." : "Scheduled Episodes"}</Title>
+      {upcomingEpisodes.length > 0 && upcomingEpisodes.map((episode, index) => 
+        <PodcastCard 
+          title={episode.title}
+          subtitle={episode.podcast_name}
+          key={index}
+          desc={episode.desc}
+          image={episode.image} 
+          meta1={`${new Date(episode.start_date).getFullYear()}-${new Date(episode.start_date).getMonth()}-${new Date(episode.start_date).getDate()}`}
+          meta2={`${new Date(episode.start_date).getHours()}:${new Date(episode.start_date).getMinutes()}:00`}
+        />)
+      }
+
+      {pastEpisodes.length > 0 && <Title  style={{ marginLeft: 16, fontSize: 20, fontFamily: 'Manrope_400Regular' }}>Live Episodes</Title>}
+      {pastEpisodes.length > 0 && pastEpisodes.map((episode, index) => 
+        <PodcastCard 
+          title={episode.title}
+          subtitle={episode.podcast_name}
+          key={index}
+          desc={episode.desc}
+          image={episode.image} 
+          meta1={`${new Date(episode.start_date).getFullYear()}-${new Date(episode.start_date).getMonth()}-${new Date(episode.start_date).getDate()}`}
+          meta2={`${new Date(episode.start_date).getHours()}:${new Date(episode.start_date).getMinutes()}:00`}
+        />)
+      }
+      
       <Wrapper>
         <StyledButton primary onPress={() => navigation.navigate("CreatePodcastPremiere", {...route.params})}> Schedule Podcast Premiere </StyledButton>
       </Wrapper>

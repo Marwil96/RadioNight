@@ -25,6 +25,7 @@ import YourPodcasts from './src/views/YourPodcasts';
 import YourPodcast from './src/views/YourPodcast';
 import CreatePodcastPremiere from './src/views/CreatePodcastPremiere';
 import Search from './src/views/Search';
+import RssPlayer from './src/views/RssPlayer';
 
 const store = configureStore({
   reducer: rootReducer,
@@ -134,6 +135,7 @@ const App = () => {
             component={PodcastDetails}
           />
           <NavigationStack.Screen name="EpisodeView" component={EpisodeView} />
+          <NavigationStack.Screen name="RssPlayer" component={RssPlayer} />
           <NavigationStack.Screen name="ChooseWayOfCreatingPodcast" component={ChooseWayOfCreatingPodcast} />
           <NavigationStack.Screen name="CreatePodcastWithRSS" component={CreatePodcastWithRSS} />
           <NavigationStack.Screen

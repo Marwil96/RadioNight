@@ -71,7 +71,8 @@ const CreatePodcastPremiere = ({ navigation, route }) => {
       podcast_image: image,
       podcast_id: id,
       rss_url: rss_url,
-      start_date: unFormattedDate
+      start_date: unFormattedDate.toString(),
+      duration: selectedPodcast.itunes.duration
     }
 
     console.log(data)

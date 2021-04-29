@@ -13,28 +13,33 @@ import { Wrapper } from "../components/Wrapper";
 import { GetPodcastPremieres, StartFollowingPodcast, StopFollowingPodcast } from "../actions";
 import { useSelector } from "react-redux";
 
-const PodcastDetails = ({route}) => {
+const PodcastDetails = ({ route, navigation }) => {
   const { user_data } = useSelector((state) => state.DatabaseReducer);
-  const [loading, setLoading ] = useState(false);
-  const [rssEpisodes, setRssEpisodes] = useState([])
+  const [loading, setLoading] = useState(false);
+  const [rssEpisodes, setRssEpisodes] = useState([]);
   const [episodes, setEpisodes] = useState([]);
-  const [rssFeedLimit, setRssFeedLimit] = useState(20)
+  const [upcomingEpisodes, setUpcomingEpisodes] = useState([]);
+  const [liveEpisodes, setLiveEpisodes] = useState([]);
+  const [pastEpisodes, setPastEpisodes] = useState([]);
+  const [rssFeedLimit, setRssFeedLimit] = useState(20);
   const { title, rss_url, image, id, authors, desc } = route.params;
 
-   useEffect(() => {
+  useEffect(() => {
     const FetchData = async () => {
       if (rss_url !== undefined) {
-        setLoading(true)
+        setLoading(true);
         const premieresData = await GetPodcastPremieres(id);
         const podcastData = await FetchPodcastFromRSS(rss_url);
-        setEpisodes(premieresData)
-        setRssEpisodes(podcastData.items)
-        setLoading(false)
+        setUpcomingEpisodes(premieresData.upcomingEpisodes);
+        setLiveEpisodes(premieresData.liveEpisodes);
+        setPastEpisodes(premieresData.pastEpisodes);
+        setRssEpisodes(podcastData.items);
+        setLoading(false);
       }
-    }
+    };
 
-    FetchData()
-  }, [])
+    FetchData();
+  }, []);
   return (
     <MainContainer>
       <TopNav />
@@ -55,19 +60,91 @@ const PodcastDetails = ({route}) => {
         desc={desc}
       />
 
-      {episodes.length > 0 && <Title style={{ marginLeft: 16 }}>Upcoming Episode Premieres</Title>}
-      {loading ? <ActivityIndicator color={colors.primary} size="large" /> :episodes.map((episode, index) => (
-        <PodcastCard
-          PodcastCard
-          title={episode.title}
-          subtitle={episode.podcast_name}
-          key={index}
-          desc={episode.desc}
-          image={episode.image}
-        />
-      )) }
+      {liveEpisodes.length > 0 && (
+        <Title
+          style={{
+            marginLeft: 16,
+            fontSize: 20,
+            fontFamily: "Manrope_400Regular",
+          }}
+        >
+          Live Episodes
+        </Title>
+      )}
+      {liveEpisodes.length > 0 &&
+        liveEpisodes.map((episode, index) => (
+          <PodcastCard
+            title={episode.title}
+            subtitle={episode.podcast_name}
+            key={index}
+            desc={episode.desc}
+            image={episode.image}
+            meta1={`${new Date(episode.start_date).getFullYear()}-${new Date(
+              episode.start_date
+            ).getMonth()}-${new Date(episode.start_date).getDate()}`}
+            meta2={`${new Date(episode.start_date).getHours()}:${new Date(
+              episode.start_date
+            ).getMinutes()}:00`}
+          />
+        ))}
+      {upcomingEpisodes.length > 0 && (
+        <Title
+          style={{
+            marginLeft: 16,
+            fontSize: 20,
+            fontFamily: "Manrope_400Regular",
+          }}
+        >
+          {" "}
+          Scheduled Episodes
+        </Title>
+      )}
+      {upcomingEpisodes.length > 0 &&
+        upcomingEpisodes.map((episode, index) => (
+          <PodcastCard
+            title={episode.title}
+            subtitle={episode.podcast_name}
+            key={index}
+            desc={episode.desc}
+            image={episode.image}
+            meta1={`${new Date(episode.start_date).getFullYear()}-${new Date(
+              episode.start_date
+            ).getMonth()}-${new Date(episode.start_date).getDate()}`}
+            meta2={`${new Date(episode.start_date).getHours()}:${new Date(
+              episode.start_date
+            ).getMinutes()}:00`}
+          />
+        ))}
 
-      <Title style={{ marginLeft: 16 }}>From RSS Feed</Title>
+      {pastEpisodes.length > 0 && (
+        <Title
+          style={{
+            marginLeft: 16,
+            fontSize: 20,
+            fontFamily: "Manrope_400Regular",
+          }}
+        >
+          Live Episodes
+        </Title>
+      )}
+      {pastEpisodes.length > 0 &&
+        pastEpisodes.map((episode, index) => (
+          <PodcastCard
+            title={episode.title}
+            subtitle={episode.podcast_name}
+            key={index}
+            desc={episode.desc}
+            image={episode.image}
+            meta1={`${new Date(episode.start_date).getFullYear()}-${new Date(
+              episode.start_date
+            ).getMonth()}-${new Date(episode.start_date).getDate()}`}
+            meta2={`${new Date(episode.start_date).getHours()}:${new Date(
+              episode.start_date
+            ).getMinutes()}:00`}
+          />
+        ))}
+
+      <Title style={{ marginLeft: 16, marginTop: 24 }}>From RSS Feed</Title>
       {loading ? (
         <ActivityIndicator color={colors.primary} size="large" />
       ) : (
@@ -78,6 +155,7 @@ const PodcastDetails = ({route}) => {
                 title={episode.title}
                 subtitle={title}
                 key={index}
+                onPress={() => navigation.navigate('RssPlayer', {episode: {...episode}, podcast: {...route.params}, mode:'rss'})}
                 desc={
                   episode.itunes.summary !== undefined && episode.itunes.summary
                 }

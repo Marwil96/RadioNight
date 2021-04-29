@@ -40,27 +40,43 @@ export const SchedulePodcastPremiere = async (data) => {
 }
 
 export const GetPodcastPremieres = async (id) => {
-  console.log("GetPodcastPremieres");
   const result = await Promise.all(
   await db.collection("episodes").where("podcast_id", "==", id)
     .get()
     .then((querySnapshot) => {
-      const episodes = [];
+      const upcomingEpisodes = [];
+      const pastEpisodes = [];
+      const liveEpisodes = [];
         querySnapshot.forEach((doc) => {
             // doc.data() is never undefined for query doc snapshots
             console.log(doc.id, " => ", doc.data());
             const data = doc.data();
-            episodes.push(data);
-        });
+            const currentDate = new Date();
+            const episodeGoesLive = new Date(data.start_date);
+            const episodeIsDone = new Date(data.start_date).setSeconds(episodeGoesLive.getSeconds() + data.duratation);
+   
+              if(currentDate > episodeIsDone) {
+                pastEpisodes.push({ ...data, episode_state: 'past' });
+                // return 'past'
+              } else if(currentDate > episodeGoesLive && currentDate < episodeIsDone) {
+                liveEpisodes.push({ ...data, episode_state: 'live' });
+                // return 'live'
+              } else {
+                upcomingEpisodes.push({...data, episode_state: 'upcoming'});
+                // return 'upcoming'
+              }
 
-        return episodes;
+            // const theEpisodeState = episodeState();
+            // episodes.push({...data, episode_state: theEpisodeState});
+        });
+        return [upcomingEpisodes, pastEpisodes, liveEpisodes];
     })
     .catch((error) => {
         console.log("Error getting documents: ", error);
     })
   )
-
-  return result
+  console.log('RESULT', result)
+  return {upcomingEpisodes: result[0], pastEpisodes: result[1], liveEpisodes: result[2], allEpisode: [...result[0], ...result[1], ...result[2]]}
 }
 
 export const FetchYourPodcasts = async (podcast_ids) => {

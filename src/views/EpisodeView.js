@@ -19,7 +19,9 @@ const ButtonContainer = styled.TouchableOpacity`
   flex-direction: row;
 `
 
-const EpisodeView = ({ navigation }) => {
+const EpisodeView = ({ navigation, route }) => {
+  const data = route.params;
+  console.log(data)
   return (
     <MainContainer>
       <Wrapper>
