@@ -27,6 +27,7 @@ import YourPodcast from './src/views/YourPodcast';
 import CreatePodcastPremiere from './src/views/CreatePodcastPremiere';
 import Search from './src/views/Search';
 import RssPlayer from './src/views/RssPlayer';
+import MiniPlayer from './src/components/MiniPlayer';
 
 
 const customizedMiddleware = getDefaultMiddleware({
@@ -113,12 +114,19 @@ const DataContainer = ({children}) => {
   const [playing, setPlaying] = useState(false);
   const [startedSound, setStartedSound] = useState(false);
   const [soundDuration, setSoundDuration] = useState(100000);
-  const [sound, setSound] = useState(100000);
+  const [sound, setSound] = useState(false);
+  const [runningEpisode, setRunningEpisode] = useState(false)
   const [soundProgress, setSoundProgress] = useState(1);
-  console.log(rssPlayerState);
+  // console.log(rssPlayerState);
 
   const playSound = async () => {
     console.log("Loading Sound");
+    // if(runningEpisode !== false) {
+    //   console.log(sound)
+    //   await sound.unloadAsync();
+    // }
+    runningEpisode !== false && await stopSound()
+    setRunningEpisode(rssPlayerData.episode)
     const { sound } = await Audio.Sound.createAsync({
       uri: rssPlayerData.episode.enclosures[0].url,
     });
@@ -163,6 +171,12 @@ const DataContainer = ({children}) => {
     setPlaying(true);
   };
 
+  const stopSound = async () => {
+    await sound.unloadAsync();
+    setStartedSound(false)
+  }
+  
+
   // useEffect(() => {
   //   console.log("HEELLOO", sound);
   //   return sound
@@ -175,15 +189,45 @@ const DataContainer = ({children}) => {
 
   
   return (
-    <View style={{ height: "100%" }}>
+    <View style={{ height: "100%", display: 'flex', flexDirection:'column-reverse' }}> 
       <Modal
         animationType="slide"
         transparent={true}
-        
         visible={rssPlayerState}
       >
-        <RssPlayer playSound={() => playSound()} restartSound={restartSound} changeAudioPosition={changeAudioPosition} slidingComplete={slidingComplete} pauseSound={pauseSound} soundDuration={soundDuration} soundProgress={soundProgress} startedSound={startedSound}  playing={playing}  episode={rssPlayerData.episode} podcast={rssPlayerData.podcast}/>
+        <RssPlayer 
+          playSound={() => playSound()} 
+          restartSound={restartSound} 
+          changeAudioPosition={changeAudioPosition} 
+          slidingComplete={slidingComplete} pauseSound={pauseSound} 
+          soundDuration={soundDuration} soundProgress={soundProgress} 
+          startedSound={startedSound}  
+          playing={playing}  
+          episode={rssPlayerData.episode} 
+          podcast={rssPlayerData.podcast} 
+          runningEpisode={runningEpisode}
+        />
       </Modal>
+      {/* <Modal
+        style={{backgroundColor: 'blue', height: }}
+        animationType="slide"
+        transparent={false}
+        visible={!rssPlayerState && startedSound}
+      > */}
+      {!rssPlayerState && startedSound &&
+      <MiniPlayer 
+        playSound={() => playSound()} 
+        restartSound={restartSound} 
+        changeAudioPosition={changeAudioPosition} 
+        slidingComplete={slidingComplete} pauseSound={pauseSound} 
+        soundDuration={soundDuration} soundProgress={soundProgress} 
+        startedSound={startedSound}  
+        playing={playing}  
+        episode={rssPlayerData.episode} 
+        podcast={rssPlayerData.podcast} 
+        runningEpisode={runningEpisode}
+      />}
+      {/* </Modal> */}
       {children}
     </View>
   );

@@ -82,11 +82,6 @@ const MainContainer = ({ children, noAuth, style, player, loading }) => {
           children
         )}
       </MainContainerStyle>
-      {player && <MiniPlayer
-        title="Welcome to Jurassic Ar..."
-        subtitle="99% Invisible"
-        image="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTy7v2Vrnp5LhNS7JoKB12kyK9_gxyCjbGFdDf7MkMmXEfvo8XY"
-      />}
     </View>
   );
 };

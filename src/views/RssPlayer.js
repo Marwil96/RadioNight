@@ -57,7 +57,7 @@ const MainContainer = styled.ScrollView`
   min-height: 100%;
 `;
 
-const RssPlayer = ({ route, podcast, episode, playSound, pauseSound, soundDuration, soundProgress, startedSound,  playing, changeAudioPosition, slidingComplete, restartSound }) => {
+const RssPlayer = ({ route, podcast, episode, playSound, pauseSound, soundDuration, soundProgress, startedSound, runningEpisode,  playing, changeAudioPosition, slidingComplete, restartSound }) => {
   // const {podcast, mode, episode} = route.params;
   // const { sound } = useSelector((state) => state.DatabaseReducer);
   const dispatch = useDispatch();
@@ -139,7 +139,7 @@ const RssPlayer = ({ route, podcast, episode, playSound, pauseSound, soundDurati
   // }, [sound]);
 
   // console.log('MATH', soundProgress, soundDuration, Math.floor(soundProgress / soundDuration), 0/0);
-
+  console.log('RUNNING_EPISODE', runningEpisode.title, runningEpisode.title === episode.title, runningEpisode === false  || runningEpisode.title !== episode.title)
   return (
     <MainContainer>
       <Wrapper>
@@ -170,7 +170,7 @@ const RssPlayer = ({ route, podcast, episode, playSound, pauseSound, soundDurati
         <Span style={{ color: colors.unFocused }}>{podcast.title}</Span>
         <Slider
           style={{ width: "100%" }}
-          value={soundProgress}
+          value={runningEpisode.title === episode.title ? soundProgress : 0}
           maximumTrackTintColor={colors.primary}
           minimumTrackTintColor={colors.primary}
           thumbTintColor={colors.primary}
@@ -186,10 +186,10 @@ const RssPlayer = ({ route, podcast, episode, playSound, pauseSound, soundDurati
             // onPress={
             //   sound === false ? () => dispatch(PlaySound(episode.enclosures[0].url)) : playing ? pauseSound : restartSound
             // }
-            onPress={ startedSound === false ? playSound : playing ? pauseSound : restartSound}
+            onPress={ runningEpisode === false  || runningEpisode.title !== episode.title ? () => playSound() : playing ? pauseSound : restartSound}
           >
             <AntDesign
-              name={playing ? "pause" : "play"}
+              name={runningEpisode.title === episode.title ? playing ? "pause" : "play" : 'play'}
               size={48}
               color="white"
             />

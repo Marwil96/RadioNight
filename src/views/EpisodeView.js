@@ -47,7 +47,7 @@ const EpisodeView = ({ navigation, route }) => {
           </ButtonContainer> */}
         </TopBar>
       </Wrapper>
-      <MiniPlayer
+      {/* <MiniPlayer
         style={{
           position: "relative",
           background: colors.smoothBlacks,
@@ -58,7 +58,7 @@ const EpisodeView = ({ navigation, route }) => {
         title="Welcome to Jurassic Ar..."
         subtitle="99% Invisible"
         image="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTy7v2Vrnp5LhNS7JoKB12kyK9_gxyCjbGFdDf7MkMmXEfvo8XY"
-      />
+      /> */}
       {/* <PodcastDetailsHeader
         bgColor={colors.text}
         style={{ paddingTop: 16, paddingBottom: 16, marginBottom: 0 }}

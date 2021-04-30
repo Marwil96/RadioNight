@@ -3,7 +3,6 @@ import { Text, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { LoginUser } from '../actions';
 import { MainContainer } from '../components/MainContainer';
-import MiniPlayer from '../components/MiniPlayer';
 import PodcastCard from '../components/PodcastCard';
 import { Title } from '../components/Title';
 import TopNav from '../components/TopNav';

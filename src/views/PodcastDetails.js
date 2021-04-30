@@ -45,7 +45,7 @@ const PodcastDetails = ({ route, navigation }) => {
   }, []);
 
   return (
-    <MainContainer>
+    <MainContainer loading={user_data?.followed_podcasts === undefined}>
       <TopNav />
       <PodcastDetailsHeader
         bgColor={colors.background}
