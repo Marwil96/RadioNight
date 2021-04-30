@@ -2,7 +2,7 @@ import React from 'react';
 import colors from "../variables/color";
 import { AntDesign } from '@expo/vector-icons'; 
 import styled from "styled-components/native";
-import { MainContainer } from '../components/MainContainer';
+// import { MainContainer } from '../components/MainContainer';
 import { Title } from '../components/Title';
 import MiniPlayer from '../components/MiniPlayer';
 import PodcastDetailsHeader from '../components/PodcastDetailsHeader';
@@ -19,14 +19,24 @@ const ButtonContainer = styled.TouchableOpacity`
   flex-direction: row;
 `
 
+const MainContainer = styled.ScrollView`
+  display: flex;
+  flex-direction: column;
+  background: ${colors.background};
+  font-family: "Manrope_400Regular";
+  padding: 48px 0;
+  min-height: 100%;
+`;
+
+
 const EpisodeView = ({ navigation, route }) => {
-  const data = route.params;
-  console.log(data)
+  // const data = route.params;
+  // console.log(data)
   return (
     <MainContainer>
       <Wrapper>
         <TopBar>
-          <ButtonContainer onPress={() => navigation.goBack()}>
+          {/* <ButtonContainer onPress={() => navigation.goBack()}>
             <AntDesign
               style={{ marginRight: 12 }}
               name="back"
@@ -34,7 +44,7 @@ const EpisodeView = ({ navigation, route }) => {
               color="white"
             />
             <Title style={{ fontSize: 16 }}>Go Back</Title>
-          </ButtonContainer>
+          </ButtonContainer> */}
         </TopBar>
       </Wrapper>
       <MiniPlayer

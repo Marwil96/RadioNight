@@ -1,5 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { Audio } from "expo-av";
 import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
 import { Provider, useDispatch, useSelector } from "react-redux";
 import rootReducer from "./src/reducers/index";
@@ -7,7 +8,7 @@ import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useFonts, Manrope_400Regular, Manrope_500Medium, Manrope_700Bold } from "@expo-google-fonts/manrope";
-import { StyleSheet, Text, View, LogBox } from "react-native";
+import { StyleSheet, Text, View, LogBox, Modal } from "react-native";
 import styled from "styled-components/native";
 import Home from './src/views/Home';
 import BottomNav from './src/components/BottomNav';
@@ -107,6 +108,87 @@ const TabNavigation = () => (
   </Tab.Navigator>
 );
 
+const DataContainer = ({children}) => {
+  const { rssPlayerState, rssPlayerData } = useSelector((state) => state.GlobalActionsReducer);
+  const [playing, setPlaying] = useState(false);
+  const [startedSound, setStartedSound] = useState(false);
+  const [soundDuration, setSoundDuration] = useState(100000);
+  const [sound, setSound] = useState(100000);
+  const [soundProgress, setSoundProgress] = useState(1);
+  console.log(rssPlayerState);
+
+  const playSound = async () => {
+    console.log("Loading Sound");
+    const { sound } = await Audio.Sound.createAsync({
+      uri: rssPlayerData.episode.enclosures[0].url,
+    });
+    setStartedSound(true)
+    sound.setOnPlaybackStatusUpdate(updateStatus);
+    Audio.setAudioModeAsync({ staysActiveInBackground: true });
+    setSound(sound);
+
+    console.log("Playing Sound");
+    await sound.playAsync();
+    setPlaying(true);
+  };
+
+  const updateStatus = (status) => {
+    // console.log(status.positionMillis, status.durationMillis);
+    setSoundDuration(status.durationMillis);
+    setSoundProgress(status.positionMillis);
+  };
+
+  const pauseSound = async () => {
+    await sound.pauseAsync();
+    setPlaying(false);
+  };
+
+  const changeAudioPosition = async (value) => {
+    console.log(value);
+    await sound.pauseAsync();
+    setPlaying(false);
+    setSoundProgress(value);
+    // soundObject.setStatusAsync(statusToSet)
+  };
+
+  const slidingComplete = async (e) => {
+    console.log("SLIDING COMPLETE");
+    sound.playFromPositionAsync(soundProgress);
+    await sound.playAsync();
+    setPlaying(true);
+  };
+
+  const restartSound = async () => {
+    await sound.playAsync();
+    setPlaying(true);
+  };
+
+  // useEffect(() => {
+  //   console.log("HEELLOO", sound);
+  //   return sound
+  //     ? () => {
+  //         console.log("Unloading Sound");
+  //         sound.unloadAsync();
+  //       }
+  //     : undefined;
+  // }, [sound]);
+
+  
+  return (
+    <View style={{ height: "100%" }}>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        
+        visible={rssPlayerState}
+      >
+        <RssPlayer playSound={() => playSound()} restartSound={restartSound} changeAudioPosition={changeAudioPosition} slidingComplete={slidingComplete} pauseSound={pauseSound} soundDuration={soundDuration} soundProgress={soundProgress} startedSound={startedSound}  playing={playing}  episode={rssPlayerData.episode} podcast={rssPlayerData.podcast}/>
+      </Modal>
+      {children}
+    </View>
+  );
+}
+
 
 
 const App = () => {
@@ -126,38 +208,49 @@ const App = () => {
    
   return (
     <Provider store={store}>
-      <NavigationContainer>
-        <NavigationStack.Navigator
-          initialRouteName="Login"
-          screenOptions={{
-            headerShown: false,
-            cardStyle: { backgroundColor: "#000" },
-          }}
-        >
-          <NavigationStack.Screen name="Signup" component={Signup} />
-          <NavigationStack.Screen name="Login" component={Login} />
-          <NavigationStack.Screen
-            name="PodcastDetails"
-            component={PodcastDetails}
-          />
-          <NavigationStack.Screen name="EpisodeView" component={EpisodeView} />
-          <NavigationStack.Screen name="RssPlayer" component={RssPlayer} />
-          <NavigationStack.Screen name="ChooseWayOfCreatingPodcast" component={ChooseWayOfCreatingPodcast} />
-          <NavigationStack.Screen name="CreatePodcastWithRSS" component={CreatePodcastWithRSS} />
-          <NavigationStack.Screen
-            name="SetupProfile"
-            component={SetupProfile}
-          />
-          <NavigationStack.Screen
-            name="ForgotPassword"
-            component={ForgotPassword}
-          />
-          <NavigationStack.Screen
-            name="TabNavigation"
-            component={TabNavigation}
-          />
-        </NavigationStack.Navigator>
-      </NavigationContainer>
+      <DataContainer>
+        <NavigationContainer>
+          <NavigationStack.Navigator
+            initialRouteName="Login"
+            screenOptions={{
+              headerShown: false,
+              cardStyle: { backgroundColor: "#000" },
+            }}
+          >
+            <NavigationStack.Screen name="Signup" component={Signup} />
+            <NavigationStack.Screen name="Login" component={Login} />
+            <NavigationStack.Screen
+              name="PodcastDetails"
+              component={PodcastDetails}
+            />
+            <NavigationStack.Screen
+              name="EpisodeView"
+              component={EpisodeView}
+            />
+            <NavigationStack.Screen name="RssPlayer" component={RssPlayer} />
+            <NavigationStack.Screen
+              name="ChooseWayOfCreatingPodcast"
+              component={ChooseWayOfCreatingPodcast}
+            />
+            <NavigationStack.Screen
+              name="CreatePodcastWithRSS"
+              component={CreatePodcastWithRSS}
+            />
+            <NavigationStack.Screen
+              name="SetupProfile"
+              component={SetupProfile}
+            />
+            <NavigationStack.Screen
+              name="ForgotPassword"
+              component={ForgotPassword}
+            />
+            <NavigationStack.Screen
+              name="TabNavigation"
+              component={TabNavigation}
+            />
+          </NavigationStack.Navigator>
+        </NavigationContainer>
+      </DataContainer>
     </Provider>
   );
 }

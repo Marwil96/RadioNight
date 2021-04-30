@@ -3,7 +3,7 @@ import { Audio } from "expo-av";
 import colors from "../variables/color";
 import { AntDesign } from "@expo/vector-icons";
 import styled from "styled-components/native";
-import { MainContainer } from "../components/MainContainer";
+// import { MainContainer } from "../components/MainContainer";
 import { Title } from "../components/Title";
 
 import MiniPlayer from "../components/MiniPlayer";
@@ -15,7 +15,8 @@ import { Span } from "../components/Span";
 import { TouchableOpacity} from "react-native";
 import Slider from "@react-native-community/slider";
 import { useDispatch, useSelector } from "react-redux";
-import { PlaySound } from "../actions";
+import { OpenRssPlayer } from "../actions/globalActions";
+// import { PlaySound } from "../actions";
 
 const TopBar = styled.View`
   width: 100%;
@@ -47,15 +48,24 @@ const PlayerContainer = styled.View`
   justify-content: center;
 `
 
-const RssPlayer = ({ navigation, route }) => {
-  const {podcast, mode, episode} = route.params;
-  const { sound } = useSelector((state) => state.DatabaseReducer);
-  const dispatch = useDispatch()
-  const [playing, setPlaying] = useState(false);
-  const [startedSound, setStartedSound] = useState(false);
-  const [soundDuration, setSoundDuration] = useState(100000);
-  const [soundProgress, setSoundProgress] = useState(1);
+const MainContainer = styled.ScrollView`
+  display: flex;
+  flex-direction: column;
+  background: ${colors.background};
+  font-family: "Manrope_400Regular";
+  padding: 48px 0;
+  min-height: 100%;
+`;
 
+const RssPlayer = ({ route, podcast, episode, playSound, pauseSound, soundDuration, soundProgress, startedSound,  playing, changeAudioPosition, slidingComplete, restartSound }) => {
+  // const {podcast, mode, episode} = route.params;
+  // const { sound } = useSelector((state) => state.DatabaseReducer);
+  const dispatch = useDispatch();
+  // const [playing, setPlaying] = useState(false);
+  // const [startedSound, setStartedSound] = useState(false);
+  // const [soundDuration, setSoundDuration] = useState(100000);
+  // const [sound, setSound] = useState(100000);
+  // const [soundProgress, setSoundProgress] = useState(1);
 
   // const playSound = async () => {
   //   console.log("Loading Sound");
@@ -69,16 +79,24 @@ const RssPlayer = ({ navigation, route }) => {
   //   setPlaying(true);
   // }
 
+  // const playSound = async () => {
+  //   console.log("Loading Sound");
+  //   const { sound } = await startAudio(episode.enclosures[0].url);
+  //   sound.setOnPlaybackStatusUpdate(updateStatus);
+  //   setSound(sound);
+  //   setPlaying(true);
+  // };
+
   // const updateStatus = (status) => {
   //   // console.log(status.positionMillis, status.durationMillis);
   //   setSoundDuration(status.durationMillis);
-  //   setSoundProgress(status.positionMillis)
-  // }
+  //   setSoundProgress(status.positionMillis);
+  // };
 
   // const pauseSound = async () => {
   //   await sound.pauseAsync();
   //   setPlaying(false);
-  // }
+  // };
 
   // const restartSound = async () => {
   //   await sound.playAsync();
@@ -86,38 +104,38 @@ const RssPlayer = ({ navigation, route }) => {
   // };
 
   // const changeAudioPosition = async (value) => {
-  //   console.log(value)
+  //   console.log(value);
   //   await sound.pauseAsync();
   //   setPlaying(false);
   //   setSoundProgress(value);
   //   // soundObject.setStatusAsync(statusToSet)
-  // }
+  // };
 
   // const slidingComplete = async (e) => {
-  //   console.log("SLIDING COMPLETE")
+  //   console.log("SLIDING COMPLETE");
   //   sound.playFromPositionAsync(soundProgress);
   //   await sound.playAsync();
   //   setPlaying(true);
-  // }
-  
+  // };
+
   // useEffect(() => {
   //   const asyncFunction = async () => {
-  //     if(sound !== false) {
-  //       console.log(sound)
+  //     if (sound !== false) {
+  //       console.log(sound);
   //     }
-  //   }
+  //   };
 
-  //   asyncFunction()
-  // }, [sound])
+  //   asyncFunction();
+  // }, [sound]);
 
   // useEffect(() => {
-  //   console.log('HEELLOO', sound)
-  //   // return sound
-  //   //   ? () => {
-  //   //       console.log("Unloading Sound");
-  //   //       sound.unloadAsync();
-  //   //     }
-  //   //   : undefined;
+  //   console.log("HEELLOO", sound);
+  //   return sound
+  //     ? () => {
+  //         console.log("Unloading Sound");
+  //         sound.unloadAsync();
+  //       }
+  //     : undefined;
   // }, [sound]);
 
   // console.log('MATH', soundProgress, soundDuration, Math.floor(soundProgress / soundDuration), 0/0);
@@ -126,7 +144,9 @@ const RssPlayer = ({ navigation, route }) => {
     <MainContainer>
       <Wrapper>
         <TopBar>
-          <ButtonContainer onPress={() => navigation.goBack()}>
+          <ButtonContainer
+            onPress={() => dispatch(OpenRssPlayer({data: {episode: {...episode}, podcast: {...podcast}}, state: false}))}
+          >
             <AntDesign
               style={{ marginRight: 12 }}
               name="back"
@@ -148,29 +168,33 @@ const RssPlayer = ({ navigation, route }) => {
         />
         <Title style={{ marginBottom: 4 }}>{episode.title}</Title>
         <Span style={{ color: colors.unFocused }}>{podcast.title}</Span>
-        {/* <Slider
+        <Slider
           style={{ width: "100%" }}
           value={soundProgress}
           maximumTrackTintColor={colors.primary}
           minimumTrackTintColor={colors.primary}
           thumbTintColor={colors.primary}
-          disabled={sound === false}
+          // disabled={sound === false}
           maximumValue={soundDuration}
           onValueChange={(value) => changeAudioPosition(value)}
           onSlidingComplete={(e) => slidingComplete(e)}
           minimumValue={0}
-        /> */}
+        />
         <PlayerContainer>
           <TouchableOpacity
             style={{ padding: 10 }}
             // onPress={
             //   sound === false ? () => dispatch(PlaySound(episode.enclosures[0].url)) : playing ? pauseSound : restartSound
             // }
-            onPress={() => {console.log('START SOUND'), dispatch(PlaySound(episode.enclosures[0].url))}}
+            onPress={ startedSound === false ? playSound : playing ? pauseSound : restartSound}
           >
-            <AntDesign name={playing ? 'pause' : 'play'} size={48} color="white" />
+            <AntDesign
+              name={playing ? "pause" : "play"}
+              size={48}
+              color="white"
+            />
           </TouchableOpacity>
-          </PlayerContainer>
+        </PlayerContainer>
       </PlayerWrapper>
     </MainContainer>
   );

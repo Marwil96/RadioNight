@@ -11,10 +11,12 @@ import { ActivityIndicator, View } from "react-native";
 import StyledButton from "../components/StyledButton";
 import { Wrapper } from "../components/Wrapper";
 import { GetPodcastPremieres, StartFollowingPodcast, StopFollowingPodcast } from "../actions";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { OpenRssPlayer } from "../actions/globalActions";
 
 const PodcastDetails = ({ route, navigation }) => {
   const { user_data } = useSelector((state) => state.DatabaseReducer);
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [rssEpisodes, setRssEpisodes] = useState([]);
   const [episodes, setEpisodes] = useState([]);
@@ -23,6 +25,7 @@ const PodcastDetails = ({ route, navigation }) => {
   const [pastEpisodes, setPastEpisodes] = useState([]);
   const [rssFeedLimit, setRssFeedLimit] = useState(20);
   const { title, rss_url, image, id, authors, desc } = route.params;
+  
 
   useEffect(() => {
     const FetchData = async () => {
@@ -156,7 +159,8 @@ const PodcastDetails = ({ route, navigation }) => {
                 title={episode.title}
                 subtitle={title}
                 key={index}
-                onPress={() => navigation.navigate('RssPlayer', {episode: {...episode}, podcast: {...route.params}, mode:'rss'})}
+                // onPress={() => navigation.navigate('RssPlayer', {episode: {...episode}, podcast: {...route.params}, mode:'rss'})}
+                onPress={() => dispatch(OpenRssPlayer({data: {episode: {...episode}, podcast: {...route.params}}, state: true}))}
                 desc={
                   episode.itunes.summary !== undefined && episode.itunes.summary
                 }
