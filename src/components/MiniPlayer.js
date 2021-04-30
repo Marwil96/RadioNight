@@ -1,12 +1,13 @@
-import React from "react";
-import { TouchableOpacity, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { PanResponder, TouchableOpacity, View, Animated } from "react-native";
 import { AntDesign } from "@expo/vector-icons"; 
 import styled from "styled-components/native";
 import colors from "../variables/color";
 import { useDispatch } from "react-redux";
 import { OpenRssPlayer } from "../actions/globalActions";
+// import Animated from "react-native-reanimated";
 
-const Wrapper = styled.TouchableOpacity`
+const Wrapper = styled(Animated.View)`
   padding: 0 16px;
   background: ${colors.smoothBlack};
   /* position: absolute; */
@@ -15,7 +16,7 @@ const Wrapper = styled.TouchableOpacity`
   width: 100%;
 `;
 
-const Content = styled.View`
+const Content = styled.TouchableOpacity`
   display: flex;
   flex-direction: row;
   padding: 10px 16px;
@@ -55,11 +56,51 @@ const Subtitle = styled.Text`
   color: ${colors.text};
 `;
 
-const MiniPlayer = ({podcast, episode, playSound, pauseSound, soundDuration, soundProgress, startedSound, runningEpisode,  playing, changeAudioPosition, slidingComplete, restartSound, style}) => {
-  const dispatch = useDispatch();
+const MiniPlayer = ({podcast, episode, playSound, pauseSound, setPlaying, setRunningEpisode, soundDuration,stopSound, soundProgress, startedSound, runningEpisode,  playing, changeAudioPosition, slidingComplete, restartSound, style}) => {
+  const dispatch = useDispatch(); 
+  const [panX, setPanX ] = useState(0)
+  const [panXOnRelease, setPanXOnRelease] = useState(0)
+
+  const pan = useRef(new Animated.ValueXY()).current;
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: () => {
+        pan.setOffset({
+          x: pan.x._value,
+          y: pan.y._value,
+        });
+      },
+      // onPanResponderMove: Animated.event([null, { dx: pan.x, dy: pan.y }], {useNativeDriver: false}),
+       onPanResponderMove: (e, gestureState) => {setPanX(gestureState.dx), Animated.event([null, { dx: pan.x, dy: pan.y }], {useNativeDriver: false})},
+      onPanResponderRelease: (e, gestureState) => {
+        setPanXOnRelease(gestureState.dx);
+        pan.flattenOffset();
+      },
+    })
+  ).current;
+  
+  useEffect(() => {
+    // dispatch(OpenRssPlayer({data: {episode: {...episode}, podcast: {...podcast}}, state: true}))
+    console.log(panXOnRelease);
+    if(panXOnRelease > 150) {
+      setPanXOnRelease(400);
+      setPlaying(false);
+      setRunningEpisode(false)
+      stopSound()
+    } else {
+      setPanX(0)
+    }
+  }, [panXOnRelease]);
+  
+  // useEffect(() => {
+  //   console.log(pan);
+  // }, [pan])
+  // console.log(panXOnRelease)
   return (
-    <Wrapper style={{  borderBottomColor: '#000', borderBottomWidth: 2}, style} onPress={() => dispatch(OpenRssPlayer({data: {episode: {...episode}, podcast: {...podcast}}, state: true}))}>
-      <Content>
+    <Wrapper style={{  borderTopColor: '#000', borderTopWidth: 2, transform: [{ translateX: panX }]}} {...panResponder.panHandlers}>
+      <Content onPress={() => dispatch(OpenRssPlayer({data: {episode: {...episode}, podcast: {...podcast}}, state: true}))} >
         <LeftColumn>
           <CoverArt source={{ uri:
               episode.itunes.image !== undefined

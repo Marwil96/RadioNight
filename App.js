@@ -5,6 +5,7 @@ import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
 import { Provider, useDispatch, useSelector } from "react-redux";
 import rootReducer from "./src/reducers/index";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import colors from "./src/variables/color";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useFonts, Manrope_400Regular, Manrope_500Medium, Manrope_700Bold } from "@expo-google-fonts/manrope";
@@ -189,22 +190,27 @@ const DataContainer = ({children}) => {
 
   
   return (
-    <View style={{ height: "100%", display: 'flex', flexDirection:'column-reverse' }}> 
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={rssPlayerState}
-      >
-        <RssPlayer 
-          playSound={() => playSound()} 
-          restartSound={restartSound} 
-          changeAudioPosition={changeAudioPosition} 
-          slidingComplete={slidingComplete} pauseSound={pauseSound} 
-          soundDuration={soundDuration} soundProgress={soundProgress} 
-          startedSound={startedSound}  
-          playing={playing}  
-          episode={rssPlayerData.episode} 
-          podcast={rssPlayerData.podcast} 
+    <View
+      style={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column-reverse",
+        backgroundColor: colors.secondary,
+      }}
+    >
+      <Modal animationType="slide" transparent={true} visible={rssPlayerState}>
+        <RssPlayer
+          playSound={() => playSound()}
+          restartSound={restartSound}
+          changeAudioPosition={changeAudioPosition}
+          slidingComplete={slidingComplete}
+          pauseSound={pauseSound}
+          soundDuration={soundDuration}
+          soundProgress={soundProgress}
+          startedSound={startedSound}
+          playing={playing}
+          episode={rssPlayerData.episode}
+          podcast={rssPlayerData.podcast}
           runningEpisode={runningEpisode}
         />
       </Modal>
@@ -214,19 +220,25 @@ const DataContainer = ({children}) => {
         transparent={false}
         visible={!rssPlayerState && startedSound}
       > */}
-      {!rssPlayerState && startedSound &&
-      <MiniPlayer 
-        playSound={() => playSound()} 
-        restartSound={restartSound} 
-        changeAudioPosition={changeAudioPosition} 
-        slidingComplete={slidingComplete} pauseSound={pauseSound} 
-        soundDuration={soundDuration} soundProgress={soundProgress} 
-        startedSound={startedSound}  
-        playing={playing}  
-        episode={rssPlayerData.episode} 
-        podcast={rssPlayerData.podcast} 
-        runningEpisode={runningEpisode}
-      />}
+      {!rssPlayerState && startedSound && (
+        <MiniPlayer
+          playSound={() => playSound()}
+          restartSound={restartSound}
+          changeAudioPosition={changeAudioPosition}
+          slidingComplete={slidingComplete}
+          pauseSound={pauseSound}
+          soundDuration={soundDuration}
+          soundProgress={soundProgress}
+          startedSound={startedSound}
+          setPlaying={setPlaying}
+          setRunningEpisode={setRunningEpisode}
+          playing={playing}
+          episode={rssPlayerData.episode}
+          podcast={rssPlayerData.podcast}
+          runningEpisode={runningEpisode}
+          stopSound={() => stopSound()}
+        />
+      )}
       {/* </Modal> */}
       {children}
     </View>
