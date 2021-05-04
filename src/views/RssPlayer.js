@@ -57,87 +57,18 @@ const MainContainer = styled.ScrollView`
   min-height: 100%;
 `;
 
-const RssPlayer = ({ route, podcast, episode, playSound, pauseSound, soundDuration, soundProgress, startedSound, runningEpisode,  playing, changeAudioPosition, slidingComplete, restartSound }) => {
-  // const {podcast, mode, episode} = route.params;
-  // const { sound } = useSelector((state) => state.DatabaseReducer);
+const RssPlayer = ({ route, podcast, fetchEpisodeProgressStorage, episode, playSound, pauseSound, soundDuration, soundProgress, startedSound, runningEpisode,  playing, changeAudioPosition, slidingComplete, restartSound, runningPodcast }) => {
+  const [episodePlayTime, setEpisodePlayTime] = useState(0)
   const dispatch = useDispatch();
-  // const [playing, setPlaying] = useState(false);
-  // const [startedSound, setStartedSound] = useState(false);
-  // const [soundDuration, setSoundDuration] = useState(100000);
-  // const [sound, setSound] = useState(100000);
-  // const [soundProgress, setSoundProgress] = useState(1);
 
-  // const playSound = async () => {
-  //   console.log("Loading Sound");
-  //   const { sound } = await Audio.Sound.createAsync({uri: episode.enclosures[0].url});
-  //   sound.setOnPlaybackStatusUpdate(updateStatus);
-  //   Audio.setAudioModeAsync({ staysActiveInBackground: true});
-  //   setSound(sound);
-
-  //   console.log("Playing Sound");
-  //   await sound.playAsync();
-  //   setPlaying(true);
-  // }
-
-  // const playSound = async () => {
-  //   console.log("Loading Sound");
-  //   const { sound } = await startAudio(episode.enclosures[0].url);
-  //   sound.setOnPlaybackStatusUpdate(updateStatus);
-  //   setSound(sound);
-  //   setPlaying(true);
-  // };
-
-  // const updateStatus = (status) => {
-  //   // console.log(status.positionMillis, status.durationMillis);
-  //   setSoundDuration(status.durationMillis);
-  //   setSoundProgress(status.positionMillis);
-  // };
-
-  // const pauseSound = async () => {
-  //   await sound.pauseAsync();
-  //   setPlaying(false);
-  // };
-
-  // const restartSound = async () => {
-  //   await sound.playAsync();
-  //   setPlaying(true);
-  // };
-
-  // const changeAudioPosition = async (value) => {
-  //   console.log(value);
-  //   await sound.pauseAsync();
-  //   setPlaying(false);
-  //   setSoundProgress(value);
-  //   // soundObject.setStatusAsync(statusToSet)
-  // };
-
-  // const slidingComplete = async (e) => {
-  //   console.log("SLIDING COMPLETE");
-  //   sound.playFromPositionAsync(soundProgress);
-  //   await sound.playAsync();
-  //   setPlaying(true);
-  // };
-
-  // useEffect(() => {
-  //   const asyncFunction = async () => {
-  //     if (sound !== false) {
-  //       console.log(sound);
-  //     }
-  //   };
-
-  //   asyncFunction();
-  // }, [sound]);
-
-  // useEffect(() => {
-  //   console.log("HEELLOO", sound);
-  //   return sound
-  //     ? () => {
-  //         console.log("Unloading Sound");
-  //         sound.unloadAsync();
-  //       }
-  //     : undefined;
-  // }, [sound]);
-
+  useEffect(() => {
+    const FetchData = async () => {
+      const response = await fetchEpisodeProgressStorage();
+      setEpisodePlayTime(response)
+    }
+    FetchData()
+  }, [])
+  
   // console.log('MATH', soundProgress, soundDuration, Math.floor(soundProgress / soundDuration), 0/0);
   console.log('RUNNING_EPISODE', runningEpisode.title, runningEpisode.title === episode.title, runningEpisode === false  || runningEpisode.title !== episode.title)
   return (
@@ -145,7 +76,7 @@ const RssPlayer = ({ route, podcast, episode, playSound, pauseSound, soundDurati
       <Wrapper>
         <TopBar>
           <ButtonContainer
-            onPress={() => dispatch(OpenRssPlayer({data: {episode: {...episode}, podcast: {...podcast}}, state: false}))}
+            onPress={() => runningEpisode.title === episode.title ? dispatch(OpenRssPlayer({data: {episode: {...episode}, podcast: {...podcast}}, state: false})) : dispatch(OpenRssPlayer({data: {episode: {...runningEpisode}, podcast: {...runningPodcast}}, state: false}))}
           >
             <AntDesign
               style={{ marginRight: 12 }}
@@ -170,7 +101,7 @@ const RssPlayer = ({ route, podcast, episode, playSound, pauseSound, soundDurati
         <Span style={{ color: colors.unFocused }}>{podcast.title}</Span>
         <Slider
           style={{ width: "100%" }}
-          value={runningEpisode.title === episode.title ? soundProgress : 0}
+          value={runningEpisode.title === episode.title ? soundProgress : episodePlayTime}
           maximumTrackTintColor={colors.primary}
           minimumTrackTintColor={colors.primary}
           thumbTintColor={colors.primary}

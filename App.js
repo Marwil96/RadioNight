@@ -1,5 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Audio } from "expo-av";
 import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
 import { Provider, useDispatch, useSelector } from "react-redux";
@@ -29,6 +30,7 @@ import CreatePodcastPremiere from './src/views/CreatePodcastPremiere';
 import Search from './src/views/Search';
 import RssPlayer from './src/views/RssPlayer';
 import MiniPlayer from './src/components/MiniPlayer';
+import { parse } from 'react-native-rss-parser';
 
 
 const customizedMiddleware = getDefaultMiddleware({
@@ -117,22 +119,28 @@ const DataContainer = ({children}) => {
   const [soundDuration, setSoundDuration] = useState(100000);
   const [sound, setSound] = useState(false);
   const [runningEpisode, setRunningEpisode] = useState(false)
+  const [runningPodcast, setRunningPodcast] = useState(false);
   const [soundProgress, setSoundProgress] = useState(1);
+  const [setEpisodeProgres, setEpisodeProgress] = useState(1);
   // console.log(rssPlayerState);
 
   const playSound = async () => {
     console.log("Loading Sound");
-    // if(runningEpisode !== false) {
-    //   console.log(sound)
-    //   await sound.unloadAsync();
-    // }
+    if(runningEpisode !== false) {
+      await stopSound()
+    }
+    const playProgress = await fetchProgressStorage();
+    console.log('IN PLAYSOUND', playProgress);
+    setSoundProgress(playProgress);
     runningEpisode !== false && await stopSound()
     setRunningEpisode(rssPlayerData.episode)
+    setRunningPodcast(rssPlayerData.podcast);
     const { sound } = await Audio.Sound.createAsync({
       uri: rssPlayerData.episode.enclosures[0].url,
     });
     setStartedSound(true)
-    sound.setOnPlaybackStatusUpdate(updateStatus);
+    sound.playFromPositionAsync(playProgress);
+    await sound.setOnPlaybackStatusUpdate(updateStatus);
     Audio.setAudioModeAsync({ staysActiveInBackground: true });
     setSound(sound);
 
@@ -141,8 +149,54 @@ const DataContainer = ({children}) => {
     setPlaying(true);
   };
 
-  const updateStatus = (status) => {
-    // console.log(status.positionMillis, status.durationMillis);
+  const fetchProgressStorage = async () => {
+    console.log('FETCH_STORAGE')
+    try {
+    const value = await AsyncStorage.getItem((JSON.stringify(`${rssPlayerData.episode.title}_progress`)));
+    console.log(value)
+    if (value !== null) {
+      // We have data!!
+      // setEpisodeProgress(JSON.parse(value));
+      console.log(value, JSON.parse(value));
+      return JSON.parse(value);
+    } else {
+      return 0
+    }
+  } catch (error) {
+    console.log("ERROR", error)
+    return 0
+    // Error retrieving data
+  }
+  }
+
+    const fetchEpisodeProgressStorage = async () => {
+    console.log('FETCH_STORAGE')
+    try {
+    const value = await AsyncStorage.getItem((JSON.stringify(`${rssPlayerData.episode.title}_progress`)));
+    console.log(value)
+    if (value !== null) {
+      // We have data!!
+      // setEpisodeProgress(JSON.parse(value));
+      console.log(value, JSON.parse(value));
+      return JSON.parse(value);
+    } else {
+      return 0
+    }
+  } catch (error) {
+    console.log("ERROR", error)
+    return 0
+    // Error retrieving data
+  }
+  }
+  const updateStatus = async (status) => {
+    console.log('UPDATE STATUS', status.positionMillis, status.durationMillis);
+    try {
+      console.log('SAVING_PROGRESSSSSSSSSSSSSS')
+      await AsyncStorage.setItem(JSON.stringify(`${rssPlayerData.episode.title}_progress`), JSON.stringify(status.positionMillis));
+    } catch (e) {
+      // console.log('CANNOT_SAVE_PROGRESS', e)
+      // saving error
+    }
     setSoundDuration(status.durationMillis);
     setSoundProgress(status.positionMillis);
   };
@@ -210,8 +264,11 @@ const DataContainer = ({children}) => {
           startedSound={startedSound}
           playing={playing}
           episode={rssPlayerData.episode}
+          fetchEpisodeProgressStorage={fetchEpisodeProgressStorage}
           podcast={rssPlayerData.podcast}
           runningEpisode={runningEpisode}
+          runningPodcast={runningPodcast}
+          fetchProgressStorage={fetchProgressStorage}
         />
       </Modal>
       {/* <Modal
