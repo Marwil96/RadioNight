@@ -16,13 +16,21 @@ export const FilterSearch = (library, searchTerm, limit) => {
 };
 
 export const FetchPodcastFromRSS = async (url) => {
-  const response = await fetch(url)
+  var myHeaders = new Headers();
+  myHeaders.append("pragma", "no-cache");
+  myHeaders.append("cache-control", "no-cache");
+  var myInit = {
+    method: "GET",
+    headers: myHeaders,
+  };
+
+  const response = await fetch(url, myInit)
     .then((response) => response.text())
     .then((responseData) => rssParser.parse(responseData))
     .then((rss) => {
       return rss;
     });
-    console.log('DONE')
+    // console.log('DONE', response)
     return response
 };
 

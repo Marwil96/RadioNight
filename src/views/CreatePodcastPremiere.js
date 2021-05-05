@@ -144,6 +144,7 @@ const CreatePodcastPremiere = ({ navigation, route }) => {
                     style={{ width: 300, paddingRight: 0, marginLeft: 0 }}
                     title={episode.title}
                     subtitle={podcast.title}
+                    key={index}
                     onPress={() => setSelectedPodcast(episode)}
                     desc={
                       episode.itunes.summary !== undefined &&

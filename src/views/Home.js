@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { LoginUser } from '../actions';
+import { GetCurrentlyLiveEpisodes, GetFollowedPremieres, LoginUser } from '../actions';
 import { MainContainer } from '../components/MainContainer';
 import PodcastCard from '../components/PodcastCard';
 import { Title } from '../components/Title';
@@ -9,68 +9,112 @@ import TopNav from '../components/TopNav';
 
 
 const Home = ({ navigation }) => {
+  const { user_data } = useSelector((state) => state.DatabaseReducer);
+  const [upcomingEpisodes, setUpcomingEpisodes] = useState([]);
+  const [liveEpisodes, setLiveEpisodes] = useState([]);
+  const [notFollowedLiveEpisodes, setNotFollowedLiveEpisodes] = useState([]);
+  const [pastEpisodes, setPastEpisodes] = useState([]);
+
+  useEffect(() => {
+    const FetchData = async () => {
+      const response = await GetFollowedPremieres(user_data.followed_podcasts);
+      const allEpisodes = await GetCurrentlyLiveEpisodes(user_data.followed_podcasts);
+      setNotFollowedLiveEpisodes([...allEpisodes.liveEpisodes, ...allEpisodes.upcomingEpisodes])
+      setUpcomingEpisodes(response.upcomingEpisodes);
+      setLiveEpisodes(response.liveEpisodes);
+      setPastEpisodes(response.pastEpisodes);
+    }
+    if(user_data !== undefined) {
+      FetchData();
+    }
+  },[user_data])
   return (
     <MainContainer player>
       <TopNav />
-      <Title style={{ marginLeft: 16, marginBottom: 24 }}>Live Episode Premieres</Title>
-      <PodcastCard
-        title="Abbi Jacobsond "
-        subtitle="Conan O’Brien, Needs a friend"
-        image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSfHG4Hb0Cbz4cZSb_syTrBqwXltb3i-La779QE549yMC81vI"
-        desc="Writer, comedian, and actress Abbi Jacobson feels scrumptious about being Conan O'Brien's friend. Abbi sits down with Conan to... "
-        meta1="Started 1 minuts ago"
-        meta2="LIVE"
-        onPress={() => navigation.navigate("EpisodeView")}
-      />
+      {liveEpisodes.length > 0 && (
+        <Title style={{ marginLeft: 16, marginBottom: 24 }}>
+          Live Premieres
+        </Title>
+      )}
+      {liveEpisodes.length > 0 &&
+        liveEpisodes.map((episode, index) => (
+          <PodcastCard
+            title={episode.title}
+            subtitle={episode.podcast_name}
+            key={index}
+            desc={episode.desc}
+            image={episode.image}
+            meta1={`${new Date(episode.start_date).getFullYear()}-${new Date(
+              episode.start_date
+            ).getMonth()}-${new Date(episode.start_date).getDate()}`}
+            meta2={`${new Date(episode.start_date).getHours()}:${new Date(
+              episode.start_date
+            ).getMinutes()}:00`}
+          />
+        ))}
+      {upcomingEpisodes.length > 0 && (
+        <Title style={{ marginLeft: 16, marginBottom: 24 }}>
+          Upcoming Premieres of Followed Podcasts
+        </Title>
+      )}
+      {upcomingEpisodes.length > 0 &&
+        upcomingEpisodes.map((episode, index) => (
+          <PodcastCard
+            title={episode.title}
+            subtitle={episode.podcast_name}
+            key={index}
+            desc={episode.desc}
+            image={episode.image}
+            meta1={`${new Date(episode.start_date).getFullYear()}-${new Date(
+              episode.start_date
+            ).getMonth()}-${new Date(episode.start_date).getDate()}`}
+            meta2={`${new Date(episode.start_date).getHours()}:${new Date(
+              episode.start_date
+            ).getMinutes()}:00`}
+          />
+        ))}
 
-      <PodcastCard
-        title="India, Farming, and the Free Market"
-        subtitle="Planet Money"
-        image="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSeQypKxL8Qzjf0n28K0uUD-iVMtxcHx-G_NspdBSTCJcZv-YWh"
-        desc="For decades, India has shielded its agricultural sector from the free market. Now, the government wants to let it in. Millions and millions of farmers..."
-        meta1="Started  3 minuts ago"
-        meta2="LIVE"
-      />
+      {pastEpisodes.length > 0 && (
+        <Title style={{ marginLeft: 16, marginBottom: 24 }}>
+          Catch up on missed shows
+        </Title>
+      )}
+      {pastEpisodes.length > 0 &&
+        pastEpisodes.map((episode, index) => (
+          <PodcastCard
+            title={episode.title}
+            subtitle={episode.podcast_name}
+            key={index}
+            desc={episode.desc}
+            image={episode.image}
+            meta1={`${new Date(episode.start_date).getFullYear()}-${new Date(
+              episode.start_date
+            ).getMonth()}-${new Date(episode.start_date).getDate()}`}
+            meta2={`${new Date(episode.start_date).getHours()}:${new Date(
+              episode.start_date
+            ).getMinutes()}:00`}
+          />
+        ))}
 
-      <PodcastCard
-        title="Welcome to Jurassic Art Redux"
-        subtitle="99% Invisible"
-        image="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTy7v2Vrnp5LhNS7JoKB12kyK9_gxyCjbGFdDf7MkMmXEfvo8XY"
-        desc="Kurt and Roman talk about icebergs and how we visualize them all wrong."
-        meta1="Started 15 minuts ago"
-        meta2="LIVE"
-      />
-
-      <Title style={{ marginBottom: 24, marginLeft: 16}}>Catch up on missed shows</Title>
-      <PodcastCard
-        title="India, Farming, and the Free Market"
-        subtitle="Planet Money"
-        image="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSeQypKxL8Qzjf0n28K0uUD-iVMtxcHx-G_NspdBSTCJcZv-YWh"
-        desc="For decades, India has shielded its agricultural sector from the free market. Now, the government wants to let it in. Millions and millions of farmers..."
-        meta1="Started  3 minuts ago"
-        meta2="LIVE"
-        style={{ marginBottom: 32 }}
-      />
-
-      <PodcastCard
-        title="Welcome to Jurassic Art Redux"
-        subtitle="99% Invisible"
-        image="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTy7v2Vrnp5LhNS7JoKB12kyK9_gxyCjbGFdDf7MkMmXEfvo8XY"
-        desc="Kurt and Roman talk about icebergs and how we visualize them all wrong."
-        meta1="Started 15 minuts ago"
-        meta2="LIVE"
-      />
-
-      <Title style={{ marginBottom: 24, marginLeft: 16 }}>You might like this</Title>
-      <PodcastCard
-        title="India, Farming, and the Free Market"
-        subtitle="Planet Money"
-        image="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSeQypKxL8Qzjf0n28K0uUD-iVMtxcHx-G_NspdBSTCJcZv-YWh"
-        desc="For decades, India has shielded its agricultural sector from the free market. Now, the government wants to let it in. Millions and millions of farmers..."
-        meta1="Started  3 minuts ago"
-        meta2="LIVE"
-        style={{ marginBottom: 32 }}
-      />
+      {notFollowedLiveEpisodes.length > 0 && <Title style={{ marginBottom: 24, marginLeft: 16 }}>
+        You might like this
+      </Title>}
+      {notFollowedLiveEpisodes.length > 0 &&
+        notFollowedLiveEpisodes.map((episode, index) => (
+          <PodcastCard
+            title={episode.title}
+            subtitle={episode.podcast_name}
+            key={index}
+            desc={episode.desc}
+            image={episode.image}
+            meta1={`${new Date(episode.start_date).getFullYear()}-${new Date(
+              episode.start_date
+            ).getMonth()}-${new Date(episode.start_date).getDate()}`}
+            meta2={`${new Date(episode.start_date).getHours()}:${new Date(
+              episode.start_date
+            ).getMinutes()}:00`}
+          />
+        ))}
     </MainContainer>
   );
 };
