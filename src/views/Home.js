@@ -41,7 +41,7 @@ const Home = ({ navigation }) => {
         meta2="LIVE"
       />
 
-      <Title style={{ marginBottom: 24 }}>Catch up on missed shows</Title>
+      <Title style={{ marginBottom: 24, marginLeft: 16}}>Catch up on missed shows</Title>
       <PodcastCard
         title="India, Farming, and the Free Market"
         subtitle="Planet Money"
@@ -61,7 +61,7 @@ const Home = ({ navigation }) => {
         meta2="LIVE"
       />
 
-      <Title style={{ marginBottom: 24 }}>You might like this</Title>
+      <Title style={{ marginBottom: 24, marginLeft: 16 }}>You might like this</Title>
       <PodcastCard
         title="India, Farming, and the Free Market"
         subtitle="Planet Money"
