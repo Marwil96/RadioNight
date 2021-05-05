@@ -26,11 +26,12 @@ import ChooseWayOfCreatingPodcast from './src/views/ChooseWayOfCreatingPodcast';
 import CreatePodcastWithRSS from './src/views/CreatePodcastWithRSS';
 import YourPodcasts from './src/views/YourPodcasts';
 import YourPodcast from './src/views/YourPodcast';
-import CreatePodcastPremiere from './src/views/CreatePodcastPremiere';
+import ScheduleEpisodePremiere from './src/views/ScheduleEpisodePremiere';
 import Search from './src/views/Search';
 import RssPlayer from './src/views/RssPlayer';
 import MiniPlayer from './src/components/MiniPlayer';
 import { parse } from 'react-native-rss-parser';
+import StartEpisodePremiere from './src/views/StartEpisodePremiere';
 
 
 const customizedMiddleware = getDefaultMiddleware({
@@ -59,7 +60,8 @@ const YourPodcastsStackScreen = () => (
   <YourPodcastsStack.Navigator initialRouteName="YourPodcasts" screenOptions={{ headerShown: false }}>
     <YourPodcastsStack.Screen name="YourPodcasts" component={YourPodcasts} />
     <YourPodcastsStack.Screen name="YourPodcast" component={YourPodcast} />
-    <YourPodcastsStack.Screen name="CreatePodcastPremiere" component={CreatePodcastPremiere} />
+    <YourPodcastsStack.Screen name="ScheduleEpisodePremiere" component={ScheduleEpisodePremiere} />
+    <YourPodcastsStack.Screen name="StartEpisodePremiere" component={StartEpisodePremiere} />
   </YourPodcastsStack.Navigator>
 )
 

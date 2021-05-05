@@ -29,6 +29,19 @@ export const FetchAllUserData = () => {
 export const SchedulePodcastPremiere = async (data) => {
   const episodeId = getTimeEpoch();
   const result = await Promise.all(
+    db.collection("scheduled_episodes").doc(episodeId).set({...data, episode_id:episodeId }).then(() => { 
+      return true
+    }).catch((error) => {
+      return false
+    })
+  )
+
+  return result
+}
+
+export const AddEpisodePremiere = async (data) => {
+  const episodeId = getTimeEpoch();
+  const result = await Promise.all(
     db.collection("episodes").doc(episodeId).set({...data, episode_id:episodeId }).then(() => { 
       return true
     }).catch((error) => {

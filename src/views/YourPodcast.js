@@ -103,8 +103,11 @@ const YourPodcast = ({ navigation, route }) => {
         />)
       }
       
+      <Wrapper style={{marginBottom: 16}}>
+        <StyledButton primary onPress={() => navigation.navigate("StartEpisodePremiere", {...route.params})}> Go Live Now! </StyledButton>
+      </Wrapper>
       <Wrapper>
-        <StyledButton primary onPress={() => navigation.navigate("CreatePodcastPremiere", {...route.params})}> Schedule Podcast Premiere </StyledButton>
+        <StyledButton onPress={() => navigation.navigate("CreatePodcastPremiere", {...route.params})}> Schedule Episode Premiere </StyledButton>
       </Wrapper>
     </MainContainer>
   );
