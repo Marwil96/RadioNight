@@ -23,8 +23,8 @@ const YourPodcasts = ({navigation}) => {
   return (
     <MainContainer>
       <Title style={{ marginLeft: 16 }}>Your Podcasts</Title>
-      {podcasts.map((podcast) => (
-        <PodcastCard title={podcast.title} image={podcast.image} onPress={() => navigation.navigate('YourPodcast',{
+      {podcasts.map((podcast, index) => (
+        <PodcastCard title={podcast.title} key={index} image={podcast.image} onPress={() => navigation.navigate('YourPodcast',{
            ...podcast
           })} />
       ))}
