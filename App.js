@@ -115,7 +115,7 @@ const TabNavigation = () => (
 );
 
 const DataContainer = ({children}) => {
-  const { rssPlayerState, rssPlayerData } = useSelector((state) => state.GlobalActionsReducer);
+  const { rssPlayerState, rssPlayerData, episodePlayerState, episodePlayerData } = useSelector((state) => state.GlobalActionsReducer);
   const [playing, setPlaying] = useState(false);
   const [startedSound, setStartedSound] = useState(false);
   const [soundDuration, setSoundDuration] = useState(100000);
@@ -126,11 +126,13 @@ const DataContainer = ({children}) => {
   const [setEpisodeProgres, setEpisodeProgress] = useState(1);
   // console.log(rssPlayerState);
 
-  const playSound = async () => {
+  const playRssEpisode = async () => {
     console.log("Loading Sound");
+
     if(runningEpisode !== false) {
       await stopSound()
     }
+    
     const playProgress = await fetchProgressStorage();
     console.log('IN PLAYSOUND', playProgress);
     setSoundProgress(playProgress);
@@ -150,6 +152,51 @@ const DataContainer = ({children}) => {
     await sound.playAsync();
     setPlaying(true);
   };
+
+  const playEpisode = async () => {
+    console.log("Loading Sound");
+
+    if(runningEpisode !== false) {
+      await stopSound()
+    }
+    
+    const playProgress = await fetchEpisodeProgress(episodePlayerData.episode_id);
+    console.log('IN PLAYSOUND', playProgress);
+    setSoundProgress(playProgress);
+    runningEpisode !== false && await stopSound()
+    setRunningEpisode(episodePlayerData)
+    setRunningPodcast(episodePlayerData);
+    const { sound } = await Audio.Sound.createAsync({
+      uri: episodePlayerData.play_link,
+    });
+    setStartedSound(true)
+    sound.playFromPositionAsync(playProgress);
+    // await sound.setOnPlaybackStatusUpdate(updateStatus);
+    Audio.setAudioModeAsync({ staysActiveInBackground: true });
+    setSound(sound);
+
+    console.log("Playing Sound");
+    await sound.playAsync();
+    setPlaying(true);
+  };
+
+  const fetchEpisodeProgress = async (episodeId) => {
+    var requestOptions = {
+      method: "GET",
+      redirect: "follow",
+    };
+
+   const result = fetch(
+      `https://blooming-sea-13003.herokuapp.com/episode-progress/${episodeId}`,
+      requestOptions
+    )
+      .then((response) => response.json())
+      .then((result) => result.episode_progress)
+      .catch((error) => console.log("error", error));
+
+    return result
+  };
+
 
   const fetchProgressStorage = async () => {
     console.log('FETCH_STORAGE')
@@ -193,7 +240,6 @@ const DataContainer = ({children}) => {
   const updateStatus = async (status) => {
     console.log('UPDATE STATUS', status.positionMillis, status.durationMillis);
     try {
-      console.log('SAVING_PROGRESSSSSSSSSSSSSS')
       await AsyncStorage.setItem(JSON.stringify(`${rssPlayerData.episode.title}_progress`), JSON.stringify(status.positionMillis));
     } catch (e) {
       // console.log('CANNOT_SAVE_PROGRESS', e)
@@ -231,9 +277,16 @@ const DataContainer = ({children}) => {
   const stopSound = async () => {
     await sound.unloadAsync();
     setStartedSound(false)
+    // setPlaying(false)
   }
-  
 
+  const stopSoundCompletely = async () => {
+    await sound.unloadAsync();
+    setStartedSound(false);
+    setPlaying(false)
+  };
+  
+  console.log('YOOOOO', episodePlayerState, rssPlayerState, startedSound )
   // useEffect(() => {
   //   console.log("HEELLOO", sound);
   //   return sound
@@ -254,9 +307,9 @@ const DataContainer = ({children}) => {
         backgroundColor: colors.secondary,
       }}
     >
-      <Modal animationType="slide" transparent={true} visible={rssPlayerState}>
+      {rssPlayerData !== undefined && <Modal animationType="slide" transparent={true} visible={rssPlayerState}>
         <RssPlayer
-          playSound={() => playSound()}
+          playSound={() => playRssEpisode()}
           restartSound={restartSound}
           changeAudioPosition={changeAudioPosition}
           slidingComplete={slidingComplete}
@@ -272,14 +325,35 @@ const DataContainer = ({children}) => {
           runningPodcast={runningPodcast}
           fetchProgressStorage={fetchProgressStorage}
         />
-      </Modal>
+      </Modal>}
+
+      {episodePlayerData !== undefined && <Modal animationType="slide" transparent={true} visible={episodePlayerState}>
+        <EpisodeView
+          playSound={() => playEpisode()}
+          restartSound={restartSound}
+          changeAudioPosition={changeAudioPosition}
+          slidingComplete={slidingComplete}
+          pauseSound={pauseSound}
+          soundDuration={soundDuration}
+          soundProgress={soundProgress}
+          startedSound={startedSound}
+          playing={playing}
+          episode={episodePlayerData}
+          fetchEpisodeProgressStorage={fetchEpisodeProgressStorage}
+          // podcast={episodePlayerData.podcast}
+          runningEpisode={runningEpisode}
+          runningPodcast={runningPodcast}
+          fetchProgressStorage={fetchProgressStorage}
+        />
+      </Modal> 
+      }
       {/* <Modal
         style={{backgroundColor: 'blue', height: }}
         animationType="slide"
         transparent={false}
         visible={!rssPlayerState && startedSound}
       > */}
-      {!rssPlayerState && startedSound && (
+      {!rssPlayerState && startedSound && !episodePlayerState && (
         <MiniPlayer
           playSound={() => playSound()}
           restartSound={restartSound}
@@ -292,10 +366,14 @@ const DataContainer = ({children}) => {
           setPlaying={setPlaying}
           setRunningEpisode={setRunningEpisode}
           playing={playing}
-          episode={rssPlayerData.episode}
-          podcast={rssPlayerData.podcast}
+          episode={episodePlayerData !== undefined ? episodePlayerData : rssPlayerData.episode}
+          podcast={episodePlayerData !== undefined ? episodePlayerData : rssPlayerData.podcast}
+          title={episodePlayerData !== undefined ? episodePlayerData.title : rssPlayerData.episode.title}
+          subtitle={episodePlayerData !== undefined ? episodePlayerData.podcast_name : rssPlayerData.podcast.title}
+          optionToPause={episodePlayerData !== undefined ? false : true}
+          coverArt={episodePlayerData !== undefined ? episodePlayerData.image : rssPlayerData.episode.itunes.image !== undefined? rssPlayerData.episode.itunes.image : rssPlayerData.podcast.image}
           runningEpisode={runningEpisode}
-          stopSound={() => stopSound()}
+          stopSound={() => stopSoundCompletely()}
         />
       )}
       {/* </Modal> */}

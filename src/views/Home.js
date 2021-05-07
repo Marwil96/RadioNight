@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { GetCurrentlyLiveEpisodes, GetFollowedPremieres, LoginUser } from '../actions';
+import { OpenEpisodePlayer } from '../actions/globalActions';
 import { MainContainer } from '../components/MainContainer';
 import PodcastCard from '../components/PodcastCard';
 import { Title } from '../components/Title';
@@ -10,6 +11,7 @@ import TopNav from '../components/TopNav';
 
 const Home = ({ navigation }) => {
   const { user_data } = useSelector((state) => state.DatabaseReducer);
+  const dispatch = useDispatch()
   const [upcomingEpisodes, setUpcomingEpisodes] = useState([]);
   const [liveEpisodes, setLiveEpisodes] = useState([]);
   const [notFollowedLiveEpisodes, setNotFollowedLiveEpisodes] = useState([]);
@@ -42,6 +44,7 @@ const Home = ({ navigation }) => {
             title={episode.title}
             subtitle={episode.podcast_name}
             key={index}
+            onPress={() => { dispatch(OpenEpisodePlayer({data:{...episode}, state: true}))}}
             desc={episode.desc}
             image={episode.image}
             meta1={`${new Date(episode.start_date).getFullYear()}-${new Date(

@@ -6,7 +6,7 @@ import * as rssParser from "react-native-rss-parser";
 import { ActivityIndicator, ScrollView, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components/native";
-import { SchedulePodcastPremiere } from "../actions";
+import { AddEpisodePremiere, SchedulePodcastPremiere } from "../actions";
 import InputField from "../components/InputField";
 import { MainContainer } from "../components/MainContainer";
 import PodcastCard from "../components/PodcastCard";
@@ -17,6 +17,7 @@ import { Wrapper } from "../components/Wrapper";
 import colors from "../variables/color";
 import { FilterSearch } from "../other/helperFunctions";
 import ToggleBar from "../components/ToggleBar";
+import { OpenEpisodePlayer } from "../actions/globalActions";
 
 const TopBar = styled.View`
   width: 100%;
@@ -48,12 +49,13 @@ const StartEpisodePremiere = ({ navigation, route }) => {
   const [hostMessage, setHostMessage] = useState("Welcome to our premiere of Wind of Change. We will be available for questions after the episode");
   const [toggleMode, setToggleMode] = useState('Directly')
   const { title, rss_url, image, id, authors, desc } = route.params;
+  const dispatch = useDispatch();
 
   useEffect(() => {
     FetchPodcast(rss_url);
   }, [rss_url]);
 
-  const SchedulePremiereHelper = async () => {
+  const StartEpisodePremiere = async () => {
     const unFormattedDate = new Date();
     const data = {
       title: selectedPodcast.title,
@@ -68,19 +70,61 @@ const StartEpisodePremiere = ({ navigation, route }) => {
       podcast_desc: desc,
       podcast_image: image,
       podcast_id: id,
+      stream_started: true,
+      host_message: hostMessage,
+      play_link: selectedPodcast.enclosures[0].url,
       rss_url: rss_url,
       start_date: unFormattedDate.toString(),
       duration: selectedPodcast.itunes.duration,
     };
 
-    console.log(data);
+    // Create a non-dom allocated Audio element
+    var au = document.createElement("audio");
 
-    const response = await SchedulePodcastPremiere(data);
-    if (response) {
-      navigation.navigate("YourPodcast", { ...route.params });
-    } else {
-      console.log("ERROR");
-    }
+    // Define the URL of the MP3 audio file
+    au.src = selectedPodcast.enclosures[0].url;
+
+    // Once the metadata has been loaded, display the duration in the console
+    au.addEventListener(
+      "loadedmetadata",
+      function () {
+        // Obtain the duration in seconds of the audio file (with milliseconds as well, a float value)
+        var duration = au.duration;
+
+        // example 12.3234 seconds
+        console.log("The duration of the song is of: " + duration + " seconds");
+        // Alternatively, just display the integer value with
+        // parseInt(duration)
+        // 12 seconds
+      },
+      false
+    );
+
+    // const response = await AddEpisodePremiere(data);
+
+    // var formdata = new FormData();
+    // console.log('RESPONSE', response)
+    // formdata.append("episode_id", response.episodeId);
+
+    // var requestOptions = {
+    //   method: "POST",
+    //   body: formdata,
+    //   redirect: "follow",
+    // };
+
+    // await fetch(
+    //   "https://blooming-sea-13003.herokuapp.com/start-stream",
+    //   requestOptions
+    // )
+    //   .then((response) => response.text())
+    //   .then((result) => console.log(result))
+    //   .catch((error) => console.log("error", error));
+
+    // if (response.success) {
+    //   navigation.navigate("YourPodcast", { ...route.params });
+    // } else {
+    //   console.log("ERROR");
+    // }
   };
 
   const FetchPodcast = async (url) => {
@@ -211,7 +255,7 @@ const StartEpisodePremiere = ({ navigation, route }) => {
 
       <Wrapper style={{ paddingBottom: 100 }}>
         <StyledButton
-          onPress={() => SchedulePremiereHelper()}
+          onPress={() => StartEpisodePremiere()}
           primary={selectedPodcast !== undefined ? true : false}
         >
           Start Premiere

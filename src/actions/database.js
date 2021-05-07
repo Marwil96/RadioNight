@@ -1,4 +1,4 @@
-import { CREATE_USER, LOGIN_USER, SIGN_OUT_USER, CREATE_PODCAST, FETCH_ALL_USER_DATA } from "./constables";
+import { CREATE_USER, LOGIN_USER, SIGN_OUT_USER, CREATE_PODCAST, FETCH_ALL_USER_DATA, FETCH_EPISODE } from "./constables";
 import firebase from "firebase";
 import { firebaseConfig } from "../../firebaseConfig";
 
@@ -41,14 +41,13 @@ export const SchedulePodcastPremiere = async (data) => {
 
 export const AddEpisodePremiere = async (data) => {
   const episodeId = getTimeEpoch();
-  const result = await Promise.all(
-    db.collection("episodes").doc(episodeId).set({...data, episode_id:episodeId }).then(() => { 
-      return true
+  const result = await db.collection("episodes").doc(episodeId).set({...data, episode_id:episodeId }).then(() => { 
+      return {success: true, episodeId: episodeId}
     }).catch((error) => {
-      return false
+      return {success: false, episodeId: false}
     })
-  )
-
+  
+  console.log('ADD EPISODE PREMIERE', result)
   return result
 }
 
@@ -105,6 +104,30 @@ export const FetchYourPodcasts = async (podcast_ids) => {
 
   return result;
 }
+
+
+export const FetchEpisode = (episodeId) => {
+  return(dispatch) => {
+    dispatch({
+      type: FETCH_EPISODE,
+      payload: { data: {}, loading: true },
+    });
+   db.collection("episodes")
+    .doc(episodeId)
+    .onSnapshot((doc) => {
+    console.log("Current data: ", doc.data());
+    const data = doc.data();
+    dispatch({
+      type: FETCH_EPISODE,
+      payload: { data: data, loading: false },
+    });
+    });
+
+  }
+
+  return data
+}
+
 
 export const CreatePodcast = ({data}) => {
 

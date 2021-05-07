@@ -4,7 +4,7 @@ import { AntDesign } from "@expo/vector-icons";
 import styled from "styled-components/native";
 import colors from "../variables/color";
 import { useDispatch } from "react-redux";
-import { OpenRssPlayer } from "../actions/globalActions";
+import { OpenEpisodePlayer, OpenRssPlayer } from "../actions/globalActions";
 // import Animated from "react-native-reanimated";
 
 const Wrapper = styled.TouchableOpacity`
@@ -56,32 +56,40 @@ const Subtitle = styled.Text`
   color: ${colors.text};
 `;
 
-const MiniPlayer = ({podcast, episode, playSound, pauseSound, setPlaying, setRunningEpisode, soundDuration, stopSound, soundProgress, startedSound, runningEpisode,  playing, changeAudioPosition, slidingComplete, restartSound, style}) => {
+const MiniPlayer = ({podcast, episode, playSound, pauseSound, title, subtitle, optionToPause, setPlaying, coverArt, setRunningEpisode, soundDuration, stopSound, soundProgress, startedSound, runningEpisode,  playing, changeAudioPosition, slidingComplete, restartSound, style}) => {
   const dispatch = useDispatch(); 
-
+  console.log('MINIPLAYER', title, coverArt, subtitle)
   return (
-    <Wrapper style={{ borderTopColor: '#000'}} onPress={() => dispatch(OpenRssPlayer({data: {episode: {...episode}, podcast: {...podcast}}, state: true}))}>
+    <Wrapper style={{ borderTopColor: '#000'}} onPress={() => optionToPause ? dispatch(OpenRssPlayer({data: {episode: {...episode}, podcast: {...podcast}}, state: true})) : dispatch(OpenEpisodePlayer({data:{...episode}, state: true}))}>
       <Content >
         <LeftColumn>
-          <CoverArt source={{ uri:
-              episode.itunes.image !== undefined
-                ? episode.itunes.image
-                : podcast.image}} />
+          <CoverArt source={{ uri: coverArt}} />
           <TitleContainer>
-            <Title>{episode.title}</Title>
-            <Subtitle>{podcast.title}</Subtitle>
+            <Title>{title}</Title>
+            <Subtitle>{subtitle}</Subtitle>
           </TitleContainer>
         </LeftColumn>
-        <TouchableOpacity
+        {optionToPause ? <TouchableOpacity
             style={{padding: 10, position: 'absolute', right: 6}}
-            onPress={ runningEpisode === false  || runningEpisode.title !== episode.title ? playSound : playing ? pauseSound : restartSound}
+            onPress={ runningEpisode === false  || runningEpisode.title !== title ? playSound : playing ? pauseSound : restartSound}
           >
             <AntDesign
-              name={runningEpisode.title === episode.title ? playing ? "pause" : "play" : 'play'}
+              name={runningEpisode.title === title ? playing ? "pause" : "play" : 'play'}
+              size={24}
+              color="white"
+            />
+          </TouchableOpacity> :
+          <TouchableOpacity
+            style={{padding: 10, position: 'absolute', right: 6}}
+            onPress={playing ? stopSound : playSound}
+          >
+            <AntDesign
+              name={playing ? "close" : "play"}
               size={24}
               color="white"
             />
           </TouchableOpacity>
+          }
       </Content>
     </Wrapper>
   );
