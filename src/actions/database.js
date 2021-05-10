@@ -18,7 +18,7 @@ const getTimeEpoch = () => {
 export const FetchAllUserData = () => {
   return (dispatch) => {
     dispatch({type: FETCH_ALL_USER_DATA, payload: {loading: true}})
-    db.collection('users').doc(user.currentUser.uid).get().then((doc) => {
+    db.collection('users').doc(user.currentUser.uid).onSnapshot((doc) => {
       const data = doc.data();
 
       dispatch({type: FETCH_ALL_USER_DATA, payload: {loading: false, user_data: data }})
@@ -215,15 +215,11 @@ export const GetFollowedPremieres = async (followed_podcasts) => {
         querySnapshot.forEach((doc) => {
             // doc.data() is never undefined for query doc snapshots
             const data = doc.data();
-            const currentDate = new Date();
-            const episodeGoesLive = new Date(data.start_date);
-            // const episodeIsDone = new Date(data.start_date).setSeconds(episodeGoesLive.getSeconds() + data.duration);
-            const episodeIsDone = data.episode_done === true;
-            console.log('SHOULD BE LIVE', currentDate > episodeGoesLive && data.episode_done !== true)
-              if(episodeIsDone) {
+
+              if(data.episode_ended === true) {
                 pastEpisodes.push({ ...data, episode_state: 'past' });
                 // return 'past'
-              } else if (currentDate > episodeGoesLive && data.episode_done !== true) {
+              } else if (data.episode_is_running === true) {
                 liveEpisodes.push({ ...data, episode_state: "live" });
                 // return 'live'
               } else {

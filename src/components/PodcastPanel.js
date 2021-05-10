@@ -4,6 +4,7 @@ import styled from "styled-components/native";
 import colors from "../variables/color";
 import { Span } from "./Span";
 import StyledButton from "./StyledButton";
+import { StartFollowingPodcast, StopFollowingPodcast } from "../actions";
 
 const Wrapper = styled.TouchableOpacity`
   padding: 0 16px;
@@ -13,9 +14,9 @@ const Wrapper = styled.TouchableOpacity`
 
 const Content = styled.View`
   display: flex;
-  flex-direction: row;
+  flex-direction: ${props => props.isOpen ? 'column' : 'row'};
   justify-content: space-between;
-  align-items: center;
+  align-items: ${props => props.isOpen ? 'flex-start' : 'center'};
   flex-shrink: 1;
 `;
 
@@ -24,13 +25,14 @@ const CardHeader = styled.View`
   flex-direction: row;
   align-items: center;
   margin-right: 8px;
-  width: 65%;
+  margin-bottom: ${(props) => (props.isOpen ? "12px" : "0px")};
+  width: ${(props) => (props.isOpen ? "100%" : "65%")};
 `;
 
 const CoverArt = styled.Image`
-  height: 50px;
-  width: 50px;
-  margin-right: 10px;
+  height: 60px;
+  width: 60px;
+  margin-right: 12px;
   border-radius: 4px;
 `;
 
@@ -40,9 +42,9 @@ const TitleContainer = styled.View`
   flex-shrink: 1;
 `;
 const Title = styled.Text`
-  font-size: 20px;
+  font-size: 18px;
   font-family: "Manrope_500Medium";
-  margin-bottom: 0px;
+  margin-bottom: 3px;
   color: ${(props) => props.textColor};
   flex-shrink: 1;
 `;
@@ -51,6 +53,14 @@ const Subtitle = styled.Text`
   font-family: "Manrope_400Regular";
   color: ${(props) => props.textColor};
 `;
+
+const DescText = styled.Text`
+  font-size: 14px;
+  margin-bottom: 12px;
+  font-family: "Manrope_400Regular";
+  color: ${(props) => props.textColor};
+`;
+
 
 const PodcastPanel = ({
   onPress,
@@ -62,31 +72,36 @@ const PodcastPanel = ({
   isFollowed,
   bgColor,
   textColor,
+  podcastId
 }) => {
   const [followingPodcast, setFollowingPodcast] = useState(isFollowed);
+  const [isOpen, setIsOpen] = useState(false);
   return (
     <Wrapper
-      onPress={onPress}
+      onPress={() => setIsOpen(!isOpen)}
       style={style}
       bgColor={bgColor}
       textColor={textColor}
     >
-      <Content>
-        <CardHeader>
+      <Content isOpen={isOpen}>
+        <CardHeader isOpen={isOpen}>
           <CoverArt source={{ uri: image }} />
           <TitleContainer>
             <Title textColor={textColor}>{title}</Title>
             <Subtitle textColor={textColor}>{subtitle}</Subtitle>
           </TitleContainer>
         </CardHeader>
+        {isOpen && <DescText  textColor={textColor}>
+          {desc}
+        </DescText>}
 
-          <StyledButton
-            style={{ paddingTop: 8, paddingBottom: 8, height: 39, flexShrink: 1 }}
-            borderMode={followingPodcast}
-            onPress={() => setFollowingPodcast(!followingPodcast)}
-          >
-            {followingPodcast ? "Following" : "Follow"}
-          </StyledButton>
+        <StyledButton
+          style={{ paddingTop: 8, paddingBottom: 8, height: 39, flexShrink: 1 }}
+          borderMode={followingPodcast}
+          onPress={(id) => {setFollowingPodcast(!followingPodcast), !followingPodcast ? StartFollowingPodcast(podcastId) :StopFollowingPodcast(podcastId)}}
+        >
+          {followingPodcast ? "Following" : "Follow"}
+        </StyledButton>
       </Content>
     </Wrapper>
   );

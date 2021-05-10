@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { GetCurrentlyLiveEpisodes, GetFollowedPremieres, LoginUser } from '../actions';
-import { OpenEpisodePlayer } from '../actions/globalActions';
+import { OpenEpisodePlayer, OpenRssPlayer } from '../actions/globalActions';
 import { MainContainer } from '../components/MainContainer';
 import PodcastCard from '../components/PodcastCard';
 import { Title } from '../components/Title';
@@ -30,6 +30,7 @@ const Home = ({ navigation }) => {
       FetchData();
     }
   },[user_data])
+  
   return (
     <MainContainer player>
       <TopNav />
@@ -50,9 +51,7 @@ const Home = ({ navigation }) => {
             meta1={`${new Date(episode.start_date).getFullYear()}-${new Date(
               episode.start_date
             ).getMonth()}-${new Date(episode.start_date).getDate()}`}
-            meta2={`${new Date(episode.start_date).getHours()}:${new Date(
-              episode.start_date
-            ).getMinutes()}:00`}
+            meta2={episode.episode_is_running ? 'LIVE' : 'PREPARTY'}
           />
         ))}
       {upcomingEpisodes.length > 0 && (
@@ -89,6 +88,7 @@ const Home = ({ navigation }) => {
             subtitle={episode.podcast_name}
             key={index}
             desc={episode.desc}
+            // onPress={() => dispatch(OpenRssPlayer({data: {episode: {...episode}, podcast: {...route.params}}, state: true}))}
             image={episode.image}
             meta1={`${new Date(episode.start_date).getFullYear()}-${new Date(
               episode.start_date
@@ -110,12 +110,11 @@ const Home = ({ navigation }) => {
             key={index}
             desc={episode.desc}
             image={episode.image}
+            onPress={() => { dispatch(OpenEpisodePlayer({data:{...episode}, state: true}))}}
             meta1={`${new Date(episode.start_date).getFullYear()}-${new Date(
               episode.start_date
             ).getMonth()}-${new Date(episode.start_date).getDate()}`}
-            meta2={`${new Date(episode.start_date).getHours()}:${new Date(
-              episode.start_date
-            ).getMinutes()}:00`}
+            meta2={'LIVE'}
           />
         ))}
     </MainContainer>

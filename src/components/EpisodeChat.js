@@ -13,6 +13,11 @@ const ChatHeader = styled.View`
 const Wrapper = styled.View`
   display: flex;
   flex-direction: column;
+  bottom: 0;
+  flex-shrink: 1;
+  /* min-height: 100%; */
+  max-height: 100%;
+  height: 100%;
 `
 
 const ChatHeaderTitle = styled.Text`
@@ -25,7 +30,9 @@ const ChatWrapper = styled.View`
   background-color: #f6f6f6;
   /* background-color: #D7D7D7; */
   width: 100%;
-  max-height: 360px;
+  max-height: 500px;
+  height: 100%;
+  flex-shrink: 1;
   padding: 16px 16px;
   flex: 1;
 `;
@@ -37,6 +44,11 @@ const MessageWrapper = styled.View`
   background-color: white;
   flex-shrink: 1;
   bottom: 24px;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 80px;
+  z-index: 100;
 `
 
 const ChatButton = styled.TouchableOpacity`

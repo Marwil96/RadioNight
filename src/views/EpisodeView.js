@@ -9,6 +9,7 @@ import PodcastDetailsHeader from '../components/PodcastDetailsHeader';
 import { Wrapper } from '../components/Wrapper';
 import EpisodeChat from '../components/EpisodeChat';
 import PodcastPanel from '../components/PodcastPanel';
+import LottieView from "lottie-react-native";
 import { FetchEpisode } from '../actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { OpenEpisodePlayer } from '../actions/globalActions';
@@ -23,7 +24,7 @@ const ButtonContainer = styled.TouchableOpacity`
   flex-direction: row;
 `
 
-const MainContainer = styled.ScrollView`
+const MainContainer = styled.View`
   display: flex;
   flex-direction: column;
   background: ${colors.background};
@@ -31,6 +32,10 @@ const MainContainer = styled.ScrollView`
   padding: 48px 0;
   padding-top: 16px;
   min-height: 100%;
+  /* max-height: 100%; */
+  width: 100%;
+  height: 108%;
+  position: absolute;
 `;
 
 const Container = styled.View`
@@ -84,10 +89,10 @@ const Subtitle = styled.Text`
 
 const MiniPlayerStyle = ({episode, runningEpisode, playSound, playing, restartSound, pauseSound}) => {
   return (
-    <Container style={{ borderTopColor: '#000'}} >
-      <Content >
+    <Container style={{ borderTopColor: "#000" }}>
+      <Content>
         <LeftColumn>
-          <CoverArt source={{ uri: episode.image}} />
+          <CoverArt source={{ uri: episode.image }} />
           <TitleContainer>
             <MiniPlayerTitle>{episode.title}</MiniPlayerTitle>
             {/* <Subtitle>{podcast.title}</Subtitle> */}
@@ -105,12 +110,12 @@ const MiniPlayerStyle = ({episode, runningEpisode, playSound, playing, restartSo
           </TouchableOpacity> */}
       </Content>
     </Container>
-  )
+  );
 }
 
 const EpisodeView = ({ podcast, fetchEpisodeProgressStorage, episode, playSound, pauseSound, soundDuration, soundProgress, startedSound, runningEpisode,  playing, changeAudioPosition, slidingComplete, restartSound, runningPodcast  }) => {
   const { episode_id } = episode;
-  const { episodeData, loading } = useSelector((state) => state.DatabaseReducer);
+  const { episodeData, loading, user_data } = useSelector((state) => state.DatabaseReducer);
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -123,7 +128,13 @@ const EpisodeView = ({ podcast, fetchEpisodeProgressStorage, episode, playSound,
     <MainContainer loading={loading}>
       <Wrapper>
         <TopBar>
-          <ButtonContainer onPress={() => dispatch(OpenEpisodePlayer({data: {...episodeData}, state: false}))}>
+          <ButtonContainer
+            onPress={() =>
+              dispatch(
+                OpenEpisodePlayer({ data: { ...episodeData }, state: false })
+              )
+            }
+          >
             <AntDesign
               style={{ marginRight: 12 }}
               name="back"
@@ -134,9 +145,21 @@ const EpisodeView = ({ podcast, fetchEpisodeProgressStorage, episode, playSound,
           </ButtonContainer>
         </TopBar>
       </Wrapper>
+      <Wrapper style={{ display: "flex", alignItems: 'center', justifyContent: "center", width: '100%' }}>
+        <LottieView
+          autoPlay
+          loop
+          style={{
+            width: 80,
+            height: 120,
+            // backgroundColor: "#eee",
+          }}
+          source={require("../assets/sound.json")}
+        />
+      </Wrapper>
 
-      <MiniPlayerStyle runningEpisode={runningEpisode} pauseSound={pauseSound} episode={episode} dispatch={dispatch} playSound={playSound} playing={playing} restartSound={restartSound}/>
-      
+      {/* <MiniPlayerStyle runningEpisode={runningEpisode} pauseSound={pauseSound} episode={episode} dispatch={dispatch} playSound={playSound} playing={playing} restartSound={restartSound}/> */}
+
       {/* <MiniPlayer
         style={{
           position: "relative",
@@ -162,10 +185,12 @@ const EpisodeView = ({ podcast, fetchEpisodeProgressStorage, episode, playSound,
         bgColor={colors.text}
         style={{ paddingTop: 16, paddingBottom: 16, marginBottom: 0 }}
         textColor={"#000"}
-        title="Planet Money"
-        image="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSeQypKxL8Qzjf0n28K0uUD-iVMtxcHx-G_NspdBSTCJcZv-YWh"
-        subtitle="Business & Comedy"
-        desc={`The economy explained. Imagine you could call up a friend and say, "Meet me at the bar and tell me what's going on with the economy." Now imagine that's actually a fun evening.`}
+        title={episode.title}
+        image={episode.image}
+        subtitle={episode.podcast_name}
+        desc={episode.desc}
+        isFollowed={user_data?.followed_podcasts.includes(episode.podcast_id)}
+        podcastId={episode.podcast_id}
       />
       <EpisodeChat />
     </MainContainer>

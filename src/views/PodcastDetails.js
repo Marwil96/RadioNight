@@ -10,9 +10,9 @@ import TopNav from "../components/TopNav";
 import { ActivityIndicator, View } from "react-native";
 import StyledButton from "../components/StyledButton";
 import { Wrapper } from "../components/Wrapper";
-import { GetPodcastPremieres, StartFollowingPodcast, StopFollowingPodcast } from "../actions";
+import { GetFollowedPremieres, GetPodcastPremieres, StartFollowingPodcast, StopFollowingPodcast } from "../actions";
 import { useDispatch, useSelector } from "react-redux";
-import { OpenRssPlayer } from "../actions/globalActions";
+import { OpenEpisodePlayer, OpenRssPlayer } from "../actions/globalActions";
 
 const PodcastDetails = ({ route, navigation }) => {
   const { user_data } = useSelector((state) => state.DatabaseReducer);
@@ -31,7 +31,7 @@ const PodcastDetails = ({ route, navigation }) => {
     const FetchData = async () => {
       if (rss_url !== undefined) {
         setLoading(true);
-        const premieresData = await GetPodcastPremieres(id);
+        const premieresData = await GetFollowedPremieres([id]);
         const podcastData = await FetchPodcastFromRSS(rss_url);
         setUpcomingEpisodes(premieresData.upcomingEpisodes);
         setLiveEpisodes(premieresData.liveEpisodes);
@@ -82,12 +82,11 @@ const PodcastDetails = ({ route, navigation }) => {
             key={index}
             desc={episode.desc}
             image={episode.image}
+            onPress={() => { dispatch(OpenEpisodePlayer({data:{...episode}, state: true}))}}
             meta1={`${new Date(episode.start_date).getFullYear()}-${new Date(
               episode.start_date
             ).getMonth()}-${new Date(episode.start_date).getDate()}`}
-            meta2={`${new Date(episode.start_date).getHours()}:${new Date(
-              episode.start_date
-            ).getMinutes()}:00`}
+            meta2={'LIVE'}
           />
         ))}
       {upcomingEpisodes.length > 0 && (

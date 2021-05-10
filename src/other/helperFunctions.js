@@ -1,4 +1,5 @@
 import * as rssParser from "react-native-rss-parser";
+import { Audio } from "expo-av";
 
 export const FilterSearch = (library, searchTerm, limit) => {
   const searchResult = limit
@@ -33,6 +34,18 @@ export const FetchPodcastFromRSS = async (url) => {
     // console.log('DONE', response)
     return response
 };
+
+export const GetMp3Duration = async (url) => {
+  const { sound } = await Audio.Sound.createAsync({
+    uri: url,
+  });
+  const status = await sound.getStatusAsync()
+  await sound.unloadAsync();
+
+  return status.durationMillis;
+}
+
+
 
 
 

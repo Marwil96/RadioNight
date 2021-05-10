@@ -15,7 +15,7 @@ import StyledButton from "../components/StyledButton";
 import { Title } from "../components/Title";
 import { Wrapper } from "../components/Wrapper";
 import colors from "../variables/color";
-import { FilterSearch } from "../other/helperFunctions";
+import { FilterSearch, GetMp3Duration } from "../other/helperFunctions";
 import ToggleBar from "../components/ToggleBar";
 import { OpenEpisodePlayer } from "../actions/globalActions";
 
@@ -56,6 +56,7 @@ const StartEpisodePremiere = ({ navigation, route }) => {
   }, [rss_url]);
 
   const StartEpisodePremiere = async () => {
+    const duration = await GetMp3Duration(selectedPodcast.enclosures[0].url);
     const unFormattedDate = new Date();
     const data = {
       title: selectedPodcast.title,
@@ -75,56 +76,37 @@ const StartEpisodePremiere = ({ navigation, route }) => {
       play_link: selectedPodcast.enclosures[0].url,
       rss_url: rss_url,
       start_date: unFormattedDate.toString(),
-      duration: selectedPodcast.itunes.duration,
+      duration: duration,
     };
 
-    // Create a non-dom allocated Audio element
-    var au = document.createElement("audio");
+    console.log('DURATION', duration)
+    
+    const response = await AddEpisodePremiere(data);
 
-    // Define the URL of the MP3 audio file
-    au.src = selectedPodcast.enclosures[0].url;
+    var formdata = new FormData();
+    console.log('RESPONSE', response)
+    formdata.append("episode_id", response.episodeId);
+    formdata.append("episode_duration", duration);
 
-    // Once the metadata has been loaded, display the duration in the console
-    au.addEventListener(
-      "loadedmetadata",
-      function () {
-        // Obtain the duration in seconds of the audio file (with milliseconds as well, a float value)
-        var duration = au.duration;
+    var requestOptions = {
+      method: "POST",
+      body: formdata,
+      redirect: "follow",
+    };
 
-        // example 12.3234 seconds
-        console.log("The duration of the song is of: " + duration + " seconds");
-        // Alternatively, just display the integer value with
-        // parseInt(duration)
-        // 12 seconds
-      },
-      false
-    );
+    await fetch(
+      "https://blooming-sea-13003.herokuapp.com/start-stream",
+      requestOptions
+    )
+      .then((response) => response.text())
+      .then((result) => console.log(result))
+      .catch((error) => console.log("error", error));
 
-    // const response = await AddEpisodePremiere(data);
-
-    // var formdata = new FormData();
-    // console.log('RESPONSE', response)
-    // formdata.append("episode_id", response.episodeId);
-
-    // var requestOptions = {
-    //   method: "POST",
-    //   body: formdata,
-    //   redirect: "follow",
-    // };
-
-    // await fetch(
-    //   "https://blooming-sea-13003.herokuapp.com/start-stream",
-    //   requestOptions
-    // )
-    //   .then((response) => response.text())
-    //   .then((result) => console.log(result))
-    //   .catch((error) => console.log("error", error));
-
-    // if (response.success) {
-    //   navigation.navigate("YourPodcast", { ...route.params });
-    // } else {
-    //   console.log("ERROR");
-    // }
+    if (response.success) {
+      navigation.navigate("YourPodcast", { ...route.params });
+    } else {
+      console.log("ERROR");
+    }
   };
 
   const FetchPodcast = async (url) => {
