@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import colors from "../variables/color";
 import { MaterialIcons } from "@expo/vector-icons";  
 import styled from "styled-components/native";
 import InputField from "./InputField";
 import { ScrollView } from "react-native";
+import { AddChatMessage, GetChatMessages } from "../actions";
+import { useDispatch, useSelector } from "react-redux";
 
 const ChatHeader = styled.View`
   background-color: #EFEFF1;
@@ -16,6 +18,7 @@ const Wrapper = styled.View`
   bottom: 0;
   flex-shrink: 1;
   /* min-height: 100%; */
+  min-height: 350px;
   max-height: 100%;
   height: 100%;
 `
@@ -86,11 +89,13 @@ const colorArray = [
   "#FFB61D",
 ];
 
-const MessageField = () => {
+const MessageField = ({userId, episodeId, userName}) => {
+  const [message, setMessage] = useState("");
+
   return (
     <MessageWrapper>
-      <InputField placeholder="Give your opinion" style={{ flexShrink: 1, marginRight: 12, backgroundColor: '#EFEFF1', color: '#000', height: 46 }} />
-      <ChatButton>
+      <InputField  value={message} onChangeText={(text) => setMessage(text)} placeholder="Give your opinion" style={{ flexShrink: 1, marginRight: 12, backgroundColor: '#EFEFF1', color: '#000', height: 46 }} />
+      <ChatButton onPress={() => {AddChatMessage({message: message, episodeId:episodeId, messageAuthor:{user_name: userName, user_id: userId}}), setMessage('')}}>
         <MaterialIcons name="keyboard-arrow-right" size={20} color={colors.primary} />
       </ChatButton>
     </MessageWrapper>
@@ -98,12 +103,23 @@ const MessageField = () => {
 }
 
 const Message = ({user, message}) => {
-  const color = colorArray[Math.floor(Math.random() * colorArray.length) + 0];
- return <MessageText ><MessageStrong style={{color: color}}>{user}</MessageStrong>: {message}</MessageText>
+  // const color = colorArray[Math.floor(Math.random() * colorArray.length) + 0];
+ return <MessageText ><MessageStrong style={{color: colors.primary}}>{user}</MessageStrong>: {message}</MessageText>
 }
 
 
-const EpisodeChat = () => {
+const EpisodeChat = ({episodeId}) => {
+  const dispatch = useDispatch();
+  const { chatMessages, user_data } = useSelector((state) => state.DatabaseReducer);
+
+  useEffect(() => {
+    console.log('EPISODE ID', episodeId)
+    if(episodeId !== undefined) {
+      dispatch(GetChatMessages({episodeId: episodeId}))
+    }
+  }, [episodeId])
+
+
   return (
     <Wrapper>
       <ChatHeader
@@ -113,49 +129,10 @@ const EpisodeChat = () => {
       </ChatHeader>
       <ChatWrapper style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-          <Message
-            user="Marwil96"
-            message="Bro who pay mid for coaching just pick one hero carry mid...."
-          />
-          <Message user="Tralfamadore31" message="HAHAHAHAAHAHAAHA" />
-          <Message user="Vaera" message="Why did it become in this way???" />
-          <Message user="yourmom" message="👹👹👊👊👊" />
-          <Message
-            user="Derpmeastro"
-            message="Whyyyyyyy aaaaaaaaaaaaaaaaaaaaaaaaaarrghhh."
-          />
-          <Message user="gonnahh" message="♥️♥️♥️♥️♥️♥️♥️" />
-          <Message user="AngelTree" message=": ⌛️⌛️⌛️⌛️⌛️⌛️⌛️⌛️⌛️" />
-          <Message user="Tralfamadore31" message="HAHAHAHAAHAHAAHA" />
-          <Message user="Vaera" message="Why did it become in this way???" />
-          <Message user="yourmom" message="👹👹👊👊👊" />
-          <Message
-            user="Derpmeastro"
-            message="Whyyyyyyy aaaaaaaaaaaaaaaaaaaaaaaaaarrghhh."
-          />
-          <Message user="gonnahh" message="♥️♥️♥️♥️♥️♥️♥️" />
-          <Message user="AngelTree" message=": ⌛️⌛️⌛️⌛️⌛️⌛️⌛️⌛️⌛️" />
-          <Message user="Tralfamadore31" message="HAHAHAHAAHAHAAHA" />
-          <Message user="Vaera" message="Why did it become in this way???" />
-          <Message user="yourmom" message="👹👹👊👊👊" />
-          <Message
-            user="Derpmeastro"
-            message="Whyyyyyyy aaaaaaaaaaaaaaaaaaaaaaaaaarrghhh."
-          />
-          <Message user="gonnahh" message="♥️♥️♥️♥️♥️♥️♥️" />
-          <Message user="AngelTree" message=": ⌛️⌛️⌛️⌛️⌛️⌛️⌛️⌛️⌛️" />
-          <Message user="Tralfamadore31" message="HAHAHAHAAHAHAAHA" />
-          <Message user="Vaera" message="Why did it become in this way???" />
-          <Message user="yourmom" message="👹👹👊👊👊" />
-          <Message
-            user="Derpmeastro"
-            message="Whyyyyyyy aaaaaaaaaaaaaaaaaaaaaaaaaarrghhh."
-          />
-          <Message user="gonnahh" message="♥️♥️♥️♥️♥️♥️♥️" />
-          <Message user="AngelTree" message=": ⌛️⌛️⌛️⌛️⌛️⌛️⌛️⌛️⌛️" />
+          {chatMessages !== undefined && chatMessages.length > 0 && chatMessages.map(({message, message_author}, index) => <Message message={message} key={index} user={message_author.user_name} />)}
         </ScrollView>
       </ChatWrapper>
-      <MessageField />
+      <MessageField userId={user_data?.user_id} episodeId={episodeId} userName={user_data?.user_name} />
     </Wrapper>
   );
 };

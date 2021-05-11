@@ -35,8 +35,7 @@ const BottomNav = ({ state, descriptors, navigation }) => {
   if (focusedOptions.tabBarVisible === false) {
     return null;
   }
-
-  if (focusedOptions.screen !== "EpisodeView") {
+  if (focusedOptions.screen !== "YourPodcasts") {
     return (
       <BottomNavWrapper style={{ flexDirection: "row" }}>
         {state.routes.map((route, index) => {

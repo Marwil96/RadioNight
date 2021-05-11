@@ -7,7 +7,7 @@ import PodcastDetailsHeader from "../components/PodcastDetailsHeader";
 import { Title } from "../components/Title";
 import {FetchPodcastFromRSS} from '../other/helperFunctions'
 import TopNav from "../components/TopNav";
-import { ActivityIndicator, View } from "react-native";
+import { ActivityIndicator, ScrollView, View } from "react-native";
 import StyledButton from "../components/StyledButton";
 import { Wrapper } from "../components/Wrapper";
 import { GetFollowedPremieres, GetPodcastPremieres, StartFollowingPodcast, StopFollowingPodcast } from "../actions";
@@ -82,11 +82,15 @@ const PodcastDetails = ({ route, navigation }) => {
             key={index}
             desc={episode.desc}
             image={episode.image}
-            onPress={() => { dispatch(OpenEpisodePlayer({data:{...episode}, state: true}))}}
+            onPress={() => {
+              dispatch(
+                OpenEpisodePlayer({ data: { ...episode }, state: true })
+              );
+            }}
             meta1={`${new Date(episode.start_date).getFullYear()}-${new Date(
               episode.start_date
             ).getMonth()}-${new Date(episode.start_date).getDate()}`}
-            meta2={'LIVE'}
+            meta2={"LIVE"}
           />
         ))}
       {upcomingEpisodes.length > 0 && (
@@ -126,25 +130,28 @@ const PodcastDetails = ({ route, navigation }) => {
             fontFamily: "Manrope_400Regular",
           }}
         >
-          Live Episodes
+          Past Premieres
         </Title>
       )}
-      {pastEpisodes.length > 0 &&
-        pastEpisodes.map((episode, index) => (
-          <PodcastCard
-            title={episode.title}
-            subtitle={episode.podcast_name}
-            key={index}
-            desc={episode.desc}
-            image={episode.image}
-            meta1={`${new Date(episode.start_date).getFullYear()}-${new Date(
-              episode.start_date
-            ).getMonth()}-${new Date(episode.start_date).getDate()}`}
-            meta2={`${new Date(episode.start_date).getHours()}:${new Date(
-              episode.start_date
-            ).getMinutes()}:00`}
-          />
-        ))}
+      <ScrollView horizontal={true}>
+        {pastEpisodes.length > 0 &&
+          pastEpisodes.map((episode, index) => (
+            <PodcastCard
+              title={episode.title}
+              subtitle={episode.podcast_name}
+              style={{ width: 300, paddingRight: 0, marginLeft: 0 }}
+              key={index}
+              desc={episode.desc}
+              image={episode.image}
+              meta1={`${new Date(episode.start_date).getFullYear()}-${new Date(
+                episode.start_date
+              ).getMonth()}-${new Date(episode.start_date).getDate()}`}
+              meta2={`${new Date(episode.start_date).getHours()}:${new Date(
+                episode.start_date
+              ).getMinutes()}:00`}
+            />
+          ))}
+      </ScrollView>
 
       <Title style={{ marginLeft: 16, marginTop: 24 }}>From RSS Feed</Title>
       {loading ? (
@@ -158,7 +165,17 @@ const PodcastDetails = ({ route, navigation }) => {
                 subtitle={title}
                 key={index}
                 // onPress={() => navigation.navigate('RssPlayer', {episode: {...episode}, podcast: {...route.params}, mode:'rss'})}
-                onPress={() => dispatch(OpenRssPlayer({data: {episode: {...episode}, podcast: {...route.params}}, state: true}))}
+                onPress={() =>
+                  dispatch(
+                    OpenRssPlayer({
+                      data: {
+                        episode: { ...episode },
+                        podcast: { ...route.params },
+                      },
+                      state: true,
+                    })
+                  )
+                }
                 desc={
                   episode.itunes.summary !== undefined && episode.itunes.summary
                 }

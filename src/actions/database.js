@@ -1,4 +1,4 @@
-import { CREATE_USER, LOGIN_USER, SIGN_OUT_USER, CREATE_PODCAST, FETCH_ALL_USER_DATA, FETCH_EPISODE } from "./constables";
+import { CREATE_USER, LOGIN_USER, SIGN_OUT_USER, CREATE_PODCAST, FETCH_ALL_USER_DATA, FETCH_EPISODE, GET_CHAT_MESSAGES} from "./constables";
 import firebase from "firebase";
 import { firebaseConfig } from "../../firebaseConfig";
 
@@ -47,8 +47,36 @@ export const AddEpisodePremiere = async (data) => {
       return {success: false, episodeId: false}
     })
   
-  console.log('ADD EPISODE PREMIERE', result)
   return result
+}
+
+export const AddChatMessage = async ({message, episodeId, messageAuthor}) => {
+  const chatId = getTimeEpoch();
+  console.log("ADD CHAT MESSAGE", message, episodeId, messageAuthor, chatId);
+  const result = await db.collection("episodes").doc(episodeId).collection('chat').doc(chatId).set({message, message_author: messageAuthor, chat_id:chatId, time_stamp: chatId }).then(() => { 
+      return true
+    }).catch((error) => {
+      return false
+    })
+    
+  return result
+}
+
+export const GetChatMessages = ({episodeId}) => {
+  console.log('GETCHATMESSAGE', episodeId )
+  return (dispatch) => {
+    dispatch({type: GET_CHAT_MESSAGES, payload: {loading: true, chat_messages: []}})
+    db.collection('episodes').doc(episodeId).collection('chat').onSnapshot((querySnapshot) => {
+      const messages = [];
+      querySnapshot.forEach((doc) => {
+        messages.push(doc.data());
+      });
+
+      console.log(messages)
+
+      dispatch({type: GET_CHAT_MESSAGES, payload: {loading: false, chat_messages: messages }})
+    })
+  }
 }
 
 export const GetPodcastPremieres = async (id) => {
@@ -86,7 +114,6 @@ export const GetPodcastPremieres = async (id) => {
         console.log("Error getting documents: ", error);
     })
   )
-  console.log('RESULT', result)
   return {upcomingEpisodes: result[0], pastEpisodes: result[1], liveEpisodes: result[2], allEpisode: [...result[0], ...result[1], ...result[2]]}
 }
 
@@ -115,7 +142,7 @@ export const FetchEpisode = (episodeId) => {
    db.collection("episodes")
     .doc(episodeId)
     .onSnapshot((doc) => {
-    console.log("Current data: ", doc.data());
+
     const data = doc.data();
     dispatch({
       type: FETCH_EPISODE,
@@ -219,7 +246,7 @@ export const GetFollowedPremieres = async (followed_podcasts) => {
               if(data.episode_ended === true) {
                 pastEpisodes.push({ ...data, episode_state: 'past' });
                 // return 'past'
-              } else if (data.episode_is_running === true) {
+              } else if (data.stream_started.state === true) {
                 liveEpisodes.push({ ...data, episode_state: "live" });
                 // return 'live'
               } else {

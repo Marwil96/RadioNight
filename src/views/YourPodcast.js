@@ -1,9 +1,11 @@
 import { AntDesign } from "@expo/vector-icons";
 import { Link } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
+import { ScrollView } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components/native";
-import { FetchYourPodcasts, GetPodcastPremieres } from "../actions";
+import { FetchYourPodcasts, GetFollowedPremieres, GetPodcastPremieres } from "../actions";
+import { OpenEpisodePlayer } from "../actions/globalActions";
 import { MainContainer } from "../components/MainContainer";
 import PodcastCard from "../components/PodcastCard";
 import StyledButton from "../components/StyledButton";
@@ -32,12 +34,13 @@ const YourPodcast = ({ navigation, route }) => {
   const [pastEpisodes, setPastEpisodes] = useState([]);
   const [loading, setLoading] = useState(false);
   const { title, id } = route.params;
+  const dispatch = useDispatch();
 
   
    useEffect(() => {
      const FetchData = async () => {
       setLoading(true);
-      const premieresData = await GetPodcastPremieres(id);
+      const premieresData = await GetFollowedPremieres([id]);
       console.log(premieresData)
       setUpcomingEpisodes(premieresData.upcomingEpisodes);
       setLiveEpisodes(premieresData.liveEpisodes);
@@ -71,13 +74,14 @@ const YourPodcast = ({ navigation, route }) => {
           title={episode.title}
           subtitle={episode.podcast_name}
           key={index}
+          onPress={() => {navigation.navigate("PremiereAdmin", {...episode})}}
           desc={episode.desc}
           image={episode.image} 
           meta1={`${new Date(episode.start_date).getFullYear()}-${new Date(episode.start_date).getMonth()}-${new Date(episode.start_date).getDate()}`}
-          meta2={`${new Date(episode.start_date).getHours()}:${new Date(episode.start_date).getMinutes()}:00`}
+          meta2='LIVE'
         />)
       }
-      <Title  style={{ marginLeft: 16, fontSize: 20, fontFamily: 'Manrope_400Regular' }}>{upcomingEpisodes.length === 0 ? "Empty... You Haven't Scheduled a Episode Premiere yet." : "Scheduled Episodes"}</Title>
+      {/* <Title  style={{ marginLeft: 16, fontSize: 20, fontFamily: 'Manrope_400Regular' }}>{upcomingEpisodes.length === 0 ? "Empty... You Haven't Scheduled a Episode Premiere yet." : "Scheduled Episodes"}</Title> */}
       {upcomingEpisodes.length > 0 && upcomingEpisodes.map((episode, index) => 
         <PodcastCard 
           title={episode.title}
@@ -90,23 +94,27 @@ const YourPodcast = ({ navigation, route }) => {
         />)
       }
 
-      {pastEpisodes.length > 0 && <Title  style={{ marginLeft: 16, fontSize: 20, fontFamily: 'Manrope_400Regular' }}>Live Episodes</Title>}
-      {pastEpisodes.length > 0 && pastEpisodes.map((episode, index) => 
-        <PodcastCard 
-          title={episode.title}
-          subtitle={episode.podcast_name}
-          key={index}
-          desc={episode.desc}
-          image={episode.image} 
-          meta1={`${new Date(episode.start_date).getFullYear()}-${new Date(episode.start_date).getMonth()}-${new Date(episode.start_date).getDate()}`}
-          meta2={`${new Date(episode.start_date).getHours()}:${new Date(episode.start_date).getMinutes()}:00`}
-        />)
-      }
-      
-      <Wrapper style={{marginBottom: 16}}>
+      <Wrapper style={{marginBottom: 48}}>
         <StyledButton primary onPress={() => navigation.navigate("StartEpisodePremiere", {...route.params})}> Go Live Now! </StyledButton>
       </Wrapper>
-      <Wrapper>
+
+      {pastEpisodes.length > 0 && <Title  style={{ marginLeft: 16, fontSize: 20, fontFamily: 'Manrope_400Regular' }}>Old Premieres</Title>}
+      <ScrollView horizontal={true}>
+        {pastEpisodes.length > 0 && pastEpisodes.map((episode, index) => 
+          <PodcastCard 
+          style={{ width: 300, paddingRight: 0, marginLeft: 0 }}
+            title={episode.title}
+            subtitle={episode.podcast_name}
+            key={index}
+            desc={episode.desc}
+            image={episode.image} 
+            meta1={`${new Date(episode.start_date).getFullYear()}-${new Date(episode.start_date).getMonth()}-${new Date(episode.start_date).getDate()}`}
+            meta2={`${new Date(episode.start_date).getHours()}:${new Date(episode.start_date).getMinutes()}:00`}
+          />)
+        }
+      </ScrollView>
+      
+      <Wrapper style={{paddingBottom: 200}}>
         <StyledButton onPress={() => navigation.navigate("CreatePodcastPremiere", {...route.params})}> Schedule Episode Premiere </StyledButton>
       </Wrapper>
     </MainContainer>

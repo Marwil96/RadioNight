@@ -5,4 +5,5 @@
 - Figure out the Data Structure [X]
 - Build Your Podcast Page [x]
 - Calculate what the episode is, Upcoming, Live or Past []
+- Pick color at setup []
 Can use didJustFinish api (https://docs.expo.io/versions/latest/sdk/av/)

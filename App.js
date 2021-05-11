@@ -32,6 +32,7 @@ import RssPlayer from './src/views/RssPlayer';
 import MiniPlayer from './src/components/MiniPlayer';
 import { parse } from 'react-native-rss-parser';
 import StartEpisodePremiere from './src/views/StartEpisodePremiere';
+import PremiereAdmin from './src/views/PremiereAdmin';
 
 
 const customizedMiddleware = getDefaultMiddleware({
@@ -60,6 +61,7 @@ const YourPodcastsStackScreen = () => (
   <YourPodcastsStack.Navigator initialRouteName="YourPodcasts" screenOptions={{ headerShown: false }}>
     <YourPodcastsStack.Screen name="YourPodcasts" component={YourPodcasts} />
     <YourPodcastsStack.Screen name="YourPodcast" component={YourPodcast} />
+    <YourPodcastsStack.Screen name="PremiereAdmin" component={PremiereAdmin} />
     <YourPodcastsStack.Screen name="ScheduleEpisodePremiere" component={ScheduleEpisodePremiere} />
     <YourPodcastsStack.Screen name="StartEpisodePremiere" component={StartEpisodePremiere} />
   </YourPodcastsStack.Navigator>
@@ -134,7 +136,6 @@ const DataContainer = ({children}) => {
     }
     
     const playProgress = await fetchProgressStorage();
-    console.log('IN PLAYSOUND', playProgress);
     setSoundProgress(playProgress);
     runningEpisode !== false && await stopSound()
     setRunningEpisode(rssPlayerData.episode)
@@ -161,7 +162,6 @@ const DataContainer = ({children}) => {
     }
     
     const playProgress = await fetchEpisodeProgress(episodePlayerData.episode_id);
-    console.log('IN PLAYSOUND', playProgress);
     setSoundProgress(playProgress);
     runningEpisode !== false && await stopSound()
     setRunningEpisode(episodePlayerData)
@@ -202,11 +202,9 @@ const DataContainer = ({children}) => {
     console.log('FETCH_STORAGE')
     try {
     const value = await AsyncStorage.getItem((JSON.stringify(`${rssPlayerData.episode.title}_progress`)));
-    console.log(value)
     if (value !== null) {
       // We have data!!
       // setEpisodeProgress(JSON.parse(value));
-      console.log(value, JSON.parse(value));
       return JSON.parse(value);
     } else {
       return 0
@@ -219,14 +217,11 @@ const DataContainer = ({children}) => {
   }
 
     const fetchEpisodeProgressStorage = async () => {
-    console.log('FETCH_STORAGE')
     try {
     const value = await AsyncStorage.getItem((JSON.stringify(`${rssPlayerData.episode.title}_progress`)));
-    console.log(value)
     if (value !== null) {
       // We have data!!
       // setEpisodeProgress(JSON.parse(value));
-      console.log(value, JSON.parse(value));
       return JSON.parse(value);
     } else {
       return 0
@@ -238,7 +233,6 @@ const DataContainer = ({children}) => {
   }
   }
   const updateStatus = async (status) => {
-    console.log('UPDATE STATUS', status.positionMillis, status.durationMillis);
     try {
       await AsyncStorage.setItem(JSON.stringify(`${rssPlayerData.episode.title}_progress`), JSON.stringify(status.positionMillis));
     } catch (e) {
@@ -255,7 +249,6 @@ const DataContainer = ({children}) => {
   };
 
   const changeAudioPosition = async (value) => {
-    console.log(value);
     await sound.pauseAsync();
     setPlaying(false);
     setSoundProgress(value);
@@ -263,7 +256,6 @@ const DataContainer = ({children}) => {
   };
 
   const slidingComplete = async (e) => {
-    console.log("SLIDING COMPLETE");
     sound.playFromPositionAsync(soundProgress);
     await sound.playAsync();
     setPlaying(true);
@@ -286,7 +278,6 @@ const DataContainer = ({children}) => {
     setPlaying(false)
   };
   
-  console.log('YOOOOO', episodePlayerState, rssPlayerState, startedSound )
   // useEffect(() => {
   //   console.log("HEELLOO", sound);
   //   return sound
@@ -344,6 +335,7 @@ const DataContainer = ({children}) => {
           runningEpisode={runningEpisode}
           runningPodcast={runningPodcast}
           fetchProgressStorage={fetchProgressStorage}
+          stopSound={() => stopSoundCompletely()}
         />
       </Modal> 
       }

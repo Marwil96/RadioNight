@@ -14,9 +14,13 @@ import { FetchEpisode } from '../actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { OpenEpisodePlayer } from '../actions/globalActions';
 import { TouchableOpacity } from 'react-native';
+import { Span } from '../components/Span';
 
 const TopBar = styled.View`
   width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 `
 
 const ButtonContainer = styled.TouchableOpacity`
@@ -113,17 +117,77 @@ const MiniPlayerStyle = ({episode, runningEpisode, playSound, playing, restartSo
   );
 }
 
-const EpisodeView = ({ podcast, fetchEpisodeProgressStorage, episode, playSound, pauseSound, soundDuration, soundProgress, startedSound, runningEpisode,  playing, changeAudioPosition, slidingComplete, restartSound, runningPodcast  }) => {
+const EpisodeView = ({ podcast, fetchEpisodeProgressStorage, episode, playSound, stopSound, pauseSound, soundDuration, soundProgress, startedSound, runningEpisode,  playing, changeAudioPosition, slidingComplete, restartSound, runningPodcast  }) => {
   const { episode_id } = episode;
+  const [displayMode, setDisplayMode] = useState('player');
+  const [countDown, setCountDown] = useState({days:'00', hours: '00', minutes: '00', seconds: '00'})
   const { episodeData, loading, user_data } = useSelector((state) => state.DatabaseReducer);
   const dispatch = useDispatch()
+  const date = new Date(episode.stream_started.episode_starts.seconds*1000);
 
   useEffect(() => {
-    dispatch(FetchEpisode(episode_id))
-    !playing && playSound()
-  }, [])
+    if(episode_id !== episodeData.episode_id) {
+      stopSound()
+    }
+  }, [episode_id])
+
+  useEffect(() => {
+    if (episodeData?.episode_is_running !== true) {
+      var countDownDate = date.getTime();
+
+      // Update the count down every 1 second
+      let x = setInterval(() => {
+        // Get today's date and time
+        var now = new Date().getTime();
+        // Find the distance between now and the count down date
+        var distance = countDownDate - now;
+
+        // Time calculations for days, hours, minutes and seconds
+        var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        var hours = Math.floor(
+          (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+        );
+        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        // Display the result in the element with id="demo"
+        setCountDown({
+          days: days,
+          hours: hours,
+          minutes: minutes,
+          seconds: seconds,
+        });
+        // If the count down is finished, write some text
+        if (distance < 0) {
+          clearInterval(x);
+          setCountDown({
+            days: days,
+            hours: hours,
+            minutes: minutes,
+            seconds: seconds,
+          });
+        }
+      }, 1000);
+
+      return () => {
+        if (x !== undefined) clearInterval(x);
+        x = null;
+      };
+    }
+  }, [episodeData]);
+
+  useEffect(() => {
+    dispatch(FetchEpisode(episode_id));
+  }, [episode_id]);
+
+  useEffect(() => {
+    if(episode_id === episodeData.episode_id) {
+      !playing && episodeData?.episode_is_running && playSound();
+    }
+  }, [episodeData]);
+
+  // console.log(episode.stream_started.episode_starts, new Date(episode.stream_started.episode_starts.seconds*1000));
   
-  console.log(episode_id, episodeData);
   return (
     <MainContainer loading={loading}>
       <Wrapper>
@@ -143,20 +207,70 @@ const EpisodeView = ({ podcast, fetchEpisodeProgressStorage, episode, playSound,
             />
             <Title style={{ fontSize: 16 }}>Go Back</Title>
           </ButtonContainer>
+          <TouchableOpacity
+            onPress={() =>
+              displayMode === "player"
+                ? setDisplayMode("message_from_host")
+                : setDisplayMode("player")
+            }
+          >
+            <Title style={{ fontSize: 16 }}>
+              {displayMode === "player" ? "Message from Host" : "See Player"}
+            </Title>
+          </TouchableOpacity>
         </TopBar>
       </Wrapper>
-      <Wrapper style={{ display: "flex", alignItems: 'center', justifyContent: "center", width: '100%' }}>
-        <LottieView
-          autoPlay
-          loop
+      {episodeData?.episode_is_running === true ? (
+        displayMode === "player" && (
+          <Wrapper
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "100%",
+            }}
+          >
+            <LottieView
+              autoPlay
+              loop
+              style={{
+                width: 80,
+                height: 120,
+                // backgroundColor: "#eee",
+              }}
+              source={require("../assets/sound.json")}
+            />
+          </Wrapper>
+        )
+      ) : displayMode === "player" && (
+        <Wrapper
           style={{
-            width: 80,
-            height: 120,
-            // backgroundColor: "#eee",
+            display: "flex",
+            justifyContent: "center",
+            width: "100%",
           }}
-          source={require("../assets/sound.json")}
-        />
-      </Wrapper>
+        >
+          <Span style={{ fontSize: 18, marginBottom: 8 }}>Time Left:</Span>
+          <Title style={{ fontSize: 64, color: colors.primary }}>{`${countDown.hours > 9 ? countDown.hours : `0${countDown.hours}`}:${countDown.minutes > 9 ? countDown.minutes : `0${countDown.minutes}`}:${countDown.seconds > 9 ? countDown.seconds : `0${countDown.seconds}`}`}</Title>
+        </Wrapper>
+      )}
+
+      {displayMode === "message_from_host" && (
+        <Wrapper
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            width: "100%",
+          }}
+        >
+          <Span style={{ fontSize: 18, marginBottom: 8 }}>
+            Message from Host
+          </Span>
+          <Title style={{ lineHeight: 38, color: colors.primary }}>
+            {episode.host_message}
+          </Title>
+        </Wrapper>
+      )}
 
       {/* <MiniPlayerStyle runningEpisode={runningEpisode} pauseSound={pauseSound} episode={episode} dispatch={dispatch} playSound={playSound} playing={playing} restartSound={restartSound}/> */}
 
@@ -192,7 +306,11 @@ const EpisodeView = ({ podcast, fetchEpisodeProgressStorage, episode, playSound,
         isFollowed={user_data?.followed_podcasts.includes(episode.podcast_id)}
         podcastId={episode.podcast_id}
       />
-      <EpisodeChat />
+      <EpisodeChat
+        episodeId={episode.episode_id}
+        userId={user_data?.user_id}
+        userName={user_data?.user_name}
+      />
     </MainContainer>
   );
 };

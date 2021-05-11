@@ -58,6 +58,18 @@ const StartEpisodePremiere = ({ navigation, route }) => {
   const StartEpisodePremiere = async () => {
     const duration = await GetMp3Duration(selectedPodcast.enclosures[0].url);
     const unFormattedDate = new Date();
+    const startTime = new Date(unFormattedDate)
+    let startsIn = 0
+    if(toggleMode === 'Directly') {
+      startsIn = 0
+    } else if(toggleMode === '15min') {
+      startsIn = 15
+    } else {
+      startsIn = 30
+    }
+
+    startTime.setMinutes ( unFormattedDate.getMinutes() + startsIn);
+
     const data = {
       title: selectedPodcast.title,
       podcast_name: title,
@@ -71,7 +83,8 @@ const StartEpisodePremiere = ({ navigation, route }) => {
       podcast_desc: desc,
       podcast_image: image,
       podcast_id: id,
-      stream_started: true,
+      episode_is_running: false,
+      stream_started: {state: true, episode_starts: startTime },
       host_message: hostMessage,
       play_link: selectedPodcast.enclosures[0].url,
       rss_url: rss_url,
@@ -87,6 +100,7 @@ const StartEpisodePremiere = ({ navigation, route }) => {
     console.log('RESPONSE', response)
     formdata.append("episode_id", response.episodeId);
     formdata.append("episode_duration", duration);
+    formdata.append("episode_start_time", startsIn);
 
     var requestOptions = {
       method: "POST",
