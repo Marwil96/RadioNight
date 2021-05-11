@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import styled from "styled-components/native";
 import { useNavigation, useScrollToTop } from "@react-navigation/native";
+import LottieView from "lottie-react-native";
 import {
   View,
   ActivityIndicator,
@@ -76,7 +77,16 @@ const MainContainer = ({ children, noAuth, style, player, loading }) => {
               justifyContent: "center",
             }}
           >
-            <ActivityIndicator color={colors.primary} size="large" />
+            <LottieView
+              autoPlay
+              loop
+              style={{
+                width: 100,
+                height: 350,
+                // backgroundColor: "#eee",
+              }}
+              source={require("../assets/loading.json")}
+            />
           </View>
         ) : (
           children
