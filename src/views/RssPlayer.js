@@ -69,8 +69,7 @@ const RssPlayer = ({ route, podcast, fetchEpisodeProgressStorage, episode, playS
     FetchData()
   }, [])
   
-  // console.log('MATH', soundProgress, soundDuration, Math.floor(soundProgress / soundDuration), 0/0);
-  console.log('RUNNING_EPISODE', runningEpisode.title, runningEpisode.title === episode.title, runningEpisode === false  || runningEpisode.title !== episode.title)
+
   return (
     <MainContainer>
       <Wrapper>

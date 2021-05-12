@@ -42,6 +42,7 @@ const DateWrapper = styled.View`
 const StartEpisodePremiere = ({ navigation, route }) => {
   const [fetched, setFetched] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [fullPageLoading, setFullPageLoading] = useState(false);
   const [podcast, setPodcast] = useState([]);
   const [episodes, setEpisodes] = useState([]);
   const [selectedPodcast, setSelectedPodcast] = useState(false);
@@ -56,6 +57,7 @@ const StartEpisodePremiere = ({ navigation, route }) => {
   }, [rss_url]);
 
   const StartEpisodePremiere = async () => {
+    setFullPageLoading(true)
     const duration = await GetMp3Duration(selectedPodcast.enclosures[0].url);
     const unFormattedDate = new Date();
     const startTime = new Date(unFormattedDate)
@@ -116,9 +118,12 @@ const StartEpisodePremiere = ({ navigation, route }) => {
       .then((result) => console.log(result))
       .catch((error) => console.log("error", error));
 
+
     if (response.success) {
+      setFullPageLoading(false);
       navigation.navigate("YourPodcast", { ...route.params });
     } else {
+      setFullPageLoading(false);
       console.log("ERROR");
     }
   };
@@ -145,7 +150,7 @@ const StartEpisodePremiere = ({ navigation, route }) => {
   // var isoDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
   // console.log(date, )
   return (
-    <MainContainer>
+    <MainContainer loading={fullPageLoading}>
       <Wrapper>
         <TopBar>
           <ButtonContainer onPress={() => navigation.goBack()}>

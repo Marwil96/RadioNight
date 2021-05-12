@@ -121,15 +121,16 @@ const EpisodeView = ({ podcast, fetchEpisodeProgressStorage, episode, playSound,
   const { episode_id } = episode;
   const [displayMode, setDisplayMode] = useState('player');
   const [countDown, setCountDown] = useState({days:'00', hours: '00', minutes: '00', seconds: '00'})
-  const { episodeData, loading, user_data } = useSelector((state) => state.DatabaseReducer);
+  const { episodeData, loading, user_data, } = useSelector((state) => state.DatabaseReducer);
   const dispatch = useDispatch()
   const date = new Date(episode.stream_started.episode_starts.seconds*1000);
 
   useEffect(() => {
-    if(episode_id !== episodeData.episode_id) {
+    if(episode_id !== episodeData.episode_id && episodeData.episode_id !== undefined && loading !== true) {
+      console.log('IF NOT EQUAL STOP SOUND',loading, episodeData, episode_id );
       stopSound()
     }
-  }, [episode_id])
+  }, [episodeData])
 
   useEffect(() => {
     if (episodeData?.episode_is_running !== true) {
@@ -181,7 +182,7 @@ const EpisodeView = ({ podcast, fetchEpisodeProgressStorage, episode, playSound,
   }, [episode_id]);
 
   useEffect(() => {
-    if(episode_id === episodeData.episode_id) {
+    if(episode_id === episodeData.episode_id && episodeData.episode_id !== undefined && loading !== true) {
       !playing && episodeData?.episode_is_running && playSound();
     }
   }, [episodeData]);

@@ -7,7 +7,7 @@ import { MainContainer } from '../components/MainContainer';
 import PodcastCard from '../components/PodcastCard';
 import { Title } from '../components/Title';
 import TopNav from '../components/TopNav';
-
+import { pauseStreamNotification } from '../other/notificationFunctions';
 
 const Home = ({ navigation }) => {
   const { user_data } = useSelector((state) => state.DatabaseReducer);
@@ -97,7 +97,7 @@ const Home = ({ navigation }) => {
               subtitle={episode.podcast_name}
               key={index}
               desc={episode.desc}
-              // onPress={() => dispatch(OpenRssPlayer({data: {episode: {...episode}, podcast: {...route.params}}, state: true}))}
+              onPress={() => dispatch(OpenRssPlayer({data: {episode: {title: episode.title, itunes: {image: episode.image}, enclosures:[{url: episode.play_link}]}, podcast: {title: episode.podcast_name, image: episode.image}}, state: true}))}
               image={episode.image}
               meta1={`${new Date(episode.start_date).getFullYear()}-${new Date(
                 episode.start_date

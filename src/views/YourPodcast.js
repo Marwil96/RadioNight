@@ -5,7 +5,7 @@ import { ScrollView } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components/native";
 import { FetchYourPodcasts, GetFollowedPremieres, GetPodcastPremieres } from "../actions";
-import { OpenEpisodePlayer } from "../actions/globalActions";
+import { OpenEpisodePlayer, OpenRssPlayer } from "../actions/globalActions";
 import { MainContainer } from "../components/MainContainer";
 import PodcastCard from "../components/PodcastCard";
 import StyledButton from "../components/StyledButton";
@@ -108,6 +108,7 @@ const YourPodcast = ({ navigation, route }) => {
             key={index}
             desc={episode.desc}
             image={episode.image} 
+             onPress={() => dispatch(OpenRssPlayer({data: {episode: {title: episode.title, itunes: {image: episode.image}, enclosures:[{url: episode.play_link}]}, podcast: {title: episode.podcast_name, image: episode.image}}, state: true}))}
             meta1={`${new Date(episode.start_date).getFullYear()}-${new Date(episode.start_date).getMonth()}-${new Date(episode.start_date).getDate()}`}
             meta2={`${new Date(episode.start_date).getHours()}:${new Date(episode.start_date).getMinutes()}:00`}
           />)

@@ -1,5 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import * as Notifications from "expo-notifications";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Audio } from "expo-av";
 import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
@@ -31,12 +32,65 @@ import Search from './src/views/Search';
 import RssPlayer from './src/views/RssPlayer';
 import MiniPlayer from './src/components/MiniPlayer';
 import { parse } from 'react-native-rss-parser';
+import { PushRSSPlayer, PushStreamPlayer } from "./src/other/notificationFunctions";
 import StartEpisodePremiere from './src/views/StartEpisodePremiere';
 import PremiereAdmin from './src/views/PremiereAdmin';
+import Constants from 'expo-constants';
+
 
 
 const customizedMiddleware = getDefaultMiddleware({
     serializableCheck: false
+ });
+ 
+ Notifications.setNotificationCategoryAsync('rssplayer', [
+  {
+    actionId: 'startaudio',
+    identifier:'startaudio', 
+    buttonTitle: 'Play',
+    isDestructive: false,
+    isAuthenticationRequired: false,
+    options: {
+      opensAppToForeground: false
+    }
+  },
+  {
+    actionId: 'pauseaudio',
+    identifier:'pauseaudio',
+    buttonTitle: 'Pause',
+    isDestructive: false,
+    isAuthenticationRequired: true,
+    options: {
+      opensAppToForeground: false
+    }
+  },
+]);
+
+  Notifications.setNotificationCategoryAsync('streamplayer', [
+  {
+    actionId: 'pausestream',
+    identifier:'pausestream',
+    buttonTitle: 'Stop Stream',
+    isDestructive: true,
+    isAuthenticationRequired: true,
+    options: {
+      opensAppToForeground: false
+    }
+  },
+  // {
+  //   actionId: 'three',
+  //   buttonTitle: 'Three',
+  //   textInput: { submitButtonTitle: 'Three', placeholder: 'Type Something' },
+  //   isAuthenticationRequired: false,
+  // },
+]);
+
+ Notifications.setNotificationHandler({
+   handleNotification: async () => ({
+     shouldShowAlert: true,
+     shouldPlaySound: false,
+     shouldSetBadge: false,
+   }),
  });
 
 const store = configureStore({
@@ -60,10 +114,6 @@ const HomeStackScreen = () => (
 const YourPodcastsStackScreen = () => (
   <YourPodcastsStack.Navigator initialRouteName="YourPodcasts" screenOptions={{ headerShown: false }}>
     <YourPodcastsStack.Screen name="YourPodcasts" component={YourPodcasts} />
-    <YourPodcastsStack.Screen name="YourPodcast" component={YourPodcast} />
-    <YourPodcastsStack.Screen name="PremiereAdmin" component={PremiereAdmin} />
-    <YourPodcastsStack.Screen name="ScheduleEpisodePremiere" component={ScheduleEpisodePremiere} />
-    <YourPodcastsStack.Screen name="StartEpisodePremiere" component={StartEpisodePremiere} />
   </YourPodcastsStack.Navigator>
 )
 
@@ -128,6 +178,46 @@ const DataContainer = ({children}) => {
   const [setEpisodeProgres, setEpisodeProgress] = useState(1);
   // console.log(rssPlayerState);
 
+   const [expoPushToken, setExpoPushToken] = useState("");
+   const [notification, setNotification] = useState(false);
+   const notificationListener = useRef();
+   const responseListener = useRef();
+
+   useEffect(() => {
+     registerForPushNotificationsAsync().then((token) =>
+       setExpoPushToken(token)
+     );
+
+     notificationListener.current =
+       Notifications.addNotificationReceivedListener((notification) => {
+         setNotification(notification);
+       });
+
+     responseListener.current =
+       Notifications.addNotificationResponseReceivedListener((response) => {
+        //  console.log("NOTIFICATION RESPONSE", response);
+         if (response.actionIdentifier === "startaudio") {
+           console.log('START STREAM', sound)
+          restartSound()
+         } else if (response.actionIdentifier === "pauseaudio") {
+           console.log("PAUSE STREAM STREAM", sound);
+           pauseSound()
+         } else if (response.actionIdentifier === "startstream") {
+           console.log("START STREAM", sound);
+         } else if(response.actionIdentifier === "pausestream") {
+           console.log('PAUSE SOUUUUUUND')
+           stopSoundCompletely()
+         }
+       });
+
+     return () => {
+       Notifications.removeNotificationSubscription(
+         notificationListener.current
+       );
+       Notifications.removeNotificationSubscription(responseListener.current);
+     };
+   }, [sound]);
+
   const playRssEpisode = async () => {
     console.log("Loading Sound");
 
@@ -152,10 +242,12 @@ const DataContainer = ({children}) => {
     console.log("Playing Sound");
     await sound.playAsync();
     setPlaying(true);
+    PushRSSPlayer({title: rssPlayerData.episode.title, subtitle: rssPlayerData.podcast.title})
   };
 
   const playEpisode = async () => {
     console.log("Loading Sound");
+    setPlaying(true);
 
     if(runningEpisode !== false) {
       await stopSound()
@@ -178,6 +270,7 @@ const DataContainer = ({children}) => {
     console.log("Playing Sound");
     await sound.playAsync();
     setPlaying(true);
+    PushStreamPlayer({title: episodePlayerData.title, subtitle: episodePlayerData.podcast_name});
   };
 
   const fetchEpisodeProgress = async (episodeId) => {
@@ -273,6 +366,7 @@ const DataContainer = ({children}) => {
   }
 
   const stopSoundCompletely = async () => {
+    console.log('STOP SOUND COMPLETELY')
     await sound.unloadAsync();
     setStartedSound(false);
     setPlaying(false)
@@ -377,6 +471,8 @@ const DataContainer = ({children}) => {
 
 
 const App = () => {
+
+   
   LogBox.ignoreLogs(["Setting a timer"]);
   LogBox.ignoreLogs(["ImmutableStateInvariantMiddleware"]);
 
@@ -422,6 +518,22 @@ const App = () => {
               component={CreatePodcastWithRSS}
             />
             <NavigationStack.Screen
+              name="YourPodcast"
+              component={YourPodcast}
+            />
+            <NavigationStack.Screen
+              name="PremiereAdmin"
+              component={PremiereAdmin}
+            />
+            <NavigationStack.Screen
+              name="ScheduleEpisodePremiere"
+              component={ScheduleEpisodePremiere}
+            />
+            <NavigationStack.Screen
+              name="StartEpisodePremiere"
+              component={StartEpisodePremiere}
+            />
+            <NavigationStack.Screen
               name="SetupProfile"
               component={SetupProfile}
             />
@@ -438,6 +550,40 @@ const App = () => {
       </DataContainer>
     </Provider>
   );
+}
+
+
+
+async function registerForPushNotificationsAsync() {
+  let token;
+  if (Constants.isDevice) {
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== "granted") {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== "granted") {
+      alert("Failed to get push token for push notification!");
+      return;
+    }
+    token = (await Notifications.getExpoPushTokenAsync()).data;
+    console.log(token);
+  } else {
+    alert("Must use physical device for Push Notifications");
+  }
+
+  if (Platform.OS === "android") {
+    Notifications.setNotificationChannelAsync("default", {
+      name: "default",
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: "#FF231F7C",
+    });
+  }
+
+  return token;
 }
 
 export default App;

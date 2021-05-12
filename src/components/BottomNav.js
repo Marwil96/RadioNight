@@ -35,7 +35,7 @@ const BottomNav = ({ state, descriptors, navigation }) => {
   if (focusedOptions.tabBarVisible === false) {
     return null;
   }
-  if (focusedOptions.screen !== "YourPodcasts") {
+  if (focusedOptions.screen !== "Tesetata") {
     return (
       <BottomNavWrapper style={{ flexDirection: "row" }}>
         {state.routes.map((route, index) => {
