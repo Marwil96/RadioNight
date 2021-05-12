@@ -56,14 +56,14 @@ const Following = ({navigation}) => {
   },[user_data])
 
   return (
-    <MainContainer>
-      <TopNav />
+    <MainContainer loading={loading} >
+      <TopNav onRefresh={() => FetchData()}/>
       <TitleWrapper>
         <DisplayModeTitle
           onPress={() => setDisplayMode("episodes")}
           active={displayMode === "episodes"}
         >
-          Episodes
+          Premieres
         </DisplayModeTitle>
         <DisplayModeTitle
           onPress={() => setDisplayMode("shows")}
