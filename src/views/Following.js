@@ -1,9 +1,10 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
 import { Text, View } from "react-native";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components/native";
-import { FetchYourPodcasts } from "../actions";
+import { FetchYourPodcasts, GetFollowedPremieres } from "../actions";
+import { OpenEpisodePlayer, OpenRssPlayer } from "../actions/globalActions";
 import InputField from "../components/InputField";
 import { MainContainer } from "../components/MainContainer";
 import PodcastCard from "../components/PodcastCard";
@@ -29,20 +30,30 @@ const DisplayModeTitle = styled.Text`
 
 const Following = ({navigation}) => {
    const { user_data } = useSelector((state) => state.DatabaseReducer);
+   const dispatch = useDispatch()
+   const [loading, setLoading] = useState(false)
    const [podcasts, setPodcasts] = useState([]);
   const [displayMode, setDisplayMode] = useState("episodes");
-  const [toggleMode, setToggleMode] = useState('live')
+  const [toggleMode, setToggleMode] = useState('Live')
+  const [upcomingEpisodes, setUpcomingEpisodes] = useState([]);
+  const [liveEpisodes, setLiveEpisodes] = useState([]);
+  const [pastEpisodes, setPastEpisodes] = useState([]);
 
+  const FetchData = async () => {
+    setLoading(true)
+    const response = await GetFollowedPremieres(user_data.followed_podcasts);
+    setUpcomingEpisodes(response.upcomingEpisodes);
+    setLiveEpisodes(response.liveEpisodes);
+    setPastEpisodes(response.pastEpisodes);
+    const podcastsData = await FetchYourPodcasts(user_data?.followed_podcasts);
+    setPodcasts(podcastsData);
+    setLoading(false);
+  }
   useEffect(() => {
     if(user_data !== undefined) {
-      const FetchData = async () => {
-        const podcastsData = await FetchYourPodcasts(user_data?.followed_podcasts);
-        setPodcasts(podcastsData);
-      };
-
       FetchData();
     }
-  }, [user_data])
+  },[user_data])
 
   return (
     <MainContainer>
@@ -62,10 +73,77 @@ const Following = ({navigation}) => {
         </DisplayModeTitle>
       </TitleWrapper>
       {displayMode === "episodes" ? (
+        <View>
         <ToggleBar
           items={["Live", "Upcoming", "Past"]}
           onChange={(value) => setToggleMode(value)}
+          style={{marginBottom :24}}
         />
+        {toggleMode === 'Live' &&
+          <View>
+            {liveEpisodes.length > 0 &&
+            liveEpisodes.map((episode, index) => (
+              <PodcastCard
+                title={episode.title}
+                subtitle={episode.podcast_name}
+                key={index}
+                onPress={() => {
+                  dispatch(
+                    OpenEpisodePlayer({ data: { ...episode }, state: true })
+                  );
+                }}
+                desc={episode.desc}
+                image={episode.image}
+                meta1={`${new Date(episode.start_date).getFullYear()}-${new Date(
+                  episode.start_date
+                ).getMonth()}-${new Date(episode.start_date).getDate()}`}
+                meta2={episode.episode_is_running ? "LIVE" : "PREPARTY"}
+              />
+            ))}
+          </View>
+          }
+          {toggleMode === 'Upcoming' && 
+            <View>
+            {upcomingEpisodes.length > 0 &&
+              upcomingEpisodes.map((episode, index) => (
+                <PodcastCard
+                  title={episode.title}
+                  subtitle={episode.podcast_name}
+                  key={index}
+                  desc={episode.desc}
+                  image={episode.image}
+                  meta1={`${new Date(episode.start_date).getFullYear()}-${new Date(
+                    episode.start_date
+                  ).getMonth()}-${new Date(episode.start_date).getDate()}`}
+                  meta2={`${new Date(episode.start_date).getHours()}:${new Date(
+                    episode.start_date
+                  ).getMinutes()}:00`}
+                />
+              ))}
+            </View>
+          }
+          {toggleMode === 'Past' && 
+          <View>
+            {pastEpisodes.length > 0 &&
+              pastEpisodes.map((episode, index) => (
+              <PodcastCard
+                title={episode.title}
+                subtitle={episode.podcast_name}
+                key={index}
+                desc={episode.desc}
+                onPress={() => dispatch(OpenRssPlayer({data: {episode: {title: episode.title, itunes: {image: episode.image}, enclosures:[{url: episode.play_link}]}, podcast: {title: episode.podcast_name, image: episode.image}}, state: true}))}
+                image={episode.image}
+                meta1={`${new Date(episode.start_date).getFullYear()}-${new Date(
+                  episode.start_date
+                ).getMonth()}-${new Date(episode.start_date).getDate()}`}
+                meta2={`${new Date(episode.start_date).getHours()}:${new Date(
+                  episode.start_date
+                ).getMinutes()}:00`}
+              />
+            ))}
+          </View>
+          }
+        </View>
       ) : (
         <View>
           {podcasts.map((podcast, index) => (
