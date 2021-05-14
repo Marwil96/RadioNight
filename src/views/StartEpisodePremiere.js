@@ -111,7 +111,7 @@ const StartEpisodePremiere = ({ navigation, route }) => {
     };
 
     await fetch(
-      "https://blooming-sea-13003.herokuapp.com/start-stream",
+      "http://radionight.receptsamlingen.website/start-stream",
       requestOptions
     )
       .then((response) => response.text())

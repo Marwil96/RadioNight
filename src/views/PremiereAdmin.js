@@ -38,7 +38,7 @@ const StopStream = async (episodeId) => {
   };
 
   await fetch(
-    "https://blooming-sea-13003.herokuapp.com/stop-stream",
+    "http://radionight.receptsamlingen.website/stop-stream",
     requestOptions
   )
     .then((response) => response.text())

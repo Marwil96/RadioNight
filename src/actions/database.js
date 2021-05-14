@@ -26,6 +26,17 @@ export const FetchAllUserData = () => {
   }
 }
 
+export const UpdateUserData = async ({data}) => {
+  console.log(data.user_image)
+  const url = data.user_image.uri !== undefined ? await UploadImage({file:data.user_image, userId: user.currentUser.uid, fileName:'profile_image'}) : data.user_image;
+  console.log('URL', url)
+   const response = await db.collection("users").doc(user.currentUser.uid).set({...data, user_image: url}, {merge: true}).then(() => { 
+    return true
+   }).catch((error) => false);
+
+   return response
+}
+
 export const SchedulePodcastPremiere = async (data) => {
   const episodeId = getTimeEpoch();
   const result = await Promise.all(
@@ -132,6 +143,13 @@ export const FetchYourPodcasts = async (podcast_ids) => {
   return result;
 }
 
+export const UpdatePodcastDetails = async ({data, podcastId}) => {
+   const response = await db.collection("podcasts").doc(podcastId).set({...data}, {merge: true}).then(() => { 
+    return true
+   }).catch((error) => false);
+
+   return response;
+}
 
 export const FetchEpisode = (episodeId) => {
   return(dispatch) => {
@@ -303,3 +321,35 @@ export const GetCurrentlyLiveEpisodes = async (followed_podcasts) => {
   )
   return {upcomingEpisodes: result[0], pastEpisodes: result[1], liveEpisodes: result[2]}
 }
+
+
+export const DownloadImage = async (ref) => {
+  console.log(ref);
+  const storageRef = storage.refFromURL(
+    `gs://memorycollector-3e5de.appspot.com/${ref}`
+  );
+  return storageRef.getDownloadURL().then((url) => {
+    return url;
+  });
+};
+
+
+
+export const UploadImage = async ({
+  file,
+  fileName,
+  userId,
+}) => {
+  
+   const response = await fetch(file.uri);
+  const blob = await response.blob();
+  // dispatch({type: UPLOAD_IMAGE, payload: {ImageUploaded: false}})
+  var uploadedImage = storage.ref(userId).child(`${fileName}.jpg`);
+
+  await uploadedImage.put(blob).then((snapshot) => {
+  });
+
+  return await storage.ref(userId).child(`${fileName}.jpg`).getDownloadURL().then(url => {
+    return url
+  })
+};

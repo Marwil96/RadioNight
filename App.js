@@ -36,6 +36,9 @@ import { PushRSSPlayer, PushStreamPlayer } from "./src/other/notificationFunctio
 import StartEpisodePremiere from './src/views/StartEpisodePremiere';
 import PremiereAdmin from './src/views/PremiereAdmin';
 import Constants from 'expo-constants';
+import PodcastSettings from './src/views/PodcastSettings';
+import UserSettings from './src/views/UserSettings';
+import EditUser from './src/views/EditUser';
 
 
 
@@ -280,7 +283,7 @@ const DataContainer = ({children}) => {
     };
 
    const result = fetch(
-      `https://blooming-sea-13003.herokuapp.com/episode-progress/${episodeId}`,
+      `http://radionight.receptsamlingen.website/episode-progress/${episodeId}`,
       requestOptions
     )
       .then((response) => response.json())
@@ -532,6 +535,18 @@ const App = () => {
             <NavigationStack.Screen
               name="StartEpisodePremiere"
               component={StartEpisodePremiere}
+            />
+            <NavigationStack.Screen
+              name="PodcastSettings"
+              component={PodcastSettings}
+            />
+            <NavigationStack.Screen
+              name="UserSettings"
+              component={UserSettings}
+            />
+            <NavigationStack.Screen
+              name="EditUser"
+              component={EditUser}
             />
             <NavigationStack.Screen
               name="SetupProfile"

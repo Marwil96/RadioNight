@@ -31,7 +31,7 @@ const TopNav = ({onRefresh}) => {
   return (
     <Wrapper>
       <Content>
-        <ProfileTag />
+        <ProfileTag onPress={() =>  navigation.navigate("UserSettings")} />
         <RightColumn>
           {onRefresh !== undefined && <IconWrapper onPress={onRefresh}>
             <MaterialIcons name="refresh" size={25} color="white" />

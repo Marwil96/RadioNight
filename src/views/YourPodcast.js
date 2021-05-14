@@ -64,7 +64,7 @@ const YourPodcast = ({ navigation, route }) => {
             />
             <Title style={{ fontSize: 16 }}>See all Podcasts</Title>
           </ButtonContainer>
-          <Link style={{ fontSize: 16, color: colors.text }}>Settings</Link>
+          <Title style={{ fontSize: 16, color: colors.text }} onPress={() => navigation.navigate('PodcastSettings', {...route.params})}>Settings</Title>
         </TopBar>
       </Wrapper>
       <Title style={{ marginLeft: 16 }}>{title}</Title>
