@@ -1,6 +1,7 @@
 {
   "name": "RadioNight",
   "displayName": "RadioNight",
+  "icon": "./src/assets/logo.png",
   "expo": {
     "name": "RadioNight",
     "slug": "RadioNight",
@@ -9,7 +10,11 @@
       "**/*"
     ],
     "android": {
-      "package": "com.marwil96.RadioNight"
+      "package": "com.marwil96.RadioNight",
+      "adaptiveIcon": {
+        "foregroundImage": "./src/assets/logo.png",
+        "backgroundColor": "#FF6A00"
+      }
     }
   }
 }

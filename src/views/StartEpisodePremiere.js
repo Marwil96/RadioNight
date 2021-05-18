@@ -2,11 +2,12 @@ import { AntDesign } from "@expo/vector-icons";
 import { Link } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import * as DocumentPicker from "expo-document-picker";
 import * as rssParser from "react-native-rss-parser";
 import { ActivityIndicator, ScrollView, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components/native";
-import { AddEpisodePremiere, SchedulePodcastPremiere } from "../actions";
+import { AddEpisodePremiere, SchedulePodcastPremiere, UploadMp3File } from "../actions";
 import InputField from "../components/InputField";
 import { MainContainer } from "../components/MainContainer";
 import PodcastCard from "../components/PodcastCard";
@@ -39,16 +40,32 @@ const DateWrapper = styled.View`
   align-items: center;
 `;
 
+const FileUploadWrapper = styled.TouchableOpacity`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  background-color: ${colors.secondary};
+  padding: 32px 16px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+`;
+
 const StartEpisodePremiere = ({ navigation, route }) => {
   const [fetched, setFetched] = useState(false);
   const [loading, setLoading] = useState(false);
   const [fullPageLoading, setFullPageLoading] = useState(false);
   const [podcast, setPodcast] = useState([]);
+  const [mp3File, setMp3File] = useState({})
   const [episodes, setEpisodes] = useState([]);
+  const [episodeTitle, setEpisodeTitle] = useState('');
+  const [episodeDesc, setEpisodeDesc] = useState('');
   const [selectedPodcast, setSelectedPodcast] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [hostMessage, setHostMessage] = useState("Welcome to our premiere of Wind of Change. We will be available for questions after the episode");
   const [toggleMode, setToggleMode] = useState('Directly')
+  const [fileUploadMode, setFileUploadMode] = useState('rss')
   const { title, rss_url, image, id, authors, desc } = route.params;
   const dispatch = useDispatch();
 
@@ -86,12 +103,13 @@ const StartEpisodePremiere = ({ navigation, route }) => {
       podcast_image: image,
       podcast_id: id,
       episode_is_running: false,
-      stream_started: {state: true, episode_starts: startTime },
+      stream_started: { state: true, episode_starts: startTime },
       host_message: hostMessage,
       play_link: selectedPodcast.enclosures[0].url,
       rss_url: rss_url,
       start_date: unFormattedDate.toString(),
       duration: duration,
+      from_file: false,
     };
 
     console.log('DURATION', duration)
@@ -128,6 +146,75 @@ const StartEpisodePremiere = ({ navigation, route }) => {
     }
   };
 
+  const StartEpisodePremiereWithFile = async () => {
+    setFullPageLoading(true);
+    const mp3Url = await UploadMp3File({file: mp3File, fileName: mp3File.name})
+    const duration = await GetMp3Duration(mp3Url);
+    const unFormattedDate = new Date();
+    const startTime = new Date(unFormattedDate);
+
+    let startsIn = 0;
+    if (toggleMode === "Directly") {
+      startsIn = 0;
+    } else if (toggleMode === "15min") {
+      startsIn = 15;
+    } else {
+      startsIn = 30;
+    }
+
+    startTime.setMinutes(unFormattedDate.getMinutes() + startsIn);
+
+    const data = {
+      title: episodeTitle,
+      podcast_name: title,
+      desc: episodeDesc,
+      image: image,
+      podcast_desc: desc,
+      podcast_image: image,
+      podcast_id: id,
+      episode_is_running: false,
+      stream_started: { state: true, episode_starts: startTime },
+      host_message: hostMessage,
+      play_link: mp3Url,
+      rss_url: rss_url,
+      start_date: unFormattedDate.toString(),
+      duration: duration,
+      from_file: true
+    };
+
+    console.log("DURATION", duration);
+
+    const response = await AddEpisodePremiere(data);
+
+    var formdata = new FormData();
+    console.log("RESPONSE", response);
+    formdata.append("episode_id", response.episodeId);
+    formdata.append("episode_duration", duration);
+    formdata.append("episode_start_time", startsIn);
+
+    var requestOptions = {
+      method: "POST",
+      body: formdata,
+      redirect: "follow",
+    };
+
+    await fetch(
+      "http://radionight.receptsamlingen.website/start-stream",
+      requestOptions
+    )
+      .then((response) => response.text())
+      .then((result) => console.log(result))
+      .catch((error) => console.log("error", error));
+
+    if (response.success) {
+      setFullPageLoading(false);
+      navigation.navigate("YourPodcast", { ...route.params });
+    } else {
+      setFullPageLoading(false);
+      console.log("ERROR");
+    }
+  };
+
   const FetchPodcast = async (url) => {
     setLoading(true);
     await fetch(url)
@@ -140,6 +227,18 @@ const StartEpisodePremiere = ({ navigation, route }) => {
       });
 
     setLoading(false);
+  };
+
+  const uploadMp3 = async () => {
+    let result = await DocumentPicker.getDocumentAsync({
+    });
+
+    if (!result.cancelled) {
+      setMp3File(result);
+      console.log(result.uri, result);
+      // onPress(result);
+      // await UploadImageAction(result)
+    }
   };
 
   useEffect(() => {
@@ -169,68 +268,112 @@ const StartEpisodePremiere = ({ navigation, route }) => {
       <Span style={{ marginLeft: 16, fontSize: 20 }}>
         Pick Episode to Premiere.
       </Span>
-      <Wrapper>
-        <InputField
-          placeholder="Search after podcast"
-          style={{ marginBottom: 24 }}
-          onChangeText={(text) => setSearchTerm(text)}
-        />
-      </Wrapper>
-      {!selectedPodcast ? (
-        <ScrollView horizontal={true}>
-          {loading ? (
-            <ActivityIndicator color={colors.primary} size="large" />
-          ) : (
-            fetched &&
-            episodes.map((episode, index) => {
-              if (index < 20) {
-                return (
-                  <PodcastCard
-                    style={{ width: 300, paddingRight: 0, marginLeft: 0 }}
-                    title={episode.title}
-                    subtitle={podcast.title}
-                    key={index}
-                    onPress={() => setSelectedPodcast(episode)}
-                    desc={
-                      episode.itunes.summary !== undefined &&
-                      episode.itunes.summary
-                    }
-                    image={
-                      episode.itunes.image !== undefined
-                        ? episode.itunes.image
-                        : podcast.image.url
-                    }
-                  />
-                );
-              }
-            })
-          )}
-        </ScrollView>
-      ) : (
-        <View>
-          <PodcastCard
-            title={selectedPodcast.title}
-            subtitle={podcast.title}
-            desc={
-              selectedPodcast.itunes.summary !== undefined &&
-              selectedPodcast.itunes.summary
-            }
-            image={
-              selectedPodcast.itunes.image !== undefined
-                ? selectedPodcast.itunes.image
-                : podcast.image.url
-            }
+      {fileUploadMode === "rss" && (
+        <Wrapper>
+          <InputField
+            placeholder="Search after podcast"
+            style={{ marginBottom: 24 }}
+            onChangeText={(text) => setSearchTerm(text)}
           />
-          <Wrapper>
-            <StyledButton
-              onPress={() => setSelectedPodcast(false)}
-              style={{ marginBottom: 32 }}
-            >
-              Pick another Episode
-            </StyledButton>
-          </Wrapper>
-        </View>
+        </Wrapper>
       )}
+      {fileUploadMode === "rss" ? (
+        !selectedPodcast ? (
+          <ScrollView horizontal={true}>
+            {loading ? (
+              <ActivityIndicator color={colors.primary} size="large" />
+            ) : (
+              fetched &&
+              episodes.map((episode, index) => {
+                if (index < 20) {
+                  return (
+                    <PodcastCard
+                      style={{ width: 300, paddingRight: 0, marginLeft: 0 }}
+                      title={episode.title}
+                      subtitle={podcast.title}
+                      key={index}
+                      onPress={() => setSelectedPodcast(episode)}
+                      desc={
+                        episode.itunes.summary !== undefined &&
+                        episode.itunes.summary
+                      }
+                      image={
+                        episode.itunes.image !== undefined
+                          ? episode.itunes.image
+                          : podcast.image.url
+                      }
+                    />
+                  );
+                }
+              })
+            )}
+          </ScrollView>
+        ) : (
+          <View>
+            <PodcastCard
+              title={selectedPodcast.title}
+              subtitle={podcast.title}
+              desc={
+                selectedPodcast.itunes.summary !== undefined &&
+                selectedPodcast.itunes.summary
+              }
+              image={
+                selectedPodcast.itunes.image !== undefined
+                  ? selectedPodcast.itunes.image
+                  : podcast.image.url
+              }
+            />
+            <Wrapper>
+              <StyledButton
+                onPress={() => setSelectedPodcast(false)}
+                style={{ marginBottom: 32 }}
+              >
+                Pick another Episode
+              </StyledButton>
+            </Wrapper>
+          </View>
+        )
+      ) : (
+        <Wrapper>
+          <Span>Episode Description</Span>
+          <InputField
+            placeholder="Episode Title"
+            onChangeText={(text) => setEpisodeTitle(text)}
+            style={{ marginBottom: 24 }}
+          />
+          <Span>Episode Description</Span>
+          <InputField
+            onChangeText={(text) => setEpisodeDesc(text)}
+            style={{ marginBottom: 24 }}
+            multiline
+            placeholder="The United States is one of the few countries that lets companies pay people for their blood plasma. Why?"
+            // value={hostMessage}
+            // onChangeText={(text) => setHostMessage(text)}
+          />
+          <FileUploadWrapper onPress={uploadMp3}>
+            <Title
+              style={{ fontSize: 16, textAlign: "center", marginBottom: 0 }}
+            >
+              {mp3File.name !== undefined
+                ? `${mp3File.name} Uploaded`
+                : "Upload Audio File"}
+            </Title>
+          </FileUploadWrapper>
+        </Wrapper>
+      )}
+
+      <Wrapper style={{ marginBottom: 32 }}>
+        {fileUploadMode === "rss" ? (
+          <StyledButton onPress={() => setFileUploadMode("file")}>
+            Upload Audio File Instead
+          </StyledButton>
+        ) : (
+          <StyledButton primary onPress={() => setFileUploadMode("rss")}>
+            Pick from RSS feed instead
+          </StyledButton>
+        )}
+      </Wrapper>
+
       <Span style={{ marginLeft: 16, fontSize: 20 }}>Run Episode</Span>
 
       <ToggleBar
@@ -256,8 +399,16 @@ const StartEpisodePremiere = ({ navigation, route }) => {
 
       <Wrapper style={{ paddingBottom: 100 }}>
         <StyledButton
-          onPress={() => StartEpisodePremiere()}
-          primary={selectedPodcast !== undefined ? true : false}
+          onPress={() => {
+            fileUploadMode === "rss"
+              ? StartEpisodePremiere()
+              : StartEpisodePremiereWithFile();
+          }}
+          primary={
+            selectedPodcast !== undefined || fileUploadMode === "file"
+              ? true
+              : false
+          }
         >
           Start Premiere
         </StyledButton>

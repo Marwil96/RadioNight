@@ -28,7 +28,7 @@ const ProfileTag = ({onPress}) => {
   const { user_data } = useSelector((state) => state.DatabaseReducer);
   return (
     <ProfileCircle onPress={onPress}>
-      {user_data.user_image !== false ? (
+      {user_data?.user_image !== false && user_data?.user_image !== undefined ? (
         <ProfileImage
           source={{
             uri: user_data.user_image,

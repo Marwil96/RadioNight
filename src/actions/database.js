@@ -322,7 +322,6 @@ export const GetCurrentlyLiveEpisodes = async (followed_podcasts) => {
   return {upcomingEpisodes: result[0], pastEpisodes: result[1], liveEpisodes: result[2]}
 }
 
-
 export const DownloadImage = async (ref) => {
   console.log(ref);
   const storageRef = storage.refFromURL(
@@ -352,4 +351,26 @@ export const UploadImage = async ({
   return await storage.ref(userId).child(`${fileName}.jpg`).getDownloadURL().then(url => {
     return url
   })
+};
+
+export const UploadMp3File = async ({file, fileName}) => {
+  const response = await fetch(file.uri);
+  const blob = await response.blob();
+  // dispatch({type: UPLOAD_IMAGE, payload: {ImageUploaded: false}})
+  var metadata = {
+    contentType: "audio/mpeg",
+  };
+  
+  // Upload the file and metadata
+  var uploadTask = storage.ref(user.currentUser.uid).child(`${fileName}`);
+
+  await uploadTask.put(blob, metadata).then((snapshot) => {});
+
+  return await storage
+    .ref(user.currentUser.uid)
+    .child(`${fileName}`)
+    .getDownloadURL()
+    .then((url) => {
+      return url;
+    });
 };
