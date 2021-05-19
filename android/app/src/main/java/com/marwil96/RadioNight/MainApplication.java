@@ -1,17 +1,19 @@
-package com.radionight;
+package com.marwil96.RadioNight;
 
+import io.agora.rtc.react.RCTAgoraRtcPackage;
 import android.app.Application;
 import android.content.Context;
 import android.net.Uri;
 
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
+import io.agora.rtc.react.RCTAgoraRtcPackage;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
-import com.radionight.generated.BasePackageList;
+import com.marwil96.RadioNight.generated.BasePackageList;
 
 import org.unimodules.adapters.react.ReactAdapterPackage;
 import org.unimodules.adapters.react.ModuleRegistryAdapter;
@@ -84,6 +86,15 @@ public class MainApplication extends Application implements ReactApplication {
   }
 
   @Override
+  protected List<ReactPackage> getPackages() {
+    return Arrays.<ReactPackage>asList(
+            new MainReactPackage(),
+            new RCTAgoraRtcPackage(),
+            new RCTAgoraRtcPackage()
+    );
+  }
+
+  @Override
   public void onCreate() {
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);
@@ -110,7 +121,7 @@ public class MainApplication extends Application implements ReactApplication {
          We use reflection here to pick up the class that initializes Flipper,
         since Flipper library is not available in release mode
         */
-        Class<?> aClass = Class.forName("com.radionight.ReactNativeFlipper");
+        Class<?> aClass = Class.forName("com.marwil96.RadioNight.ReactNativeFlipper");
         aClass
             .getMethod("initializeFlipper", Context.class, ReactInstanceManager.class)
             .invoke(null, context, reactInstanceManager);

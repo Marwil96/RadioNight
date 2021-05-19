@@ -8,6 +8,7 @@ import PodcastCard from '../components/PodcastCard';
 import { Title } from '../components/Title';
 import TopNav from '../components/TopNav';
 import { pauseStreamNotification } from '../other/notificationFunctions';
+import RtcEngine from "react-native-agora";
 
 const Home = ({ navigation }) => {
   const { user_data } = useSelector((state) => state.DatabaseReducer);
@@ -33,6 +34,10 @@ const Home = ({ navigation }) => {
       FetchData();
     }
   },[user_data])
+
+  useEffect(() => {
+    RtcEngine.create("765ce70ea42c46ca9f899394c5dcf36b");
+  }, [])
   
   return (
     <MainContainer player loading={loading}>
