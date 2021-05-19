@@ -61,6 +61,63 @@ export const AddEpisodePremiere = async (data) => {
   return result
 }
 
+export const FetchMods = async (mods) => {
+  const result = await Promise.all(
+    await mods.map(async (id) => {
+      const response = await db.collection("users").doc(id).get().then((doc) => {
+        const data = doc.data();
+        return data
+      })
+
+      return response
+    })
+  )
+
+  return result;
+}
+
+export const AcceptInvitationToMod = async (invitationData) => {
+  const response = await db.collection('podcasts').doc(invitationData.podcast_id).set({mods: firebase.firestore.FieldValue.arrayUnion(user.currentUser.uid)}, {merge: true}).then(()  => {
+    return true
+  }).catch((error) => false);
+
+  if(response) {
+    await db.collection("users").doc(user.currentUser.uid).set({invited_to_mod: firebase.firestore.FieldValue.arrayRemove(invitationData)}, {merge: true});
+    return true
+  } else {
+    return false
+  }
+}
+
+export const DeclineInvitationToMod = async (invitationData) => {
+  const response = await db.collection("users").doc(user.currentUser.uid).set({invited_to_mod: firebase.firestore.FieldValue.arrayRemove(invitationData)}, {merge: true}).then(()  => {
+    return true
+  }).catch((error) => false);
+
+  return response
+}
+
+export const InviteUserToMod = async ({userName, podcastId, podcastTitle}) => {
+  const userId = await db.collection('users').where("user_name", "==", userName).get().then((querySnapshot) => {
+    const users = [];
+     querySnapshot.forEach((doc) => { 
+       users.push(doc.data())
+     })
+     return users
+  })
+
+  if(userId.length > 0) {
+    const response = await db.collection('users').doc(userId[0].user_id).set({invited_to_mod: firebase.firestore.FieldValue.arrayUnion({podcast_title: podcastTitle, podcast_id: podcastId})}, {merge: true}).then(()  => {
+      return true
+    }).catch((error) => false);
+    return response
+  } else {
+    return false
+  }
+
+  // return response
+}
+
 export const AddChatMessage = async ({message, episodeId, messageAuthor}) => {
   const chatId = getTimeEpoch();
   console.log("ADD CHAT MESSAGE", message, episodeId, messageAuthor, chatId);
@@ -201,6 +258,7 @@ export const CreatePodcast = ({data}) => {
       authors: data.authors,
       categories: data.categories,
       id: podcastId,
+      mods: [user.currentUser.uid],
       rss_url: data.rss_url
       // episodes: allEpisodes
     }).then(() => {

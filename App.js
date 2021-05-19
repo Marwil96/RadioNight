@@ -36,9 +36,12 @@ import { PushRSSPlayer, PushStreamPlayer } from "./src/other/notificationFunctio
 import StartEpisodePremiere from './src/views/StartEpisodePremiere';
 import PremiereAdmin from './src/views/PremiereAdmin';
 import Constants from 'expo-constants';
-import PodcastSettings from './src/views/PodcastSettings';
+import EditPodcast from './src/views/EditPodcast';
 import UserSettings from './src/views/UserSettings';
 import EditUser from './src/views/EditUser';
+import PodcastSettings from './src/views/PodcastSettings';
+import PodcastCommunity from './src/views/PodcastCommunity';
+import AddModerator from './src/views/AddModerator';
 
 
 
@@ -533,8 +536,20 @@ const App = () => {
               component={ScheduleEpisodePremiere}
             />
             <NavigationStack.Screen
+              name="PodcastCommunity"
+              component={PodcastCommunity}
+            />
+            <NavigationStack.Screen
+              name="AddModerator"
+              component={AddModerator}
+            />
+            <NavigationStack.Screen
               name="StartEpisodePremiere"
               component={StartEpisodePremiere}
+            />
+            <NavigationStack.Screen
+              name="EditPodcast"
+              component={EditPodcast}
             />
             <NavigationStack.Screen
               name="PodcastSettings"
@@ -544,10 +559,7 @@ const App = () => {
               name="UserSettings"
               component={UserSettings}
             />
-            <NavigationStack.Screen
-              name="EditUser"
-              component={EditUser}
-            />
+            <NavigationStack.Screen name="EditUser" component={EditUser} />
             <NavigationStack.Screen
               name="SetupProfile"
               component={SetupProfile}

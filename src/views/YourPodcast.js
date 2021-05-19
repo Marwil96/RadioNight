@@ -40,11 +40,13 @@ const YourPodcast = ({ navigation, route }) => {
    useEffect(() => {
      const FetchData = async () => {
       setLoading(true);
+
       const premieresData = await GetFollowedPremieres([id]);
-      console.log(premieresData)
+      
       setUpcomingEpisodes(premieresData.upcomingEpisodes);
       setLiveEpisodes(premieresData.liveEpisodes);
       setPastEpisodes(premieresData.pastEpisodes);
+      
       setLoading(false);
      };
 

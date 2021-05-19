@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { GetCurrentlyLiveEpisodes, GetFollowedPremieres, LoginUser } from '../actions';
+import { AcceptInvitationToMod, DeclineInvitationToMod, GetCurrentlyLiveEpisodes, GetFollowedPremieres, LoginUser } from '../actions';
 import { OpenEpisodePlayer, OpenRssPlayer } from '../actions/globalActions';
+import InviteCard from '../components/InviteCard';
 import { MainContainer } from '../components/MainContainer';
 import PodcastCard from '../components/PodcastCard';
 import { Title } from '../components/Title';
 import TopNav from '../components/TopNav';
+import { Wrapper } from '../components/Wrapper';
 import { pauseStreamNotification } from '../other/notificationFunctions';
 
 const Home = ({ navigation }) => {
@@ -37,6 +39,20 @@ const Home = ({ navigation }) => {
   return (
     <MainContainer player loading={loading}>
       <TopNav onRefresh={() => FetchData()} />
+      {user_data !== undefined && user_data.invited_to_mod.length > 0 && 
+      <View>
+        <Title style={{ marginLeft: 16, marginBottom: 24 }}>
+          Invitations to moderate
+        </Title>
+
+        <ScrollView horizontal={true}>
+          {user_data.invited_to_mod.map(({podcast_title, podcast_id}, index) => (
+            <InviteCard key={index} title={`Start Moderating ${podcast_title}`}  style={{ width: 300, paddingRight: 0, marginLeft: 0 }} accept={() => AcceptInvitationToMod({podcast_title, podcast_id})} decline={() => DeclineInvitationToMod({podcast_title, podcast_id})}/>
+          ))}
+        </ScrollView>
+        
+      </View>
+      }
       {liveEpisodes.length > 0 && (
         <Title style={{ marginLeft: 16, marginBottom: 24 }}>
           Live Premieres

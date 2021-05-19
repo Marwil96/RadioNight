@@ -1,13 +1,16 @@
-import { AntDesign } from '@expo/vector-icons';
-import React, { useState } from 'react';
-import styled from 'styled-components/native';
-import { UpdatePodcastDetails } from '../actions';
-import InputField from '../components/InputField';
-import { MainContainer } from '../components/MainContainer';
-import { Span } from '../components/Span';
-import StyledButton from '../components/StyledButton';
-import { Title } from '../components/Title';
-import { Wrapper } from '../components/Wrapper';
+import { AntDesign } from "@expo/vector-icons";
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import styled from "styled-components/native";
+import { UpdatePodcastDetails } from "../actions";
+import ActionButton from "../components/ActionButton";
+import InputField from "../components/InputField";
+import { MainContainer } from "../components/MainContainer";
+import { Span } from "../components/Span";
+import StyledButton from "../components/StyledButton";
+import { Title } from "../components/Title";
+import { Wrapper } from "../components/Wrapper";
+import colors from "../variables/color";
 
 const TopBar = styled.View`
   width: 100%;
@@ -21,24 +24,40 @@ const ButtonContainer = styled.TouchableOpacity`
   flex-direction: row;
 `;
 
-const PodcastSettings = ({navigation, route}) => {
-  const { title, id, desc, rss_url } = route.params;
+const ProfileContainer = styled.View`
+  padding: 12px 16px;
+  margin: 0 16px;
+  background-color: ${colors.secondary};
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 8px;
+`;
+
+const ProfileImage = styled.Image`
+  width: 69px;
+  height: 69px;
+  border-radius: 8px;
+`;
+
+const PodcastSettings = ({ navigation, route }) => {
+  const { user_data } = useSelector((state) => state.DatabaseReducer);
+  const { title, id, desc, rss_url, image } = route.params;
   const [loading, setLoading] = useState(false);
-  const [podcastTitle, setPodcastTitle] = useState(title);
-  const [podcastDesc, setPodcastDesc] = useState(desc);
-  const [podcastRSSUrl, setPodcastRSSUrl] = useState(rss_url);
-  const [removePodcastCheck, setRemovePodcastCheck] = useState('')
+  const [podcastTitle, setPodcastTitle] = useState();
+  const [podcastDesc, setPodcastDesc] = useState();
+  const [removePodcastCheck, setRemovePodcastCheck] = useState("");
 
   const UpdateSettings = async () => {
-    setLoading(true)
-    const response = await UpdatePodcastDetails({data:{title: podcastTitle, desc: podcastDesc, rss_url: podcastRSSUrl}, podcastId: id})
-    console.log(response)
+    setLoading(true);
+    // const response = dadadad
     setLoading(false);
 
-    if(response) {
-      navigation.goBack()
-    }
-  }
+    // if (response) {
+    //   navigation.goBack();
+    // }
+  };
 
   return (
     <MainContainer loading={loading}>
@@ -55,67 +74,38 @@ const PodcastSettings = ({navigation, route}) => {
           </ButtonContainer>
         </TopBar>
       </Wrapper>
-      <Title style={{ marginLeft: 16, fontSize: 24 }}>Settings</Title>
-      <Wrapper style={{ marginBottom: 24 }}>
-        <Span style={{ fontSize: 20, marginBottom: 12 }}>Podcast Title</Span>
-        {/* <Span style={{ fontSize: 16, opacity: 0.8, marginBottom: 12 }}>
-          Message for the audience that is shown before the start of the
-          episode.
-        </Span> */}
-        <InputField
-          placeholder="Planet Money"
-          value={podcastTitle}
-          onChangeText={(text) => setPodcastTitle(text)}
-        />
-      </Wrapper>
-      <Wrapper style={{ marginBottom: 24 }}>
-        <Span style={{ fontSize: 20, marginBottom: 12 }}>
-          Podcast Description
-        </Span>
-        <InputField
-          placeholder={`The economy explained. Imagine you could call up a friend and say, "Meet me at the bar and tell me what's going on with the economy." Now imagine that's actually a fun evening.`}
-          multiline={true}
-          value={podcastDesc}
-          onChangeText={(text) => setPodcastDesc(text)}
-        />
-      </Wrapper>
+      <Title style={{ marginLeft: 16, fontSize: 24 }}>Podcast Settings</Title>
 
-      <Wrapper style={{ marginBottom: 24 }}>
-        <Span style={{ fontSize: 20, marginBottom: 12 }}>RSS Feed</Span>
-        <InputField
-          placeholder={`https://example.com/rss`}
-          value={podcastRSSUrl}
-          onChangeText={(text) => setPodcastRSSUrl(text)}
+      <ProfileContainer style={{ marginBottom: 24 }}>
+        <Title style={{ fontSize: 20, marginBottom: 0 }}>{title}</Title>
+        <ProfileImage
+          source={{
+            uri: image,
+          }}
         />
-      </Wrapper>
-      <Wrapper style={{ marginBottom: 32 }}>
-        <StyledButton
-        onPress={() => UpdateSettings()}
-        primary={podcastTitle !== undefined && podcastDesc !== undefined ? true : false}
-        >
-          Save Settings
-        </StyledButton>
-      </Wrapper>
+      </ProfileContainer>
 
-      <Wrapper style={{ marginBottom: 24, paddingBottom: 200 }}>
-        {/* <Span style={{ fontSize: 20, marginBottom: 12 }}>
-          Fill in the pocast name to remove podcast.
-        </Span>
-        <InputField
-          style={{ marginBottom: 24 }}
-          placeholder="Podcast Name"
-          value={removePodcastCheck}
-          onChangeText={(text) => setRemovePodcastCheck(text)}
-        />
-        <StyledButton
-        // onPress={() => StartEpisodePremiere()}
-         primary={removePodcastCheck === title ? true : false}
+      <Wrapper>
+        <ActionButton
+          action="Go to"
+          onPress={() =>
+            navigation.navigate("PodcastCommunity", { ...route.params })
+          }
         >
-          Remove Podcast
-        </StyledButton> */}
+          Community
+        </ActionButton>
+        <ActionButton
+          action="Edit"
+          onPress={() =>
+            navigation.navigate("EditPodcast", { ...route.params })
+          }
+        >
+          Edit Podcast
+        </ActionButton>
       </Wrapper>
+      <Wrapper style={{ marginBottom: 24, paddingBottom: 200 }}></Wrapper>
     </MainContainer>
   );
-}
+};
 
 export default PodcastSettings;
