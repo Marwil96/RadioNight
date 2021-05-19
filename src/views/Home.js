@@ -39,16 +39,16 @@ const Home = ({ navigation }) => {
   return (
     <MainContainer player loading={loading}>
       <TopNav onRefresh={() => FetchData()} />
-      {user_data !== undefined && user_data.invited_to_mod.length > 0 && 
+      {user_data !== undefined && user_data?.invited_to_mod.length > 0 && 
       <View>
         <Title style={{ marginLeft: 16, marginBottom: 24 }}>
           Invitations to moderate
         </Title>
 
         <ScrollView horizontal={true}>
-          {user_data.invited_to_mod.map(({podcast_title, podcast_id}, index) => (
+          {user_data !== undefined ? user_data?.invited_to_mod.map(({podcast_title, podcast_id}, index) => (
             <InviteCard key={index} title={`Start Moderating ${podcast_title}`}  style={{ width: 300, paddingRight: 0, marginLeft: 0 }} accept={() => AcceptInvitationToMod({podcast_title, podcast_id})} decline={() => DeclineInvitationToMod({podcast_title, podcast_id})}/>
-          ))}
+          )) : ''}
         </ScrollView>
         
       </View>

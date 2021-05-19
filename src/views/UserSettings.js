@@ -24,7 +24,7 @@ const ButtonContainer = styled.TouchableOpacity`
   flex-direction: row;
 `;
 
-const ProfileContainer = styled.View`
+const ProfileContainer = styled.TouchableOpacity`
   padding: 12px 16px;
   margin: 0 16px;
   background-color: ${colors.secondary};
@@ -75,7 +75,7 @@ const UserSettings = ({ navigation, route }) => {
       </Wrapper>
       <Title style={{ marginLeft: 16, fontSize: 24 }}>Account</Title>
 
-      <ProfileContainer style={{ marginBottom: 24 }}>
+      <ProfileContainer style={{ marginBottom: 24 }} onPress={() => navigation.navigate('ProfilePage', {...user_data})}>
         <Title style={{ fontSize: 20, marginBottom: 0 }}>
           {user_data.user_name}
         </Title>

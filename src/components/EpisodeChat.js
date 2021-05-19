@@ -3,9 +3,12 @@ import colors from "../variables/color";
 import { MaterialIcons } from "@expo/vector-icons";  
 import styled from "styled-components/native";
 import InputField from "./InputField";
-import { ScrollView } from "react-native";
-import { AddChatMessage, GetChatMessages } from "../actions";
+import { ScrollView, TouchableOpacity, View } from "react-native";
+import { AddChatMessage, FetchPodcastData, GetChatMessages, AddUserToBanList } from "../actions";
 import { useDispatch, useSelector } from "react-redux";
+import { Title } from "./Title";
+import { Span } from "./Span";
+import StyledButton from "./StyledButton";
 
 const ChatHeader = styled.View`
   background-color: #EFEFF1;
@@ -89,52 +92,105 @@ const colorArray = [
   "#FFB61D",
 ];
 
-const MessageField = ({userId, episodeId, userName}) => {
+const MessageField = ({userId, episodeId, userName, isMod}) => {
   const [message, setMessage] = useState("");
 
   return (
     <MessageWrapper>
       <InputField  value={message} onChangeText={(text) => setMessage(text)} placeholder="Give your opinion" style={{ flexShrink: 1, marginRight: 12, backgroundColor: '#EFEFF1', color: '#000', height: 46 }} />
-      <ChatButton onPress={() => {AddChatMessage({message: message, episodeId:episodeId, messageAuthor:{user_name: userName, user_id: userId}}), setMessage('')}}>
+      <ChatButton onPress={() => {AddChatMessage({ isMod: isMod, message: message, episodeId:episodeId, messageAuthor:{user_name: userName, user_id: userId}}), setMessage('')}}>
         <MaterialIcons name="keyboard-arrow-right" size={20} color={colors.primary} />
       </ChatButton>
     </MessageWrapper>
   );
 }
 
-const Message = ({user, message}) => {
+const Message = ({user, message, onNamePress, isMod}) => {
   // const color = colorArray[Math.floor(Math.random() * colorArray.length) + 0];
- return <MessageText ><MessageStrong style={{color: colors.primary}}>{user}</MessageStrong>: {message}</MessageText>
+ return <TouchableOpacity onPress={onNamePress} style={{display: 'flex', flexDirection: 'row'}}>{isMod && <MaterialIcons name="security" size={14} color={colors.primary} style={{marginRight: 4}} />}<MessageText><MessageStrong style={{color: colors.primary}}>{user}</MessageStrong>: {message}</MessageText></TouchableOpacity>
 }
 
 
-const EpisodeChat = ({episodeId}) => {
+const EpisodeChat = ({episodeId, podcastId}) => {
   const dispatch = useDispatch();
   const { chatMessages, user_data } = useSelector((state) => state.DatabaseReducer);
-
+  const [podcastData, setPodcastData] = useState(false);
+  const [modControls, openModControls] = useState({state: false, user: false});
+  const [isMod, setIsMod] = useState(false);
+  const [isBanned, setIsBanned] = useState(false);
+  
   useEffect(() => {
-    console.log('EPISODE ID', episodeId)
     if(episodeId !== undefined) {
       dispatch(GetChatMessages({episodeId: episodeId}))
     }
   }, [episodeId])
 
+    // useEffect(() => console.log("re-render because x changed:", x), [openModControls]);
 
-  return (
-    <Wrapper>
-      <ChatHeader
-        style={{ borderBottomColor: "#A8A8A9", borderBottomWidth: 1 }}
-      >
-        <ChatHeaderTitle>Chat</ChatHeaderTitle>
-      </ChatHeader>
-      <ChatWrapper style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-          {chatMessages !== undefined && chatMessages.length > 0 && chatMessages.map(({message, message_author}, index) => <Message message={message} key={index} user={message_author.user_name} />)}
-        </ScrollView>
-      </ChatWrapper>
-      <MessageField userId={user_data?.user_id} episodeId={episodeId} userName={user_data?.user_name} />
-    </Wrapper>
-  );
+
+    useEffect(() => {
+      const FetchData = async () => {
+        const podcastData = await FetchPodcastData(podcastId);
+        console.log(podcastData.mods, user_data.user_id, podcastData.mods.includes(user_data.user_id));
+        setIsMod(podcastData.mods.includes(user_data.user_id))
+        setIsBanned(podcastData.banned_users.includes(user_data.user_id));
+        setPodcastData(podcastData);
+      };
+
+      FetchData();
+    }, []);
+
+
+  if(modControls.state) {
+    return (
+      <Wrapper style={{ padding: 16 }}>
+        <Title>Mod Controls</Title>
+        <StyledButton style={{marginBottom: 16}} primary onPress={() => {AddUserToBanList({user_id: modControls.user.user_id, podcast_id: podcastData.id }); openModControls({ state: false, user: false })}}>Ban {modControls.user.user_name}</StyledButton>
+        <StyledButton onPress={() => openModControls({ state: false, user: false })}>Go Back To Chat</StyledButton>
+      </Wrapper>
+    );
+  } else {
+      return (
+        <Wrapper>
+          <ChatHeader
+            style={{ borderBottomColor: "#A8A8A9", borderBottomWidth: 1 }}
+          >
+            <ChatHeaderTitle>Chat</ChatHeaderTitle>
+          </ChatHeader>
+          <ChatWrapper style={{ flex: 1 }}>
+            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+              {chatMessages !== undefined &&
+                chatMessages.length > 0 &&
+                chatMessages.map(
+                  ({ message, message_author, isMod }, index) => (
+                    <Message
+                      onNamePress={() =>
+                        openModControls({ state: true, user: message_author })
+                      }
+                      message={message}
+                      isMod={isMod}
+                      key={index}
+                      user={message_author.user_name}
+                    />
+                  )
+                )}
+            </ScrollView>
+          </ChatWrapper>
+          {!isBanned ? (
+            <MessageField
+              isMod={isMod}
+              userId={user_data?.user_id}
+              episodeId={episodeId}
+              userName={user_data?.user_name}
+            />
+          ) : (
+            <Span style={{ marginLeft: 16, paddingTop: 12, paddingBottom: 12 }}>
+              You are banned from writing in chat
+            </Span>
+          )}
+        </Wrapper>
+      );
+  }
 };
 
 export default EpisodeChat;

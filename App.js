@@ -42,6 +42,7 @@ import EditUser from './src/views/EditUser';
 import PodcastSettings from './src/views/PodcastSettings';
 import PodcastCommunity from './src/views/PodcastCommunity';
 import AddModerator from './src/views/AddModerator';
+import ProfilePage from './src/views/ProfilePage';
 
 
 
@@ -542,6 +543,10 @@ const App = () => {
             <NavigationStack.Screen
               name="AddModerator"
               component={AddModerator}
+            />
+            <NavigationStack.Screen
+              name="ProfilePage"
+              component={ProfilePage}
             />
             <NavigationStack.Screen
               name="StartEpisodePremiere"

@@ -26,6 +26,26 @@ export const FetchAllUserData = () => {
   }
 }
 
+export const FetchUserData = async (userId) => {
+  const response = await db.collection("users").doc(userId).get().then((doc) => {
+    const data = doc.data();
+    return data
+  })
+
+
+  return response
+}
+
+export const FetchPodcastData= async (podcastId) => {
+  const response = await db.collection("podcasts").doc(podcastId).get().then((doc) => {
+    const data = doc.data();
+    return data
+  })
+
+
+  return response
+}
+
 export const UpdateUserData = async ({data}) => {
   console.log(data.user_image)
   const url = data.user_image.uri !== undefined ? await UploadImage({file:data.user_image, userId: user.currentUser.uid, fileName:'profile_image'}) : data.user_image;
@@ -61,6 +81,50 @@ export const AddEpisodePremiere = async (data) => {
   return result
 }
 
+export const FetchBannedUsers = async (bannedUsers) => {
+  const result = await Promise.all(
+    await bannedUsers.map(async (id) => {
+      const response = await db.collection("users").doc(id).get().then((doc) => {
+        const data = doc.data();
+        return data
+      })
+
+      return response
+    })
+  )
+
+  return result;
+}
+
+export const RemoveUserFromBanList = async (invitationData) => {
+  const response = await db.collection('podcasts').doc(invitationData.podcast_id).set({banned_users: firebase.firestore.FieldValue.arrayRemove(invitationData.user_id)}, {merge: true}).then(()  => {
+    return true
+  }).catch((error) => false);
+
+  return response;
+}
+
+export const AddUserToBanList = async (invitationData) => {
+  const response = await db.collection('podcasts').doc(invitationData.podcast_id).set({banned_users: firebase.firestore.FieldValue.arrayUnion(invitationData.user_id)}, {merge: true}).then(()  => {
+    return true
+  }).catch((error) => false);
+
+  return response;
+}
+
+
+export const FetchAllFollowers = async (podcastId) => {
+  const allFollowers = await db.collection('users').where("followed_podcasts", "array-contains", podcastId).get().then((querySnapshot) => {
+    const followers = [];
+     querySnapshot.forEach((doc) => { 
+       followers.push(doc.data())
+     })
+     return followers
+  })
+
+  return allFollowers;
+}
+
 export const FetchMods = async (mods) => {
   const result = await Promise.all(
     await mods.map(async (id) => {
@@ -75,6 +139,26 @@ export const FetchMods = async (mods) => {
 
   return result;
 }
+
+export const RemoveAsMod = async (invitationData) => {
+  const response = await db
+    .collection("podcasts")
+    .doc(invitationData.podcast_id)
+    .set(
+      {
+        mods: firebase.firestore.FieldValue.arrayRemove(
+          invitationData.user_id
+        ),
+      },
+      { merge: true }
+    )
+    .then(() => {
+      return true;
+    })
+    .catch((error) => false);
+
+  return response;
+};
 
 export const AcceptInvitationToMod = async (invitationData) => {
   const response = await db.collection('podcasts').doc(invitationData.podcast_id).set({mods: firebase.firestore.FieldValue.arrayUnion(user.currentUser.uid)}, {merge: true}).then(()  => {
@@ -118,10 +202,10 @@ export const InviteUserToMod = async ({userName, podcastId, podcastTitle}) => {
   // return response
 }
 
-export const AddChatMessage = async ({message, episodeId, messageAuthor}) => {
+export const AddChatMessage = async ({isMod, message, episodeId, messageAuthor}) => {
   const chatId = getTimeEpoch();
-  console.log("ADD CHAT MESSAGE", message, episodeId, messageAuthor, chatId);
-  const result = await db.collection("episodes").doc(episodeId).collection('chat').doc(chatId).set({message, message_author: messageAuthor, chat_id:chatId, time_stamp: chatId }).then(() => { 
+
+  const result = await db.collection("episodes").doc(episodeId).collection('chat').doc(chatId).set({isMod, message, message_author: messageAuthor, chat_id:chatId, time_stamp: chatId }).then(() => { 
       return true
     }).catch((error) => {
       return false
@@ -259,6 +343,7 @@ export const CreatePodcast = ({data}) => {
       categories: data.categories,
       id: podcastId,
       mods: [user.currentUser.uid],
+      banned_users: [],
       rss_url: data.rss_url
       // episodes: allEpisodes
     }).then(() => {

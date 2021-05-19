@@ -10,7 +10,7 @@ import { Wrapper } from '../components/Wrapper';
 import EpisodeChat from '../components/EpisodeChat';
 import PodcastPanel from '../components/PodcastPanel';
 import LottieView from "lottie-react-native";
-import { FetchEpisode } from '../actions';
+import { FetchEpisode, FetchPodcastData } from "../actions";
 import { useDispatch, useSelector } from 'react-redux';
 import { OpenEpisodePlayer } from '../actions/globalActions';
 import { TouchableOpacity } from 'react-native';
@@ -309,6 +309,7 @@ const EpisodeView = ({ podcast, fetchEpisodeProgressStorage, episode, playSound,
       />
       <EpisodeChat
         episodeId={episode.episode_id}
+        podcastId={episode.podcast_id}
         userId={user_data?.user_id}
         userName={user_data?.user_name}
       />
