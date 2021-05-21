@@ -1,5 +1,6 @@
 import { AntDesign } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components/native';
 import { FetchAllFollowers, FetchBannedUsers, FetchMods, RemoveAsMod, RemoveUserFromBanList } from '../actions';
 import ActionButton from '../components/ActionButton';
@@ -22,7 +23,8 @@ const ButtonContainer = styled.TouchableOpacity`
 `;
 
 const PodcastCommunity = ({ navigation, route}) => {
-  const { title, id, desc, rss_url, image, mods, banned_users } = route.params;
+    const { user_data } = useSelector((state) => state.DatabaseReducer);
+  const { title, id, desc, rss_url, image, mods, banned_users, officialBroadcast } = route.params;
   const [toggleMode, setToggleMode] = useState('Mods');
   const [podcastMods, setPodcastMods] = useState([])
   const [allFollowers, setAllFollowers] = useState([]);
@@ -31,10 +33,14 @@ const PodcastCommunity = ({ navigation, route}) => {
   useEffect(() => {
     const FetchData = async () => {
       const allMods = await FetchMods(mods);
-      const allFollowers = await FetchAllFollowers(id);
-      const bannedUsers = await FetchBannedUsers(banned_users);
-      setAllFollowers(allFollowers)
       setPodcastMods(allMods);
+
+      if(officialBroadcast) {
+        const allFollowers = await FetchAllFollowers(id);
+        setAllFollowers(allFollowers);
+      }
+
+      const bannedUsers = await FetchBannedUsers(banned_users);
       setAllBannedUsers(bannedUsers);
       console.log(allMods, allFollowers);
     }
@@ -69,13 +75,13 @@ const PodcastCommunity = ({ navigation, route}) => {
         </TopBar>
       </Wrapper>
       <ToggleBar
-        items={["Mods", "Followers", "Banns"]}
+        items={officialBroadcast ? ["Mods", "Followers", "Banns"] : ["Mods", "Banns"]}
         onChange={(value) => setToggleMode(value)}
         style={{ marginBottom: 32 }}
       />
 
      {toggleMode === 'Mods' && <Wrapper>
-        {podcastMods.map((user, index) => <ActionButton key={index} action="Remove as Moderator" onPress={async () =>{RemoveAsMod({user_id: user.user_id, podcast_id: id}); FetchModHelper(user.user_id);}}>{user.user_name}</ActionButton>)}
+        {podcastMods.map((user, index) => <ActionButton key={index} action="Remove as Moderator" onPress={async () =>{RemoveAsMod({collection: officialBroadcast ? "podcasts" : "users", user_id: user.user_id, podcast_id: officialBroadcast ? id : user_data.user_id }); FetchModHelper(user.user_id);}}>{user.user_name}</ActionButton>)}
         <StyledButton primary style={{marginTop: 12}} onPress={() => navigation.navigate('AddModerator', {...route.params})}>Add Mod</StyledButton>
       </Wrapper>}
 
@@ -84,7 +90,7 @@ const PodcastCommunity = ({ navigation, route}) => {
       </Wrapper>}
 
        {toggleMode === 'Banns' && <Wrapper>
-        {allBannedUsers.map((user, index) => <ActionButton key={index} action="Remove Ban" onPress={async () =>{RemoveUserFromBanList({user_id: user.user_id, podcast_id: id}); FetchBannedUsersHelper(user.user_id);}}>{user.user_name}</ActionButton>)}
+        {allBannedUsers.map((user, index) => <ActionButton key={index} action="Remove Ban" onPress={async () =>{RemoveUserFromBanList({collection: officialBroadcast ? "podcasts" : "users", user_id: user.user_id, podcast_id: officialBroadcast ? id : user_data.user_id }); FetchBannedUsersHelper(user.user_id);}}>{user.user_name}</ActionButton>)}
       </Wrapper>}
 
     </MainContainer>

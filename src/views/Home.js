@@ -39,20 +39,33 @@ const Home = ({ navigation }) => {
   return (
     <MainContainer player loading={loading}>
       <TopNav onRefresh={() => FetchData()} />
-      {user_data !== undefined && user_data?.invited_to_mod.length > 0 && 
-      <View>
-        <Title style={{ marginLeft: 16, marginBottom: 24 }}>
-          Invitations to moderate
-        </Title>
+      {user_data !== undefined && user_data?.invited_to_mod.length > 0 && (
+        <View>
+          <Title style={{ marginLeft: 16, marginBottom: 24 }}>
+            Invitations to moderate
+          </Title>
 
-        <ScrollView horizontal={true}>
-          {user_data !== undefined ? user_data?.invited_to_mod.map(({podcast_title, podcast_id}, index) => (
-            <InviteCard key={index} title={`Start Moderating ${podcast_title}`}  style={{ width: 300, paddingRight: 0, marginLeft: 0 }} accept={() => AcceptInvitationToMod({podcast_title, podcast_id})} decline={() => DeclineInvitationToMod({podcast_title, podcast_id})}/>
-          )) : ''}
-        </ScrollView>
-        
-      </View>
-      }
+          <ScrollView horizontal={true}>
+            {user_data !== undefined
+              ? user_data?.invited_to_mod.map(
+                  ({ podcast_title, podcast_id, official_broadcast }, index) => (
+                    <InviteCard
+                      key={index}
+                      title={official_broadcast ? `Start Moderating ${podcast_title}` : `Start Moderating ${podcast_title} personal broadcast.`  }
+                      style={{ width: 300, paddingRight: 0, marginLeft: 0 }}
+                      accept={() =>
+                        AcceptInvitationToMod({official_broadcast, collection: official_broadcast ? "podcasts" : "users", podcast_title, podcast_id })
+                      }
+                      decline={() =>
+                        DeclineInvitationToMod({official_broadcast, collection: official_broadcast ? "podcasts" : "users", podcast_title, podcast_id })
+                      }
+                    />
+                  )
+                )
+              : ""}
+          </ScrollView>
+        </View>
+      )}
       {liveEpisodes.length > 0 && (
         <Title style={{ marginLeft: 16, marginBottom: 24 }}>
           Live Premieres
@@ -71,9 +84,11 @@ const Home = ({ navigation }) => {
             }}
             desc={episode.desc}
             image={episode.image}
-            meta1={`${new Date(episode.start_date).getFullYear()}-${new Date(
-              episode.start_date
-            ).getMonth()}-${new Date(episode.start_date).getDate()}`}
+            meta1={
+              episode?.official === true
+                ? "Official Broadcast"
+                : "Community Broadcast"
+            }
             meta2={episode.episode_is_running ? "LIVE" : "PREPARTY"}
           />
         ))}
@@ -113,7 +128,24 @@ const Home = ({ navigation }) => {
               subtitle={episode.podcast_name}
               key={index}
               desc={episode.desc}
-              onPress={() => dispatch(OpenRssPlayer({data: {episode: {title: episode.title, itunes: {image: episode.image}, enclosures:[{url: episode.play_link}]}, podcast: {title: episode.podcast_name, image: episode.image}}, state: true}))}
+              onPress={() =>
+                dispatch(
+                  OpenRssPlayer({
+                    data: {
+                      episode: {
+                        title: episode.title,
+                        itunes: { image: episode.image },
+                        enclosures: [{ url: episode.play_link }],
+                      },
+                      podcast: {
+                        title: episode.podcast_name,
+                        image: episode.image,
+                      },
+                    },
+                    state: true,
+                  })
+                )
+              }
               image={episode.image}
               meta1={`${new Date(episode.start_date).getFullYear()}-${new Date(
                 episode.start_date

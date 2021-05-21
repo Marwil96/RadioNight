@@ -1,5 +1,6 @@
 import { AntDesign } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import styled from "styled-components/native";
 import { InviteUserToMod } from "../actions";
 import InputField from "../components/InputField";
@@ -22,14 +23,15 @@ const ButtonContainer = styled.TouchableOpacity`
 `;
 
 const AddModerator = ({ navigation, route }) => {
-  const { title, id, desc, rss_url, image, mods } = route.params;
+  const { user_data } = useSelector((state) => state.DatabaseReducer);
+  const { title, id, desc, rss_url, image, mods, officialBroadcast } = route.params;
   const [userName, setUserName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false)
 
   const InviteUser = async () => {
     setLoading(true)
-    const response = await InviteUserToMod({podcastId: id, userName: userName, podcastTitle: title})
+    const response = await InviteUserToMod({officialBroadcast: officialBroadcast, podcastId: officialBroadcast ? id : user_data.user_id, userName: userName, podcastTitle: officialBroadcast ? title : user_data.user_name})
     setLoading(false);
 
     if(response){

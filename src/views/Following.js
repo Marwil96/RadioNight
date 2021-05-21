@@ -94,9 +94,7 @@ const Following = ({navigation}) => {
                 }}
                 desc={episode.desc}
                 image={episode.image}
-                meta1={`${new Date(episode.start_date).getFullYear()}-${new Date(
-                  episode.start_date
-                ).getMonth()}-${new Date(episode.start_date).getDate()}`}
+                meta1={episode.official ? 'Official Broadcast' : 'Community Broadcast'}
                 meta2={episode.episode_is_running ? "LIVE" : "PREPARTY"}
               />
             ))}

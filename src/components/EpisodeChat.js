@@ -4,7 +4,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import styled from "styled-components/native";
 import InputField from "./InputField";
 import { ScrollView, TouchableOpacity, View } from "react-native";
-import { AddChatMessage, FetchPodcastData, GetChatMessages, AddUserToBanList } from "../actions";
+import { AddChatMessage, FetchPodcastData, GetChatMessages, AddUserToBanList, FetchUserData } from "../actions";
 import { useDispatch, useSelector } from "react-redux";
 import { Title } from "./Title";
 import { Span } from "./Span";
@@ -111,7 +111,7 @@ const Message = ({user, message, onNamePress, isMod}) => {
 }
 
 
-const EpisodeChat = ({episodeId, podcastId}) => {
+const EpisodeChat = ({episodeId, podcastId, officialBroadCast, owner}) => {
   const dispatch = useDispatch();
   const { chatMessages, user_data } = useSelector((state) => state.DatabaseReducer);
   const [podcastData, setPodcastData] = useState(false);
@@ -130,7 +130,7 @@ const EpisodeChat = ({episodeId, podcastId}) => {
 
     useEffect(() => {
       const FetchData = async () => {
-        const podcastData = await FetchPodcastData(podcastId);
+        const podcastData = officialBroadCast ? await FetchPodcastData(podcastId) : await FetchUserData(owner);;
         console.log(podcastData.mods, user_data.user_id, podcastData.mods.includes(user_data.user_id));
         setIsMod(podcastData.mods.includes(user_data.user_id))
         setIsBanned(podcastData.banned_users.includes(user_data.user_id));
@@ -145,7 +145,11 @@ const EpisodeChat = ({episodeId, podcastId}) => {
     return (
       <Wrapper style={{ padding: 16 }}>
         <Title>Mod Controls</Title>
-        <StyledButton style={{marginBottom: 16}} primary onPress={() => {AddUserToBanList({user_id: modControls.user.user_id, podcast_id: podcastData.id }); openModControls({ state: false, user: false })}}>Ban {modControls.user.user_name}</StyledButton>
+        <StyledButton style={{marginBottom: 16}} primary onPress={() => {AddUserToBanList({
+          collection: officialBroadCast ? "podcasts" : "users",
+          user_id: modControls.user.user_id,
+          podcast_id: officialBroadCast ? podcastData.id : owner,
+        }); openModControls({ state: false, user: false })}}>Ban {modControls.user.user_name}</StyledButton>
         <StyledButton onPress={() => openModControls({ state: false, user: false })}>Go Back To Chat</StyledButton>
       </Wrapper>
     );

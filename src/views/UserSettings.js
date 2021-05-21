@@ -87,10 +87,18 @@ const UserSettings = ({ navigation, route }) => {
       </ProfileContainer>
 
       <Wrapper>
+        <ActionButton
+          action="Go to"
+          onPress={() =>
+            navigation.navigate("PodcastCommunity", { officialBroadcast: false, banned_users: user_data.banned_users, mods: user_data.mods, id: user_data.user_id })
+          }
+        >
+          Community
+        </ActionButton>
         <ActionButton action="Open">Settings</ActionButton>
         <ActionButton action="Edit" onPress={() => navigation.navigate("EditUser")}>Edit Profile</ActionButton>
-        <ActionButton action="Change">Change Email</ActionButton>
-        <ActionButton action="Change">Change Password</ActionButton>
+        {/* <ActionButton action="Change">Change Email</ActionButton>
+        <ActionButton action="Change">Change Password</ActionButton> */}
         <ActionButton action="Delete" borderMode={true} style={{backgroundColor: colors.background}}>Delete Account</ActionButton>
       </Wrapper>
       <Wrapper style={{ marginBottom: 24, paddingBottom: 200 }}>

@@ -43,6 +43,7 @@ import PodcastSettings from './src/views/PodcastSettings';
 import PodcastCommunity from './src/views/PodcastCommunity';
 import AddModerator from './src/views/AddModerator';
 import ProfilePage from './src/views/ProfilePage';
+import CreateCommunityPremiere from './src/views/CreateCommunityPremiere';
 
 
 
@@ -527,6 +528,10 @@ const App = () => {
             <NavigationStack.Screen
               name="YourPodcast"
               component={YourPodcast}
+            />
+            <NavigationStack.Screen
+              name="CreateCommunityPremiere"
+              component={CreateCommunityPremiere}
             />
             <NavigationStack.Screen
               name="PremiereAdmin"

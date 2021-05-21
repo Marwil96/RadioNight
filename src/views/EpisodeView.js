@@ -221,40 +221,50 @@ const EpisodeView = ({ podcast, fetchEpisodeProgressStorage, episode, playSound,
           </TouchableOpacity>
         </TopBar>
       </Wrapper>
-      {episodeData?.episode_is_running === true ? (
-        displayMode === "player" && (
-          <Wrapper
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: "100%",
-            }}
-          >
-            <LottieView
-              autoPlay
-              loop
+      {episodeData?.episode_is_running === true
+        ? displayMode === "player" && (
+            <Wrapper
               style={{
-                width: 80,
-                height: 120,
-                // backgroundColor: "#eee",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "100%",
               }}
-              source={require("../assets/sound.json")}
-            />
-          </Wrapper>
-        )
-      ) : displayMode === "player" && (
-        <Wrapper
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            width: "100%",
-          }}
-        >
-          <Span style={{ fontSize: 18, marginBottom: 8 }}>Time Left:</Span>
-          <Title style={{ fontSize: 64, color: colors.primary }}>{`${countDown.hours > 9 ? countDown.hours : `0${countDown.hours}`}:${countDown.minutes > 9 ? countDown.minutes : `0${countDown.minutes}`}:${countDown.seconds > 9 ? countDown.seconds : `0${countDown.seconds}`}`}</Title>
-        </Wrapper>
-      )}
+            >
+              <LottieView
+                autoPlay
+                loop
+                style={{
+                  width: 80,
+                  height: 120,
+                  // backgroundColor: "#eee",
+                }}
+                source={require("../assets/sound.json")}
+              />
+            </Wrapper>
+          )
+        : displayMode === "player" && (
+            <Wrapper
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                width: "100%",
+              }}
+            >
+              <Span style={{ fontSize: 18, marginBottom: 8 }}>Time Left:</Span>
+              <Title style={{ fontSize: 64, color: colors.primary }}>{`${
+                countDown.hours > 9 ? countDown.hours : `0${countDown.hours}`
+              }:${
+                countDown.minutes > 9
+                  ? countDown.minutes
+                  : `0${countDown.minutes}`
+              }:${
+                countDown.seconds > 9
+                  ? countDown.seconds
+                  : `0${countDown.seconds}`
+              }`}</Title>
+            </Wrapper>
+          )}
 
       {displayMode === "message_from_host" && (
         <Wrapper
@@ -312,6 +322,8 @@ const EpisodeView = ({ podcast, fetchEpisodeProgressStorage, episode, playSound,
         podcastId={episode.podcast_id}
         userId={user_data?.user_id}
         userName={user_data?.user_name}
+        officialBroadCast={episode.official}
+        owner={episode.owner}
       />
     </MainContainer>
   );

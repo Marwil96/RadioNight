@@ -97,7 +97,7 @@ export const FetchBannedUsers = async (bannedUsers) => {
 }
 
 export const RemoveUserFromBanList = async (invitationData) => {
-  const response = await db.collection('podcasts').doc(invitationData.podcast_id).set({banned_users: firebase.firestore.FieldValue.arrayRemove(invitationData.user_id)}, {merge: true}).then(()  => {
+  const response = await db.collection(invitationData.collection).doc(invitationData.podcast_id).set({banned_users: firebase.firestore.FieldValue.arrayRemove(invitationData.user_id)}, {merge: true}).then(()  => {
     return true
   }).catch((error) => false);
 
@@ -105,7 +105,7 @@ export const RemoveUserFromBanList = async (invitationData) => {
 }
 
 export const AddUserToBanList = async (invitationData) => {
-  const response = await db.collection('podcasts').doc(invitationData.podcast_id).set({banned_users: firebase.firestore.FieldValue.arrayUnion(invitationData.user_id)}, {merge: true}).then(()  => {
+  const response = await db.collection(invitationData.collection).doc(invitationData.podcast_id).set({banned_users: firebase.firestore.FieldValue.arrayUnion(invitationData.user_id)}, {merge: true}).then(()  => {
     return true
   }).catch((error) => false);
 
@@ -142,7 +142,7 @@ export const FetchMods = async (mods) => {
 
 export const RemoveAsMod = async (invitationData) => {
   const response = await db
-    .collection("podcasts")
+    .collection(invitationData.collection)
     .doc(invitationData.podcast_id)
     .set(
       {
@@ -160,28 +160,29 @@ export const RemoveAsMod = async (invitationData) => {
   return response;
 };
 
-export const AcceptInvitationToMod = async (invitationData) => {
-  const response = await db.collection('podcasts').doc(invitationData.podcast_id).set({mods: firebase.firestore.FieldValue.arrayUnion(user.currentUser.uid)}, {merge: true}).then(()  => {
+export const AcceptInvitationToMod = async ({official_broadcast, collection, podcast_title, podcast_id }) => {
+  const response = await db.collection(collection).doc(podcast_id).set({mods: firebase.firestore.FieldValue.arrayUnion(user.currentUser.uid)}, {merge: true}).then(()  => {
     return true
   }).catch((error) => false);
 
   if(response) {
-    await db.collection("users").doc(user.currentUser.uid).set({invited_to_mod: firebase.firestore.FieldValue.arrayRemove(invitationData)}, {merge: true});
+    await db.collection("users").doc(user.currentUser.uid).set({invited_to_mod: firebase.firestore.FieldValue.arrayRemove({official_broadcast, podcast_title, podcast_id})}, {merge: true});
     return true
   } else {
     return false
   }
 }
 
-export const DeclineInvitationToMod = async (invitationData) => {
-  const response = await db.collection("users").doc(user.currentUser.uid).set({invited_to_mod: firebase.firestore.FieldValue.arrayRemove(invitationData)}, {merge: true}).then(()  => {
+export const DeclineInvitationToMod = async ({official_broadcast, collection, podcast_title, podcast_id }) => {
+  const response = await db.collection("users").doc(user.currentUser.uid).set({invited_to_mod: firebase.firestore.FieldValue.arrayRemove({official_broadcast, podcast_title, podcast_id})}, {merge: true}).then(()  => {
     return true
   }).catch((error) => false);
 
   return response
 }
 
-export const InviteUserToMod = async ({userName, podcastId, podcastTitle}) => {
+export const InviteUserToMod = async ({userName, podcastId, podcastTitle, officialBroadcast}) => {
+  console.log(userName, podcastId, podcastTitle, officialBroadcast)
   const userId = await db.collection('users').where("user_name", "==", userName).get().then((querySnapshot) => {
     const users = [];
      querySnapshot.forEach((doc) => { 
@@ -191,7 +192,7 @@ export const InviteUserToMod = async ({userName, podcastId, podcastTitle}) => {
   })
 
   if(userId.length > 0) {
-    const response = await db.collection('users').doc(userId[0].user_id).set({invited_to_mod: firebase.firestore.FieldValue.arrayUnion({podcast_title: podcastTitle, podcast_id: podcastId})}, {merge: true}).then(()  => {
+    const response = await db.collection('users').doc(userId[0].user_id).set({invited_to_mod: firebase.firestore.FieldValue.arrayUnion({podcast_title: podcastTitle, podcast_id: podcastId, official_broadcast: officialBroadcast})}, {merge: true}).then(()  => {
       return true
     }).catch((error) => false);
     return response
@@ -344,6 +345,7 @@ export const CreatePodcast = ({data}) => {
       id: podcastId,
       mods: [user.currentUser.uid],
       banned_users: [],
+      owner: user.currentUser.uid,
       rss_url: data.rss_url
       // episodes: allEpisodes
     }).then(() => {
@@ -392,6 +394,38 @@ export const GetAllPodcasts = async () => {
   return result
 };
 
+export const FetchYourCommunityPremieres = async () => {
+  const result = await Promise.all(
+   await db.collection("episodes").where("owner", "==", user.currentUser.uid).get().then((querySnapshot) => {
+
+      const upcomingEpisodes = [];
+      const pastEpisodes = [];
+      const liveEpisodes = [];
+
+      querySnapshot.forEach((doc) => {
+          // doc.data() is never undefined for query doc snapshots
+          const data = doc.data();
+            if(data.episode_ended === true) {
+              pastEpisodes.push({ ...data, episode_state: 'past' });
+              // return 'past'
+            } else if (data.stream_started.state === true) {
+              liveEpisodes.push({ ...data, episode_state: "live" });
+              // return 'live'
+            } else {
+              upcomingEpisodes.push({ ...data, episode_state: "upcoming" });
+              // return 'upcoming'
+            }
+      });
+      return [upcomingEpisodes, pastEpisodes, liveEpisodes];
+    
+   })
+    .catch((error) => {
+        console.log("Error getting documents: ", error);
+    })
+  )
+  return {upcomingEpisodes: result[0], pastEpisodes: result[1], liveEpisodes: result[2]}
+}
+
 export const GetFollowedPremieres = async (followed_podcasts) => {
   const result = await Promise.all(
   await db.collection("episodes").where("podcast_id", "in", followed_podcasts)
@@ -400,31 +434,40 @@ export const GetFollowedPremieres = async (followed_podcasts) => {
       const upcomingEpisodes = [];
       const pastEpisodes = [];
       const liveEpisodes = [];
+      const liveOfficialEpisodes = [];
+      const liveCommunityEpisodes = [];
         querySnapshot.forEach((doc) => {
             // doc.data() is never undefined for query doc snapshots
             const data = doc.data();
 
-              if(data.episode_ended === true) {
+              if(data.episode_ended === true && data.official === true) {
                 pastEpisodes.push({ ...data, episode_state: 'past' });
                 // return 'past'
-              } else if (data.stream_started.state === true) {
+              } else if (data.stream_started.state === true && data.episode_ended !== true) {
                 liveEpisodes.push({ ...data, episode_state: "live" });
+                if(data.official === true) {
+                  liveOfficialEpisodes.push({ ...data, episode_state: "live", official: true });
+                } else {
+                  liveCommunityEpisodes.push({ ...data, episode_state: "live", official: false });
+                }
                 // return 'live'
               } else {
-                upcomingEpisodes.push({ ...data, episode_state: "upcoming" });
+                if(data.official === true) {
+                  upcomingEpisodes.push({ ...data, episode_state: "upcoming" });
+                }
                 // return 'upcoming'
               }
 
             // const theEpisodeState = episodeState();
             // episodes.push({...data, episode_state: theEpisodeState});
         });
-        return [upcomingEpisodes, pastEpisodes, liveEpisodes];
+        return [upcomingEpisodes, pastEpisodes, liveEpisodes, liveOfficialEpisodes, liveCommunityEpisodes];
     })
     .catch((error) => {
         console.log("Error getting documents: ", error);
     })
   )
-  return {upcomingEpisodes: result[0], pastEpisodes: result[1], liveEpisodes: result[2], allEpisodes: [...result[0], ...result[1], ...result[2]]}
+  return {upcomingEpisodes: result[0], pastEpisodes: result[1], liveEpisodes: result[2], allEpisodes: [...result[0], ...result[1], ...result[2]], liveOfficialEpisodes: result[3], liveCommunityEpisodes: result[4]}
 }
 
 export const GetCurrentlyLiveEpisodes = async (followed_podcasts) => {

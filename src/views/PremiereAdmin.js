@@ -1,6 +1,7 @@
 import { AntDesign } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { Button, View } from 'react-native';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components/native';
 import EpisodeChat from '../components/EpisodeChat';
 import InputField from '../components/InputField';
@@ -75,17 +76,25 @@ const DetailsMode = ({ episodeTitle, podcastTitle, hostMessage, setHostMessage, 
   );
 };
 
-const ChatMode = ({episodeId}) => {
+const ChatMode = ({episodeId, userId, podcastId, userName, owner,official}) => {
   return (
-    <EpisodeChat episodeId={episodeId} />
-  )
+    <EpisodeChat
+      episodeId={episodeId}
+      podcastId={podcastId}
+      userId={userId}
+      userName={userName}
+      owner={owner}
+      officialBroadCast={official}
+    />
+  );
 }
 
 
 const PremiereAdmin = ({route, navigation}) => {
+  const { user_data, } = useSelector((state) => state.DatabaseReducer);
   const [hostMessage, setHostMessage] = useState("Welcome to our premiere of Wind of Change. We will be available for questions after the episode");
   const [toggleMode, setToggleMode] = useState("Details");
-  const { title, image, desc, podcast_name, episode_id } = route.params;
+  const { title, image, desc, podcast_name, episode_id, owner, official, podcast_id } = route.params;
 
   return (
     <MainContainer>
@@ -101,12 +110,12 @@ const PremiereAdmin = ({route, navigation}) => {
         </ButtonContainer>
       </TopBar>
       <ToggleBar
-        items={["Details", "Chat", "Users"]}
+        items={["Details", "Chat"]}
         onChange={(value) => setToggleMode(value)}
         style={{marginBottom: 32}}
       />
       {toggleMode === 'Details' && <DetailsMode episodeTitle={title} podcastTitle={podcast_name} hostMessage={hostMessage} setHostMessage={setHostMessage} episodeId={episode_id}/>}
-      {toggleMode ==='Chat' && <ChatMode episode_id={episode_id} />}
+      {toggleMode ==='Chat' && <ChatMode official={official} episodeId={episode_id} podcastId={podcast_id} owner={owner} userId={user_data.user_id} userName={user_data.user_name} />}
       
     </MainContainer>
   );

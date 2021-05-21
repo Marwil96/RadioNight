@@ -89,7 +89,7 @@ const PodcastSettings = ({ navigation, route }) => {
         <ActionButton
           action="Go to"
           onPress={() =>
-            navigation.navigate("PodcastCommunity", { ...route.params })
+            navigation.navigate("PodcastCommunity", { ...route.params, officialBroadcast: true })
           }
         >
           Community

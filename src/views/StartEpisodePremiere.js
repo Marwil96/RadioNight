@@ -110,6 +110,7 @@ const StartEpisodePremiere = ({ navigation, route }) => {
       start_date: unFormattedDate.toString(),
       duration: duration,
       from_file: false,
+      official: true
     };
 
     console.log('DURATION', duration)
@@ -179,7 +180,8 @@ const StartEpisodePremiere = ({ navigation, route }) => {
       rss_url: rss_url,
       start_date: unFormattedDate.toString(),
       duration: duration,
-      from_file: true
+      from_file: true,
+      official: true,
     };
 
     console.log("DURATION", duration);
