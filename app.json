@@ -10,10 +10,17 @@
       "**/*"
     ],
     "android": {
-      "package": "com.marwil96.RadioNight",
+      "package": "com.williammartinsson.radionight",
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/logo.png",
         "backgroundColor": "#FF6A00"
+      }
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.williammartinsson.radionight",
+      "config": {
+         "usesNonExemptEncryption": false
       }
     }
   }
