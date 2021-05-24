@@ -2,6 +2,7 @@ import {
   CREATE_USER,
   LOGIN_USER,
   SIGN_OUT_USER,
+  UPDATE_USER_STATUS,
 } from "../actions/constables";
 
 const AuthReducer = (
@@ -14,6 +15,10 @@ const AuthReducer = (
     case SIGN_OUT_USER:
       return {
         userLoggedIn: false,
+      };
+    case UPDATE_USER_STATUS:
+      return {
+        userLoggedIn: action.payload.userLoggedIn,
       };
     case LOGIN_USER:
       return {

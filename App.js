@@ -44,6 +44,7 @@ import PodcastCommunity from './src/views/PodcastCommunity';
 import AddModerator from './src/views/AddModerator';
 import ProfilePage from './src/views/ProfilePage';
 import CreateCommunityPremiere from './src/views/CreateCommunityPremiere';
+import { UpdateUserStatus } from './src/actions';
 
 
 
@@ -190,6 +191,11 @@ const DataContainer = ({children}) => {
    const [notification, setNotification] = useState(false);
    const notificationListener = useRef();
    const responseListener = useRef();
+   const dispatch = useDispatch()
+
+   useEffect(() => {
+     dispatch(UpdateUserStatus());
+   }, []);
 
    useEffect(() => {
      registerForPushNotificationsAsync().then((token) =>

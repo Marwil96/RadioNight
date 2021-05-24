@@ -41,12 +41,16 @@ const Following = ({navigation}) => {
 
   const FetchData = async () => {
     setLoading(true)
-    const response = await GetFollowedPremieres(user_data.followed_podcasts);
-    setUpcomingEpisodes(response.upcomingEpisodes);
-    setLiveEpisodes(response.liveEpisodes);
-    setPastEpisodes(response.pastEpisodes);
-    const podcastsData = await FetchYourPodcasts(user_data?.followed_podcasts);
-    setPodcasts(podcastsData);
+    if(user_data.followed_podcasts.length > 0) {
+      const response = await GetFollowedPremieres(user_data.followed_podcasts);
+      setUpcomingEpisodes(response.upcomingEpisodes);
+      setLiveEpisodes(response.liveEpisodes);
+      setPastEpisodes(response.pastEpisodes);
+      const podcastsData = await FetchYourPodcasts(
+        user_data?.followed_podcasts
+      );
+      setPodcasts(podcastsData);
+    }
     setLoading(false);
   }
   useEffect(() => {

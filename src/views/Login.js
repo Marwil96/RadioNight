@@ -24,6 +24,7 @@ const Login = ({navigation}) => {
   const { userLoggedIn } = useSelector((state) => state.AuthReducer);
 
   useEffect(() => {
+    console.log('USER LOGGED IN ', userLoggedIn)
     if (userLoggedIn) {
       navigation.navigate("TabNavigation");
     }

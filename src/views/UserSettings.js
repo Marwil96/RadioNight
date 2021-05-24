@@ -1,8 +1,8 @@
 import { AntDesign } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components/native";
-import { UpdatePodcastDetails } from "../actions";
+import { SignOutUser, UpdatePodcastDetails } from "../actions";
 import ActionButton from "../components/ActionButton";
 import InputField from "../components/InputField";
 import { MainContainer } from "../components/MainContainer";
@@ -47,6 +47,7 @@ const UserSettings = ({ navigation, route }) => {
   const [podcastTitle, setPodcastTitle] = useState();
   const [podcastDesc, setPodcastDesc] = useState();
   const [removePodcastCheck, setRemovePodcastCheck] = useState("");
+  const dispatch = useDispatch()
 
   const UpdateSettings = async () => {
     setLoading(true);
@@ -79,11 +80,14 @@ const UserSettings = ({ navigation, route }) => {
         <Title style={{ fontSize: 20, marginBottom: 0 }}>
           {user_data.user_name}
         </Title>
+        {user_data?.user_image !== false && user_data?.user_image !== undefined ? (
         <ProfileImage
           source={{
             uri: user_data.user_image,
           }}
-        />
+        /> ) :
+         <AntDesign name="user" size={32} color="white" />
+        }
       </ProfileContainer>
 
       <Wrapper>
@@ -99,6 +103,7 @@ const UserSettings = ({ navigation, route }) => {
         <ActionButton action="Edit" onPress={() => navigation.navigate("EditUser")}>Edit Profile</ActionButton>
         {/* <ActionButton action="Change">Change Email</ActionButton>
         <ActionButton action="Change">Change Password</ActionButton> */}
+        <ActionButton action="Do it" borderMode={true} style={{backgroundColor: colors.background}}  onPress={() => dispatch(SignOutUser())}>Logout</ActionButton>
         <ActionButton action="Delete" borderMode={true} style={{backgroundColor: colors.background}}>Delete Account</ActionButton>
       </Wrapper>
       <Wrapper style={{ marginBottom: 24, paddingBottom: 200 }}>
