@@ -70,11 +70,8 @@ const CreateCommunityPremiere = ({ navigation, route }) => {
   const [selectedEpisode, setSelectedEpisode] = useState(false);
   const [selectedPodcast, setSelectedPodcast] = useState(false);
   const [episodeSearchTerm, setEpisodeSearchTerm] = useState("");
-  const [hostMessage, setHostMessage] = useState(
-    "Welcome to our premiere of Wind of Change. We will be available for questions after the episode"
-  );
+  const [hostMessage, setHostMessage] = useState("");
   const [toggleMode, setToggleMode] = useState("Directly");
-  const [fileUploadMode, setFileUploadMode] = useState("rss");
   const dispatch = useDispatch();
 
 const [allPodcasts, setAllPodcasts] = useState([]);

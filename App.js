@@ -45,6 +45,7 @@ import AddModerator from './src/views/AddModerator';
 import ProfilePage from './src/views/ProfilePage';
 import CreateCommunityPremiere from './src/views/CreateCommunityPremiere';
 import { UpdateUserStatus } from './src/actions';
+import VerifyYourPodcast from './src/views/VerifyYourPodcast';
 
 
 
@@ -558,6 +559,10 @@ const App = () => {
             <NavigationStack.Screen
               name="ProfilePage"
               component={ProfilePage}
+            />
+            <NavigationStack.Screen
+              name="VerifyYourPodcast"
+              component={VerifyYourPodcast}
             />
             <NavigationStack.Screen
               name="StartEpisodePremiere"

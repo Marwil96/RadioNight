@@ -316,46 +316,169 @@ export const FetchEpisode = (episodeId) => {
 }
 
 
-export const CreatePodcast = ({data}) => {
+export const CheckIfRSSFeedIsInUse = async (rss_feed) => {
+  const result = await db
+      .collection("podcasts")
+      .get()
+      .then((querySnapshot) => {
+        const podcasts = [];
+        let rssFeedExists = false;
+        querySnapshot.forEach((doc) => {
+          // doc.data() is never undefined for query doc snapshots
+          const data = doc.data();
+          if(rss_feed === data.rss_url) {
+            rssFeedExists = true;
+            podcasts.push(data);
+          }
+        });
 
-  // const allEpisodes = data.items.map((episode) => { 
-  //   return (
-  //     {
-  //       title: episode.title, 
-  //       subtitle: data.title, 
-  //       published: episode.published,
-  //       duration: episode.itunes.duration, 
-  //       summary: episode.itunes.summary !== undefined ? episode.itunes.summary : '', 
-  //       image: episode.itunes.image !== undefined ? episode.itunes.image : data.image.url, 
-  //       sound_file: {url: episode.enclosures[0].url, length: episode.enclosures[0].length, mimeType: episode.enclosures[0].mimeType} 
-  //     } 
-  //   )
-  // })
+        return {rssFeedExists: rssFeedExists, podcastData: podcasts[0]};
+      })
+      .catch((error) => {
+        console.log("Error getting document:", error);
+        return false;
+      })
 
+  console.log(result)
+  return result;
+}
+
+
+export const CreatePodcast = ({ title, description, image, authors, categories, rss_url, official, itunes}) => {
   const podcastId = getTimeEpoch();
 
-  return (dispatch) => { 
-    dispatch({ type: CREATE_PODCAST, payload: { loading: true, podcast_created: true } });
-    db.collection("podcasts").doc(podcastId).set({
-      title: data.title,
-      desc: data.description,
-      image: data.image.url,
-      authors: data.authors,
-      categories: data.categories,
-      id: podcastId,
-      mods: [user.currentUser.uid],
-      banned_users: [],
-      owner: user.currentUser.uid,
-      rss_url: data.rss_url
-      // episodes: allEpisodes
-    }).then(() => {
-    db.collection("users").doc(user.currentUser.uid).set({
-      owned_podcasts: firebase.firestore.FieldValue.arrayUnion(podcastId)
-    }, {merge: true});
-    
-    dispatch({type: CREATE_PODCAST, payload: {loading: false, podcast_created: true}})
-  })
-  }
+  return (dispatch) => {
+    dispatch({
+      type: CREATE_PODCAST,
+      payload: { loading: true, podcast_created: true },
+    });
+    db.collection("podcasts")
+      .doc(podcastId)
+      .set({
+        title: title,
+        desc: description,
+        image: image.url,
+        authors: authors,
+        categories: categories,
+        id: podcastId,
+        mods: official ? [user.currentUser.uid] : [],
+        banned_users: [],
+        owner: official ? user.currentUser.uid : false,
+        rss_url: rss_url,
+        verified_ownership: false,
+        official: official,
+        official_email: itunes.owner.email,
+        // episodes: allEpisodes
+      })
+      .then(() => {
+        if(official) {
+          db.collection("users")
+            .doc(user.currentUser.uid)
+            .set(
+              {
+                owned_podcasts:
+                  firebase.firestore.FieldValue.arrayUnion(podcastId),
+              },
+              { merge: true }
+            );
+        }
+
+        if (official) {
+          var formdata = new FormData();
+          formdata.append("podcast_id", podcastId);
+          // formdata.append("email", data.itunes.owner.email);
+          formdata.append("email", "william_martinsson@hotmail.com");
+          formdata.append("podcast_name", title);
+
+          var requestOptions = {
+            method: "POST",
+            body: formdata,
+            redirect: "follow",
+          };
+
+          fetch(
+            "http://radionight.receptsamlingen.website/sendmail",
+            requestOptions
+          )
+            .then((response) => response.text())
+            .then((result) => console.log(result))
+            .catch((error) => console.log("error", error));
+        }
+
+        dispatch({
+          type: CREATE_PODCAST,
+          payload: { loading: false, podcast_created: true },
+        });
+      });
+  };
+};
+
+export const AddOwnershipToPodcast = ({ title, description, image, authors, categories, rss_url, official, itunes, podcast_id}) => {
+
+  return (dispatch) => {
+    dispatch({
+      type: CREATE_PODCAST,
+      payload: { loading: true, podcast_created: true },
+    });
+    db.collection("podcasts")
+      .doc(podcast_id)
+      .set({
+        title: title,
+        desc: description,
+        image: image.url,
+        authors: authors,
+        categories: categories,
+        id: podcast_id,
+        mods: official ? [user.currentUser.uid] : [],
+        banned_users: [],
+        owner: official ? user.currentUser.uid : false,
+        rss_url: rss_url,
+        verified_ownership: false,
+        official: official,
+        official_email: itunes.owner.email,
+        // episodes: allEpisodes
+      })
+      .then(() => {
+        if(official) {
+          db.collection("users")
+            .doc(user.currentUser.uid)
+            .set(
+              {
+                owned_podcasts:
+                  firebase.firestore.FieldValue.arrayUnion(podcast_id),
+              },
+              { merge: true }
+            );
+        }
+
+        if (official) {
+          var formdata = new FormData();
+          formdata.append("podcast_id", podcast_id);
+          // formdata.append("email", data.itunes.owner.email);
+          formdata.append("email", "william_martinsson@hotmail.com");
+          formdata.append("podcast_name", title);
+
+          var requestOptions = {
+            method: "POST",
+            body: formdata,
+            redirect: "follow",
+          };
+
+          fetch(
+            "http://radionight.receptsamlingen.website/sendmail",
+            requestOptions
+          )
+            .then((response) => response.text())
+            .then((result) => console.log(result))
+            .catch((error) => console.log("error", error));
+        }
+
+        dispatch({
+          type: CREATE_PODCAST,
+          payload: { loading: false, podcast_created: true },
+        });
+      });
+  };
 };
 
 export const StartFollowingPodcast = (podcastId) => {

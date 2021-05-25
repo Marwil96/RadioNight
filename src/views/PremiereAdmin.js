@@ -92,9 +92,9 @@ const ChatMode = ({episodeId, userId, podcastId, userName, owner,official}) => {
 
 const PremiereAdmin = ({route, navigation}) => {
   const { user_data, } = useSelector((state) => state.DatabaseReducer);
-  const [hostMessage, setHostMessage] = useState("Welcome to our premiere of Wind of Change. We will be available for questions after the episode");
+    const { title, image, desc, podcast_name, episode_id, owner, official, podcast_id, host_message} = route.params;
+  const [hostMessage, setHostMessage] = useState(host_message);
   const [toggleMode, setToggleMode] = useState("Details");
-  const { title, image, desc, podcast_name, episode_id, owner, official, podcast_id } = route.params;
 
   return (
     <MainContainer>

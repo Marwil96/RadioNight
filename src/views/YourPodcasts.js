@@ -12,6 +12,7 @@ const YourPodcasts = ({navigation}) => {
   const [podcasts, setPodcasts] = useState([]);
    const [livePremieres, setLivePremieres] = useState([]);
   const { user_data } = useSelector((state) => state.DatabaseReducer);
+  
   useEffect(() => {
     if(user_data !== undefined) {
       const FetchData = async () => {
@@ -57,10 +58,11 @@ const YourPodcasts = ({navigation}) => {
           title={podcast.title}
           key={index}
           image={podcast.image}
-          onPress={() =>
+          onPress={() => {
+            podcast.verified_ownership === true ? 
             navigation.navigate("YourPodcast", {
               ...podcast,
-            })
+            }) : navigation.navigate("VerifyYourPodcast")}
           }
         />
       ))}

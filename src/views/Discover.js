@@ -7,6 +7,8 @@ import { Wrapper } from "../components/Wrapper";
 import {GetAllPodcasts} from '../actions/index';
 import PodcastCard from "../components/PodcastCard";
 import { FilterSearch } from "../other/helperFunctions";
+import Card from "../components/Card";
+import { View } from "react-native";
 
 const Discover = ({navigation}) => {
   const [allPodcasts, setAllPodcasts] = useState([])
@@ -37,22 +39,25 @@ const Discover = ({navigation}) => {
           onChangeText={(text) => setSearchTerm(text)}
         />
       </Wrapper>
-      {searchResults.map((podcast, index) => {
-        if(index < 20) {
-          return (
-            <PodcastCard
-              title={podcast.title}
-              image={podcast.image}
-              key={index}
-              onPress={() =>
-                navigation.navigate("PodcastDetails", {
-                  ...podcast,
-                })
-              }
-            />
-          );
-        }
-      })}
+      <View style={{paddingBottom: 200}}>
+        {searchResults.map((podcast, index) => {
+          if (index < 20) {
+            return (
+              <PodcastCard
+                title={podcast.title}
+                image={podcast.image}
+                key={index}
+                onPress={() =>
+                  navigation.navigate("PodcastDetails", {
+                    ...podcast,
+                  })
+                }
+              />
+            );
+          }
+        })}
+        {searchResults.length === 0 && <Card />}
+      </View>
     </MainContainer>
   );
 };

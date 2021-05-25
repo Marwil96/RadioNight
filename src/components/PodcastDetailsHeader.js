@@ -79,7 +79,7 @@ const PodcastDetailsHeader = ({
             {subtitle !== undefined && <Subtitle textColor={textColor}>{subtitle}</Subtitle>}
           </TitleContainer>
         </CardHeader>
-        <Span style={{ fontSize: 14, marginBottom: 16, color:textColor }}>{desc} </Span>
+        <Span style={{ fontSize: 16, marginBottom: 16, lineHeight: 24, color:textColor }}>{desc} </Span>
         <BottomRow>
           <StyledButton
             style={{ paddingTop: 10, paddingBottom: 10 }}

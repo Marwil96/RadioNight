@@ -12,7 +12,8 @@ import { Wrapper } from '../components/Wrapper';
 import colors from '../variables/color';
 import PodcastCard from '../components/PodcastCard';
 import { useDispatch, useSelector } from 'react-redux';
-import { CreatePodcast } from '../actions';
+import { AddOwnershipToPodcast, CheckIfRSSFeedIsInUse, CreatePodcast } from '../actions';
+import * as Linking from "expo-linking";
 
 const Label = styled.Text`
   font-size: 16px;
@@ -36,16 +37,18 @@ const CreatePodcastWithRSS = ({navigation}) => {
   const [rssUrl, setRssUrl] = useState('')
   const [fetching, setFetching] = useState(false);
   const [fetched, setFetched] = useState(false);
+  const [error, setError] = useState({message: '', state: false, type:'', data: {}})
   const [data, setData] = useState({})
 
   const dispatch = useDispatch()
   const { podcastCreated, loading } = useSelector((state) => state.DatabaseReducer);
 
-  useEffect(() => {
-    if(podcastCreated) console.log('PODCAST_CREATED')
-  }, [podcastCreated])
+  // useEffect(() => {
+  //   if(podcastCreated) navigation.navigate('Home')
+  // }, [podcastCreated])
 
   const FetchPodcast = async (url) => {
+    setError({message: '', state: false, type:'', data: {}})
     setFetching(true)
     await fetch(url)
       .then((response) => response.text())
@@ -56,6 +59,28 @@ const CreatePodcastWithRSS = ({navigation}) => {
       });
 
       setFetching(false)
+  }
+
+  const CreatePodcastHelper = async () => {
+    const official = toggleMode === "No" ? false : true;
+    const { rssFeedExists, podcastData} = await CheckIfRSSFeedIsInUse(data.rss_url);
+
+    if(rssFeedExists && !podcastData.verified_ownership && official) {
+      console.log('Add ownership to podcast and make it official')
+      dispatch(AddOwnershipToPodcast({...data, podcast_id: podcastData.id, verified_ownership: false, official: true}));
+      navigation.navigate("Home");
+    } else if(rssFeedExists && podcastData.verified_ownership && podcastData.official && official) {
+      console.log('Someone already owns this podcast.')
+      setError({message: "Someone already owns this podcasts, if you dont think thats right. Contact us!", state: true, type:'already_owns', data: podcastData})
+    } else if(rssFeedExists && !official) {
+      console.log("This podcast already exists in Radio Night");
+      setError({message: "This podcast already exists in Radio Night, check it out!", state: true, type:'exists', data: podcastData})
+    } else if(!rssFeedExists) {
+      dispatch(CreatePodcast({...data, verified_ownership: false, official: toggleMode === 'No' ? false : true}));
+      navigation.navigate("Home");
+      console.log('This Podcast Does Not Exist in RadioNight')
+    }
+    // dispatch(CreatePodcast({...data, verified_ownership: false, official: toggleMode === 'No' ? false : true}))
   }
 
   return (
@@ -88,7 +113,11 @@ const CreatePodcastWithRSS = ({navigation}) => {
         </Wrapper>
       )}
 
-      {fetched && (
+      {error.state ? 
+      <Wrapper>
+        <Title>{error.message}</Title>
+        <StyledButton primary onPress={() => { error.type === 'exists' ? navigation.navigate("PodcastDetails", {...error.data}) : Linking.openURL("mailto: info@ohhi.se")}}>Go to Podcast</StyledButton>
+      </Wrapper> : fetched && (
         <View style={{ paddingBottom: 250 }}>
           <Title style={{ marginLeft: 16, marginBottom: 24 }}>
             RSS Details
@@ -119,6 +148,7 @@ const CreatePodcastWithRSS = ({navigation}) => {
                     style={{ width: 300, paddingRight: 0, marginLeft: 0 }}
                     title={episode.title}
                     subtitle={data.title}
+                    key={index}
                     desc={episode.itunes.summary !== undefined && episode.itunes.summary }
                     image={
                       episode.itunes.image !== undefined
@@ -131,7 +161,7 @@ const CreatePodcastWithRSS = ({navigation}) => {
             })}
           </ScrollView>
           <Wrapper>
-            <StyledButton primary onPress={() => dispatch(CreatePodcast({data}))}>
+            <StyledButton primary onPress={() => CreatePodcastHelper()}>
               Add Podcast
             </StyledButton>
           </Wrapper>

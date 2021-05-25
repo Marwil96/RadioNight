@@ -5,7 +5,7 @@ import { Span } from './Span';
 
 const Wrapper = styled.TouchableOpacity`
   padding: 0 16px;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 `
 
 const Content = styled.View`
