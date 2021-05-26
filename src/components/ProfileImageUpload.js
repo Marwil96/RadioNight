@@ -46,7 +46,7 @@ const ProfileImageUpload = ({style, setImage, userImage}) => {
       <UploadImage
         onPress={(image) => setImage(image)}
         desc="Upload Image"
-        websiteImage={userImage}
+        websiteImage={userImage !== undefined ? userImage : null}
       />
       {/* <ProfileImage>  */}
       {/* <AntDesign style={{margin: 0}} name="user" size={64} color="white" />  */}

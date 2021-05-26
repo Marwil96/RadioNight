@@ -10,7 +10,7 @@ const UploadImageWrapper = styled.View`
   /* border: 1px solid ${colors.primary}; */
   width: 100px;
   height: 100px;
-  border-radius: 1000;
+  border-radius: 1000px;
   background-color: ${colors.background};
   display: flex;
   justify-content: center;
@@ -62,7 +62,7 @@ const UploadImage = ({
     if (!result.cancelled) {
       setImage(result.uri);
       console.log(result.uri, result)
-      onPress(result);
+      onPress(result.uri);
       // await UploadImageAction(result)
     }
   };

@@ -96,11 +96,11 @@ const ProfilePage = ({ navigation, route }) => {
             <Title style={{ fontSize: 22, marginBottom: 0 }}>
               {userData.user_name}
             </Title>
-            <ProfileImage
+            {userData.user_image && <ProfileImage
               source={{
                 uri: userData.user_image,
               }}
-            />
+            />}
           </Header>
           <Span>{userData.bio}</Span>
         </ProfileContainer>

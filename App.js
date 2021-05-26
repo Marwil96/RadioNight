@@ -251,7 +251,7 @@ const DataContainer = ({children}) => {
     setStartedSound(true)
     sound.playFromPositionAsync(playProgress);
     await sound.setOnPlaybackStatusUpdate(updateStatus);
-    Audio.setAudioModeAsync({ staysActiveInBackground: true });
+    Audio.setAudioModeAsync({ staysActiveInBackground: true, playsInSilentModeIOS: true });
     setSound(sound);
 
     console.log("Playing Sound");
@@ -279,7 +279,7 @@ const DataContainer = ({children}) => {
     setStartedSound(true)
     sound.playFromPositionAsync(playProgress);
     // await sound.setOnPlaybackStatusUpdate(updateStatus);
-    Audio.setAudioModeAsync({ staysActiveInBackground: true });
+    Audio.setAudioModeAsync({ staysActiveInBackground: true, playsInSilentModeIOS: true});
     setSound(sound);
 
     console.log("Playing Sound");

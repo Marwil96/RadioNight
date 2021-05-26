@@ -22,16 +22,24 @@ const Home = ({ navigation }) => {
 
   const FetchData = async () => {
     setLoading(true)
+    const allEpisodes = await GetCurrentlyLiveEpisodes(user_data.followed_podcasts);
+    setNotFollowedLiveEpisodes([...allEpisodes.liveEpisodes])
+    
     if(user_data.followed_podcasts.length > 1 ) {
       const response = await GetFollowedPremieres(user_data.followed_podcasts);
-      const allEpisodes = await GetCurrentlyLiveEpisodes(user_data.followed_podcasts);
-      setNotFollowedLiveEpisodes([...allEpisodes.liveEpisodes, ...allEpisodes.upcomingEpisodes])
       setUpcomingEpisodes(response.upcomingEpisodes);
       setLiveEpisodes(response.liveEpisodes);
       setPastEpisodes(response.pastEpisodes);
     }
     setLoading(false);
   }
+
+  useEffect(() => {
+    if(user_data !== undefined) {
+      FetchData();
+    }
+  },[])
+
   useEffect(() => {
     if(user_data !== undefined) {
       FetchData();
@@ -183,6 +191,7 @@ const Home = ({ navigation }) => {
             meta2={"LIVE"}
           />
         ))}
+        <View style={{paddingBottom: 200}}></View>
     </MainContainer>
   );
 };

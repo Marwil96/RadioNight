@@ -13,6 +13,7 @@ import colors from '../variables/color';
 import PodcastCard from '../components/PodcastCard';
 import { useDispatch, useSelector } from 'react-redux';
 import { AddOwnershipToPodcast, CheckIfRSSFeedIsInUse, CreatePodcast } from '../actions';
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import * as Linking from "expo-linking";
 
 const Label = styled.Text`
@@ -85,88 +86,105 @@ const CreatePodcastWithRSS = ({navigation}) => {
 
   return (
     <MainContainer loading={loading}>
-      <TopNav />
-      <Title style={{ marginLeft: 16 }}>Connect Podcast Feed</Title>
-      <Label style={{ marginBottom: 16 }}>
-        Do you own or represent the owner of the Podcast?
-      </Label>
+      <KeyboardAwareScrollView>
+        <TopNav />
+        <Title style={{ marginLeft: 16 }}>Connect Podcast Feed</Title>
+        <Label style={{ marginBottom: 16 }}>
+          Do you own or represent the owner of the Podcast?
+        </Label>
 
-      <ToggleBar
-        style={{ marginBottom: 16 }}
-        items={["No", "Yes"]}
-        onChange={(value) => setToggleMode(value)}
-      />
+        <ToggleBar
+          style={{ marginBottom: 16 }}
+          items={["No", "Yes"]}
+          onChange={(value) => setToggleMode(value)}
+        />
 
-      <Label style={{ marginBottom: 16 }}>RSS Feed</Label>
-      {fetching ? (
-        <ActivityIndicator size="large" color={colors.primary} />
-      ) : (
-        <Wrapper style={{ marginBottom: 32 }}>
-          <InputField
-            style={{ marginBottom: 12 }}
-            onChangeText={(text) => setRssUrl(text)}
-            placeholder="RSS Feed"
-          />
-          <StyledButton primary onPress={() => FetchPodcast(rssUrl)}>
-            Fetch Details
-          </StyledButton>
-        </Wrapper>
-      )}
-
-      {error.state ? 
-      <Wrapper>
-        <Title>{error.message}</Title>
-        <StyledButton primary onPress={() => { error.type === 'exists' ? navigation.navigate("PodcastDetails", {...error.data}) : Linking.openURL("mailto: info@ohhi.se")}}>Go to Podcast</StyledButton>
-      </Wrapper> : fetched && (
-        <View style={{ paddingBottom: 250 }}>
-          <Title style={{ marginLeft: 16, marginBottom: 24 }}>
-            RSS Details
-          </Title>
-
-          <Label>Title</Label>
-          <Title style={{ marginLeft: 16, marginBottom: 16 }}>
-            {data.title}
-          </Title>
-
-          <Label>Description</Label>
-          <Title style={{ marginLeft: 16, marginBottom: 16, fontSize: 16 }}>
-            {data.description}
-          </Title>
-
-          <Label>Cover Image</Label>
-          <CoverArt
-            source={{ uri: data.image.url }}
-            style={{ marginBottom: 24 }}
-          />
-
-          <Label style={{ marginBottom: 16 }}>Last Episodes</Label>
-          <ScrollView horizontal={true}>
-            {data.items.map((episode, index) => {
-              if (index < 20) {
-                return (
-                  <PodcastCard
-                    style={{ width: 300, paddingRight: 0, marginLeft: 0 }}
-                    title={episode.title}
-                    subtitle={data.title}
-                    key={index}
-                    desc={episode.itunes.summary !== undefined && episode.itunes.summary }
-                    image={
-                      episode.itunes.image !== undefined
-                        ? episode.itunes.image
-                        : data.image.url
-                    }
-                  />
-                );
-              }
-            })}
-          </ScrollView>
-          <Wrapper>
-            <StyledButton primary onPress={() => CreatePodcastHelper()}>
-              Add Podcast
+        <Label style={{ marginBottom: 16 }}>RSS Feed</Label>
+        {fetching ? (
+          <ActivityIndicator size="large" color={colors.primary} />
+        ) : (
+          <Wrapper style={{ marginBottom: 32 }}>
+            <InputField
+              style={{ marginBottom: 12 }}
+              onChangeText={(text) => setRssUrl(text)}
+              placeholder="RSS Feed"
+            />
+            <StyledButton primary onPress={() => FetchPodcast(rssUrl)}>
+              Fetch Details
             </StyledButton>
           </Wrapper>
-        </View>
-      )}
+        )}
+
+        {error.state ? (
+          <Wrapper>
+            <Title>{error.message}</Title>
+            <StyledButton
+              primary
+              onPress={() => {
+                error.type === "exists"
+                  ? navigation.navigate("PodcastDetails", { ...error.data })
+                  : Linking.openURL("mailto: info@ohhi.se");
+              }}
+            >
+              Go to Podcast
+            </StyledButton>
+          </Wrapper>
+        ) : (
+          fetched && (
+            <View style={{ paddingBottom: 250 }}>
+              <Title style={{ marginLeft: 16, marginBottom: 24 }}>
+                RSS Details
+              </Title>
+
+              <Label>Title</Label>
+              <Title style={{ marginLeft: 16, marginBottom: 16 }}>
+                {data.title}
+              </Title>
+
+              <Label>Description</Label>
+              <Title style={{ marginLeft: 16, marginBottom: 16, fontSize: 16 }}>
+                {data.description}
+              </Title>
+
+              <Label>Cover Image</Label>
+              <CoverArt
+                source={{ uri: data.image.url }}
+                style={{ marginBottom: 24 }}
+              />
+
+              <Label style={{ marginBottom: 16 }}>Last Episodes</Label>
+              <ScrollView horizontal={true}>
+                {data.items.map((episode, index) => {
+                  if (index < 20) {
+                    return (
+                      <PodcastCard
+                        style={{ width: 300, paddingRight: 0, marginLeft: 0 }}
+                        title={episode.title}
+                        subtitle={data.title}
+                        key={index}
+                        desc={
+                          episode.itunes.summary !== undefined &&
+                          episode.itunes.summary
+                        }
+                        image={
+                          episode.itunes.image !== undefined
+                            ? episode.itunes.image
+                            : data.image.url
+                        }
+                      />
+                    );
+                  }
+                })}
+              </ScrollView>
+              <Wrapper>
+                <StyledButton primary onPress={() => CreatePodcastHelper()}>
+                  Add Podcast
+                </StyledButton>
+              </Wrapper>
+            </View>
+          )
+        )}
+      </KeyboardAwareScrollView>
     </MainContainer>
   );
 }

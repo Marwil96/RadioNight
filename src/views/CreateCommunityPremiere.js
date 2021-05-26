@@ -124,7 +124,7 @@ useEffect(() => {
       podcast_id: selectedPodcast.id,
       episode_is_running: false,
       stream_started: { state: true, episode_starts: startTime },
-      host_message: hostMessage,
+      host_message: hostMessage.length > 0 ? hostMessage : `Welcome to ${selectedEpisode.title}!`,
       play_link: selectedEpisode.enclosures[0].url,
       rss_url: selectedPodcast.rss_url,
       start_date: unFormattedDate.toString(),

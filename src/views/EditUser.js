@@ -32,7 +32,7 @@ const EditUser = ({ navigation, route }) => {
 
   const UpdateUserDetails = async () => {
     setLoading(true);
-    const response = await UpdateUserData({data: {user_image: userImage, bio: userBio, user_name: userName }});
+    const response = await UpdateUserData({data: {user_image: userImage, bio: userBio !== undefined ? userBio : 'This is my profile!', user_name: userName }});
     console.log(response);
     setLoading(false);
 

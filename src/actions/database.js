@@ -48,7 +48,7 @@ export const FetchPodcastData= async (podcastId) => {
 
 export const UpdateUserData = async ({data}) => {
   console.log(data.user_image)
-  const url = data.user_image.uri !== undefined ? await UploadImage({file:data.user_image, userId: user.currentUser.uid, fileName:'profile_image'}) : data.user_image;
+  const url = data.user_image !== undefined ? await UploadImage({file:data.user_image, userId: user.currentUser.uid, fileName:'profile_image'}) : data.user_image;
   console.log('URL', url)
    const response = await db.collection("users").doc(user.currentUser.uid).set({...data, user_image: url}, {merge: true}).then(() => { 
     return true
@@ -595,7 +595,7 @@ export const GetFollowedPremieres = async (followed_podcasts) => {
 
 export const GetCurrentlyLiveEpisodes = async (followed_podcasts) => {
   const result = await Promise.all(
-  await db.collection("episodes").where("podcast_id", "not-in", followed_podcasts)
+  await db.collection("episodes").where("podcast_id", "not-in", followed_podcasts.length > 0 ? followed_podcasts : ['3131231'])
     .get()
     .then((querySnapshot) => {
      const upcomingEpisodes = [];
@@ -611,7 +611,7 @@ export const GetCurrentlyLiveEpisodes = async (followed_podcasts) => {
               if(episodeIsDone) {
                 pastEpisodes.push({ ...data, episode_state: 'past' });
                 // return 'past'
-              } else if (currentDate > episodeGoesLive && data.episode_done !== true) {
+              } else if (data.stream_started.state === true && data.episode_ended !== true) {
                 liveEpisodes.push({ ...data, episode_state: "live" });
                 // return 'live'
               } else {
@@ -628,6 +628,7 @@ export const GetCurrentlyLiveEpisodes = async (followed_podcasts) => {
         console.log("Error getting documents: ", error);
     })
   )
+
   return {upcomingEpisodes: result[0], pastEpisodes: result[1], liveEpisodes: result[2]}
 }
 
@@ -649,7 +650,7 @@ export const UploadImage = async ({
   userId,
 }) => {
   
-   const response = await fetch(file.uri);
+   const response = await fetch(file);
   const blob = await response.blob();
   // dispatch({type: UPLOAD_IMAGE, payload: {ImageUploaded: false}})
   var uploadedImage = storage.ref(userId).child(`${fileName}.jpg`);
@@ -663,7 +664,7 @@ export const UploadImage = async ({
 };
 
 export const UploadMp3File = async ({file, fileName}) => {
-  const response = await fetch(file.uri);
+  const response = await fetch(file);
   const blob = await response.blob();
   // dispatch({type: UPLOAD_IMAGE, payload: {ImageUploaded: false}})
   var metadata = {

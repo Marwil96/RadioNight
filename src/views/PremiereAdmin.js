@@ -49,7 +49,7 @@ const StopStream = async (episodeId) => {
 
 const DetailsMode = ({ episodeTitle, podcastTitle, hostMessage, setHostMessage, episodeId}) => {
   return (
-    <Wrapper>
+    <Wrapper style={{paddingBottom: 200}}>
       <Title style={{ lineHeight: 38 }}>
         Premiere of <HighlightedTitle>{episodeTitle}</HighlightedTitle> by {podcastTitle}.
       </Title>
