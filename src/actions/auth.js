@@ -1,6 +1,7 @@
 import { CREATE_USER, LOGIN_USER, SIGN_OUT_USER, UPDATE_USER_STATUS } from "./constables";
 import firebase from "firebase";
 import {firebaseConfig} from "../../firebaseConfig";
+import { FetchAllUserData } from "./database";
 
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
@@ -14,11 +15,13 @@ let storage = firebase.storage();
 export const LoginUser = ({ email, password }) => {
   return (dispatch) => {
     firebase.auth().signInWithEmailAndPassword(email, password).then(() => {
+      dispatch(FetchAllUserData());
       dispatch({
         type: LOGIN_USER,
         payload: { userLoggedIn: true },
       });
     }).catch(error => {
+      console.log(error)
       dispatch({
         type: LOGIN_USER,
         payload: { userLoggedIn: false },

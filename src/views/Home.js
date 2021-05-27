@@ -3,6 +3,7 @@ import { ScrollView, Text, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { AcceptInvitationToMod, DeclineInvitationToMod, GetCurrentlyLiveEpisodes, GetFollowedPremieres, LoginUser } from '../actions';
 import { OpenEpisodePlayer, OpenRssPlayer } from '../actions/globalActions';
+import EmptyState from '../components/EmptyState';
 import InviteCard from '../components/InviteCard';
 import { MainContainer } from '../components/MainContainer';
 import PodcastCard from '../components/PodcastCard';
@@ -49,6 +50,7 @@ const Home = ({ navigation }) => {
   return (
     <MainContainer player loading={loading}>
       <TopNav onRefresh={() => FetchData()} />
+      {liveEpisodes.length === 0 && upcomingEpisodes.length === 0 && pastEpisodes.length === 0 && notFollowedLiveEpisodes.length === 0 && <EmptyState title='Start following a Podcast.' subtitle='Look through our collection of podcasts and see if something fits you...' buttonText='Search' onPress={() => navigation.navigate("DiscoverStack", { screen: 'Discover' })} imageUrl='https://firebasestorage.googleapis.com/v0/b/radionight-5dc07.appspot.com/o/images%2FFollow_podcast.png?alt=media&token=1125f71a-c466-4c81-9c9d-d9c14479a2b3' />}
       {user_data !== undefined && user_data?.invited_to_mod.length > 0 && (
         <View>
           <Title style={{ marginLeft: 16, marginBottom: 24 }}>
@@ -169,7 +171,7 @@ const Home = ({ navigation }) => {
 
       {notFollowedLiveEpisodes.length > 0 && (
         <Title style={{ marginBottom: 24, marginLeft: 16 }}>
-          You might like this
+          You might like this... 
         </Title>
       )}
       {notFollowedLiveEpisodes.length > 0 &&

@@ -5,6 +5,7 @@ import colors from "../variables/color";
 import { Span } from "./Span";
 import StyledButton from "./StyledButton";
 import { StartFollowingPodcast, StopFollowingPodcast } from "../actions";
+import { View } from "react-native";
 
 const Wrapper = styled.TouchableOpacity`
   padding: 0 16px;
@@ -72,7 +73,8 @@ const PodcastPanel = ({
   isFollowed,
   bgColor,
   textColor,
-  podcastId
+  podcastId,
+  owner
 }) => {
   const [followingPodcast, setFollowingPodcast] = useState(isFollowed);
   const [isOpen, setIsOpen] = useState(false);
@@ -95,13 +97,16 @@ const PodcastPanel = ({
           {desc}
         </DescText>}
 
-        <StyledButton
-          style={{ paddingTop: 8, paddingBottom: 8, height: 39, flexShrink: 1 }}
-          borderMode={followingPodcast}
-          onPress={(id) => {setFollowingPodcast(!followingPodcast), !followingPodcast ? StartFollowingPodcast(podcastId) :StopFollowingPodcast(podcastId)}}
-        >
-          {followingPodcast ? "Following" : "Follow"}
-        </StyledButton>
+        <View style={{display: 'flex', flexDirection: 'row'}}>
+          {/* { isOpen && <StyledButton style={{ paddingTop: 8, paddingBottom: 8, height: 39, flexShrink: 1, marginRight: 12 }} onPress={() => navigation.navigate('ProfilePage', {user_id: owner})}>Visit Host</StyledButton> } */}
+          <StyledButton
+            style={{ paddingTop: 8, paddingBottom: 8, height: 39, flexShrink: 1 }}
+            borderMode={followingPodcast}
+            onPress={(id) => {setFollowingPodcast(!followingPodcast), !followingPodcast ? StartFollowingPodcast(podcastId) :StopFollowingPodcast(podcastId)}}
+          >
+            {followingPodcast ? "Following" : "Follow"}
+          </StyledButton>
+        </View>
       </Content>
     </Wrapper>
   );

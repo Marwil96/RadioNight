@@ -12,10 +12,11 @@ import { Wrapper } from "../components/Wrapper";
 const SetupProfile = ({ navigation }) => {
   const [userBio, setUserBio] = useState('');
   const [userImage, setUserImage] = useState(false);
+  const [loading, setLoading] = useState(false)
 
   const UpdateUserDetails = async () => {
     setLoading(true);
-    const response = await UpdateUserData({data: {user_image: userImage, bio: userBio !== undefined ? userBio : 'This is my profile!', user_name: userName }});
+    const response = await UpdateUserData({data: {user_image: userImage, bio: userBio !== undefined ? userBio : 'This is my profile!' }});
     console.log(response);
     setLoading(false);
 

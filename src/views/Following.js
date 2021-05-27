@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components/native";
 import { FetchYourPodcasts, GetFollowedPremieres } from "../actions";
 import { OpenEpisodePlayer, OpenRssPlayer } from "../actions/globalActions";
+import EmptyState from "../components/EmptyState";
 import InputField from "../components/InputField";
 import { MainContainer } from "../components/MainContainer";
 import PodcastCard from "../components/PodcastCard";
@@ -85,7 +86,7 @@ const Following = ({navigation}) => {
         />
         {toggleMode === 'Live' &&
           <View>
-            {liveEpisodes.length > 0 &&
+            {liveEpisodes.length > 0 ?
             liveEpisodes.map((episode, index) => (
               <PodcastCard
                 title={episode.title}
@@ -101,12 +102,12 @@ const Following = ({navigation}) => {
                 meta1={episode.official ? 'Official Broadcast' : 'Community Broadcast'}
                 meta2={episode.episode_is_running ? "LIVE" : "PREPARTY"}
               />
-            ))}
+            )) : <EmptyState title='No Live Premieres.' subtitle='Start up your own community premiere or listen in on other podcasts.' buttonText='Start Community Premiere' onPress={() => navigation.navigate("CreateCommunityPremiere")} imageUrl='https://images.unsplash.com/photo-1512736912-cd9db1d90b72?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1052&q=80' />}
           </View>
           }
           {toggleMode === 'Upcoming' && 
             <View>
-            {upcomingEpisodes.length > 0 &&
+            {upcomingEpisodes.length > 0 ?
               upcomingEpisodes.map((episode, index) => (
                 <PodcastCard
                   title={episode.title}
@@ -121,7 +122,7 @@ const Following = ({navigation}) => {
                     episode.start_date
                   ).getMinutes()}:00`}
                 />
-              ))}
+              )) : <EmptyState title='No Upcoming Premieres.' subtitle='Start up your own community premiere or listen in on other podcasts.' buttonText='Start Community Premiere' onPress={() => navigation.navigate("CreateCommunityPremiere")} imageUrl='https://images.unsplash.com/photo-1512736912-cd9db1d90b72?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1052&q=80' />}
             </View>
           }
           {toggleMode === 'Past' && 
@@ -148,7 +149,7 @@ const Following = ({navigation}) => {
         </View>
       ) : (
         <View>
-          {podcasts.map((podcast, index) => (
+          {podcasts.length > 0 ? podcasts.map((podcast, index) => (
             <PodcastCard
               title={podcast.title}
               image={podcast.image}
@@ -159,9 +160,10 @@ const Following = ({navigation}) => {
                 })
               }
             />
-          ))}
+          )) : <EmptyState title='Start following a Podcast.' subtitle='Look through our collection of podcasts and see if something fits you...' buttonText='Search' onPress={() => navigation.navigate("DiscoverStack", { screen: 'Discover' })} imageUrl='https://firebasestorage.googleapis.com/v0/b/radionight-5dc07.appspot.com/o/images%2FFollow_podcast.png?alt=media&token=1125f71a-c466-4c81-9c9d-d9c14479a2b3' />}
         </View>
       )}
+      <View style={{paddingBottom: 200}}></View>
     </MainContainer>
   );
 };

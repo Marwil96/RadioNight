@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Text, View } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components/native";
 import { SignUpUser } from "../actions";
@@ -31,14 +32,16 @@ const Signup = ({navigation}) => {
 
   return (
     <MainContainer noAuth>
-      <Wrapper>
-        <Title style={{ fontSize: 32, marginTop: 48 }}>Create Account</Title>
-        <InputField placeholder="Username" style={{ marginBottom: 16 }} onChangeText={(text) => setUserName(text)} />
-        <InputField placeholder="Email" style={{ marginBottom: 16 }} onChangeText={(text) => setEmail(text)} />
-        <InputField placeholder="Password" style={{ marginBottom: 24 }} onChangeText={(text) => setPassword(text)} />
-        <StyledButton primary style={{ marginBottom: 16 }} onPress={() => { dispatch(SignUpUser({ userName: userName, email: email, password: password }))}} >Create Account</StyledButton>
-        <StyledButton style={{ marginBottom: 16 }} onPress={() => navigation.navigate("Login")}> Go to Login </StyledButton>
-      </Wrapper>
+      <KeyboardAwareScrollView>
+        <Wrapper>
+          <Title style={{ fontSize: 32, marginTop: 48 }}>Create Account</Title>
+          <InputField placeholder="Username" textContentType='username' autoCompleteType='username'  style={{ marginBottom: 16 }} onChangeText={(text) => setUserName(text)} />
+          <InputField placeholder="Email" textContentType='emailAddress' autoCompleteType='email' keyboardType='email-address' style={{ marginBottom: 16 }} onChangeText={(text) => setEmail(text)} />
+          <InputField placeholder="Password" textContentType='password' secureTextEntry autoCompleteType='password' style={{ marginBottom: 24 }} onChangeText={(text) => setPassword(text)} />
+          <StyledButton primary style={{ marginBottom: 16 }} onPress={() => { dispatch(SignUpUser({ userName: userName, email: email, password: password }))}} >Create Account</StyledButton>
+          <StyledButton style={{ marginBottom: 16 }} onPress={() => navigation.navigate("Login")}> Go to Login </StyledButton>
+        </Wrapper>
+      </KeyboardAwareScrollView>
     </MainContainer>
   );
 };

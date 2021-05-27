@@ -47,9 +47,9 @@ const TopNav = ({onRefresh}) => {
           {/* <IconWrapper>
             <AntDesign name="message1" size={25} color="white" />
           </IconWrapper> */}
-          {/* <IconWrapper onPress={() => navigation.navigate("Discover", { screen: 'Discover' })}>
+          <IconWrapper onPress={() => navigation.navigate("DiscoverStack", { screen: 'Discover' })}>
             <AntDesign name="search1" size={25} color="white" />
-          </IconWrapper> */}
+          </IconWrapper>
         </RightColumn>
       </Content>
     </Wrapper>

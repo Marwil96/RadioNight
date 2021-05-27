@@ -116,7 +116,7 @@ const YourPodcastsStack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const HomeStackScreen = () => (
-  <HomeStack.Navigator initialRouteName="EpisodeView" screenOptions={{ headerShown: false }}>
+  <HomeStack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
     <HomeStack.Screen name="Home" component={Home} />
   </HomeStack.Navigator>
 );

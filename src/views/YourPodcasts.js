@@ -6,28 +6,34 @@ import { MainContainer } from '../components/MainContainer';
 import PodcastCard from '../components/PodcastCard';
 import StyledButton from '../components/StyledButton';
 import { Title } from '../components/Title';
+import TopNav from '../components/TopNav';
 import { Wrapper } from '../components/Wrapper';
 
 const YourPodcasts = ({navigation}) => {
   const [podcasts, setPodcasts] = useState([]);
-   const [livePremieres, setLivePremieres] = useState([]);
+  const [livePremieres, setLivePremieres] = useState([]);
+  const [loading, setLoading] = useState(false)
   const { user_data } = useSelector((state) => state.DatabaseReducer);
+
+
+  const FetchData = async () => {
+    setLoading(true)
+    const podcastsData = await FetchYourPodcasts(user_data.owned_podcasts);
+    const premieres = await FetchYourCommunityPremieres();
+    setLivePremieres(premieres.liveEpisodes);
+    setPodcasts(podcastsData);
+    setLoading(false)
+  };
   
   useEffect(() => {
     if(user_data !== undefined) {
-      const FetchData = async () => {
-        const podcastsData = await FetchYourPodcasts(user_data.owned_podcasts);
-        const premieres = await FetchYourCommunityPremieres();
-        setLivePremieres(premieres.liveEpisodes)
-        setPodcasts(podcastsData);
-      };
-
       FetchData();
     }
   }, [user_data])
   
   return (
-    <MainContainer>
+    <MainContainer loading={loading}>
+      <TopNav onRefresh={() => FetchData()} />
       {livePremieres.length > 0 && (
         <Title
           style={{
@@ -48,7 +54,7 @@ const YourPodcasts = ({navigation}) => {
             }}
             desc={episode.desc}
             image={episode.image}
-            meta1={'Community Broadcast'}
+            meta1={"Community Broadcast"}
             meta2="LIVE"
           />
         ))}
@@ -59,14 +65,15 @@ const YourPodcasts = ({navigation}) => {
           key={index}
           image={podcast.image}
           onPress={() => {
-            podcast.verified_ownership === true ? 
-            navigation.navigate("YourPodcast", {
-              ...podcast,
-            }) : navigation.navigate("VerifyYourPodcast")}
-          }
+            podcast.verified_ownership === true
+              ? navigation.navigate("YourPodcast", {
+                  ...podcast,
+                })
+              : navigation.navigate("VerifyYourPodcast");
+          }}
         />
       ))}
-      <Wrapper style={{paddingBottom: 200}}>
+      <Wrapper style={{ paddingBottom: 200 }}>
         <StyledButton
           primary
           style={{ marginBottom: 16 }}

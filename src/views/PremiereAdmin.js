@@ -1,8 +1,9 @@
 import { AntDesign } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { Button, View } from 'react-native';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/native';
+import { OpenEpisodePlayer } from '../actions/globalActions';
 import EpisodeChat from '../components/EpisodeChat';
 import InputField from '../components/InputField';
 import { MainContainer } from '../components/MainContainer';
@@ -47,7 +48,7 @@ const StopStream = async (episodeId) => {
     .catch((error) => console.log("error", error));
 };
 
-const DetailsMode = ({ episodeTitle, podcastTitle, hostMessage, setHostMessage, episodeId}) => {
+const DetailsMode = ({dispatch, episodeTitle, podcastTitle, hostMessage, setHostMessage, episodeId, episode}) => {
   return (
     <Wrapper style={{paddingBottom: 200}}>
       <Title style={{ lineHeight: 38 }}>
@@ -71,6 +72,7 @@ const DetailsMode = ({ episodeTitle, podcastTitle, hostMessage, setHostMessage, 
           value={hostMessage}
           onChangeText={(text) => setHostMessage(text)}
         />
+      <StyledButton style={{marginBottom: 16}} primary onPress={() => dispatch(OpenEpisodePlayer({ data: { ...episode }, state: true }))}>Go to Livestream</StyledButton>
       <StyledButton onPress={() => StopStream(episodeId)}>End Premiere</StyledButton>
     </Wrapper>
   );
@@ -95,6 +97,7 @@ const PremiereAdmin = ({route, navigation}) => {
     const { title, image, desc, podcast_name, episode_id, owner, official, podcast_id, host_message} = route.params;
   const [hostMessage, setHostMessage] = useState(host_message);
   const [toggleMode, setToggleMode] = useState("Details");
+  const dispatch = useDispatch();
 
   return (
     <MainContainer>
@@ -114,7 +117,7 @@ const PremiereAdmin = ({route, navigation}) => {
         onChange={(value) => setToggleMode(value)}
         style={{marginBottom: 32}}
       />
-      {toggleMode === 'Details' && <DetailsMode episodeTitle={title} podcastTitle={podcast_name} hostMessage={hostMessage} setHostMessage={setHostMessage} episodeId={episode_id}/>}
+      {toggleMode === 'Details' && <DetailsMode dispatch={dispatch} episode={route.params} episodeTitle={title} podcastTitle={podcast_name} hostMessage={hostMessage} setHostMessage={setHostMessage} episodeId={episode_id}/>}
       {toggleMode ==='Chat' && <ChatMode official={official} episodeId={episode_id} podcastId={podcast_id} owner={owner} userId={user_data.user_id} userName={user_data.user_name} />}
       
     </MainContainer>

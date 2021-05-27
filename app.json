@@ -2,10 +2,16 @@
   "name": "RadioNight",
   "displayName": "RadioNight",
   "icon": "./src/assets/logo.png",
+  "privacy": "public",
   "expo": {
     "name": "RadioNight",
     "slug": "RadioNight",
+    "privacy": "public",
     "version": "1.0.2",
+    "splash": {
+      "image": "./src/assets/splash.png",
+      "resizeMode": "cover"
+    },
     "assetBundlePatterns": [
       "**/*"
     ],
@@ -19,6 +25,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.williammartinsson.radionight",
+      "icon": "./src/assets/logo.png",
       "config": {
          "usesNonExemptEncryption": false
       }

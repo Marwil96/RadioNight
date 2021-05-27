@@ -316,6 +316,7 @@ const EpisodeView = ({ podcast, fetchEpisodeProgressStorage, episode, playSound,
         desc={episode.desc}
         isFollowed={user_data?.followed_podcasts.includes(episode.podcast_id)}
         podcastId={episode.podcast_id}
+        owner={episode.owner}
       />
       <EpisodeChat
         episodeId={episode.episode_id}
