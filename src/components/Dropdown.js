@@ -89,6 +89,7 @@ const Dropdown = ({ options, onSelect, placeholder, modifier, setDropdownActive 
         <Content keyboardShouldPersistTaps="always">
           {options.map((option, index) => (
             <TouchableOpacity
+              key={index}
               onPress={() => {
                 setActiveOption(option);
                 onSelect(option);
