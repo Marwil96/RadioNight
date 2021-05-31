@@ -15,6 +15,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AddOwnershipToPodcast, CheckIfRSSFeedIsInUse, CreatePodcast } from '../actions';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import * as Linking from "expo-linking";
+import CategoryTag from '../components/CategoryTag';
+import Dropdown from '../components/Dropdown';
+
+const allCategories = ["Storytelling", "Sports", "Business", 'News', "Crime", "Fiction", "Comedy", "Science", "Gaming", "Chatting", "Politics", "Music"];
+const allLanguages = ["English", "German", "French", "Spanish", "Swedish", "Italian", "Norwegian", "Danish", "Finnish", "Russian", "Dutch", "Portuguese"]
 
 const Label = styled.Text`
   font-size: 16px;
@@ -38,8 +43,12 @@ const CreatePodcastWithRSS = ({navigation}) => {
   const [rssUrl, setRssUrl] = useState('')
   const [fetching, setFetching] = useState(false);
   const [fetched, setFetched] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [addCategoryOpen, setAddCategoryOpen] = useState(false);
   const [error, setError] = useState({message: '', state: false, type:'', data: {}})
   const [data, setData] = useState({})
+  const [dropdownActive, setDropdownActive] = useState(false);
+  const [lang, setLang] = useState('English')
 
   const dispatch = useDispatch()
   const { podcastCreated, loading } = useSelector((state) => state.DatabaseReducer);
@@ -56,6 +65,7 @@ const CreatePodcastWithRSS = ({navigation}) => {
       .then((responseData) => rssParser.parse(responseData))
       .then((rss) => {
         setData({...rss, rss_url: url})
+        console.log(rss)
         setFetched(true)
       });
 
@@ -68,7 +78,7 @@ const CreatePodcastWithRSS = ({navigation}) => {
 
     if(rssFeedExists && !podcastData.verified_ownership && official) {
       console.log('Add ownership to podcast and make it official')
-      dispatch(AddOwnershipToPodcast({...data, podcast_id: podcastData.id, verified_ownership: false, official: true}));
+      dispatch(AddOwnershipToPodcast({...data, lang: lang, categories: categories, podcast_id: podcastData.id, verified_ownership: false, official: true}));
       navigation.navigate("Home");
     } else if(rssFeedExists && podcastData.verified_ownership && podcastData.official && official) {
       console.log('Someone already owns this podcast.')
@@ -77,7 +87,7 @@ const CreatePodcastWithRSS = ({navigation}) => {
       console.log("This podcast already exists in Radio Night");
       setError({message: "This podcast already exists in Radio Night, check it out!", state: true, type:'exists', data: podcastData})
     } else if(!rssFeedExists) {
-      dispatch(CreatePodcast({...data, verified_ownership: false, official: toggleMode === 'No' ? false : true}));
+      dispatch(CreatePodcast({...data, verified_ownership: false, lang: lang, categories: categories, official: toggleMode === 'No' ? false : true}));
       navigation.navigate("Home");
       console.log('This Podcast Does Not Exist in RadioNight')
     }
@@ -146,6 +156,58 @@ const CreatePodcastWithRSS = ({navigation}) => {
                 {data.description}
               </Title>
 
+              <Label style={{ marginBottom: 12 }}>Categories</Label>
+              <View
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  justifyContent: "flex-start",
+                  paddingLeft: 16,
+                  paddingRight: 16,
+                  marginBottom: 24,
+                }}
+              >
+               {categories.length <= 2 && <CategoryTag
+                  primary
+                  onPress={() => setAddCategoryOpen(!addCategoryOpen)}
+                >
+                  {addCategoryOpen ? "Close" : "Add +"}
+                </CategoryTag>}
+                {addCategoryOpen
+                  ? allCategories.map((title, index) => { 
+                    if(!categories.includes(title)){
+                      return (
+                        <CategoryTag
+                          key={index}
+                          onPress={() => {
+                            setCategories([...categories, title]),
+                              setAddCategoryOpen(false);
+                          }}
+                          add
+                        >
+                          {title}
+                        </CategoryTag>
+                      )
+                    }
+                  })
+                  : categories.map((title, index) => (
+                      <CategoryTag
+                        key={index}
+                        onPress={() => {
+                          setCategories(categories.filter(e => e !== title)),
+                          setAddCategoryOpen(false);
+                        }}
+                        remove
+                      >
+                        {title}
+                      </CategoryTag>
+                    ))}
+              </View>
+
+              <Label style={{ marginBottom: 12 }}>Language</Label>
+              <Dropdown options={allLanguages} setDropdownActive={setDropdownActive} placeholder='English' onSelect={(lang) => setLang(lang)}/>
+
               <Label>Cover Image</Label>
               <CoverArt
                 source={{ uri: data.image.url }}
@@ -176,10 +238,11 @@ const CreatePodcastWithRSS = ({navigation}) => {
                   }
                 })}
               </ScrollView>
+
               <Wrapper>
-                <StyledButton primary onPress={() => CreatePodcastHelper()}>
+                {!dropdownActive && <StyledButton primary onPress={() =>  CreatePodcastHelper()}>
                   Add Podcast
-                </StyledButton>
+                </StyledButton>}
               </Wrapper>
             </View>
           )

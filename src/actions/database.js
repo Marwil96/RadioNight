@@ -344,7 +344,7 @@ export const CheckIfRSSFeedIsInUse = async (rss_feed) => {
 }
 
 
-export const CreatePodcast = ({ title, description, image, authors, categories, rss_url, official, itunes}) => {
+export const CreatePodcast = ({ title, description, image, authors, categories, lang, rss_url, official, itunes, explicit}) => {
   const podcastId = getTimeEpoch();
 
   return (dispatch) => {
@@ -359,7 +359,9 @@ export const CreatePodcast = ({ title, description, image, authors, categories, 
         desc: description,
         image: image.url,
         authors: authors,
+        explicit: explicit === 'yes' ? true : false,
         categories: categories,
+        lang: lang,
         id: podcastId,
         mods: official ? [user.currentUser.uid] : [],
         banned_users: [],
@@ -376,8 +378,8 @@ export const CreatePodcast = ({ title, description, image, authors, categories, 
             .doc(user.currentUser.uid)
             .set(
               {
-                owned_podcasts:
-                  firebase.firestore.FieldValue.arrayUnion(podcastId),
+                owned_podcasts: firebase.firestore.FieldValue.arrayUnion(podcastId),
+                followed_podcasts: firebase.firestore.FieldValue.arrayUnion(podcastId),
               },
               { merge: true }
             );
