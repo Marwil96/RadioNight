@@ -18,7 +18,7 @@ import * as Linking from "expo-linking";
 import CategoryTag from '../components/CategoryTag';
 import Dropdown from '../components/Dropdown';
 
-const allCategories = ["Storytelling", "Sports", "Business", 'News', "Crime", "Fiction", "Comedy", "Science", "Gaming", "Chatting", "Politics", "Music"];
+const allCategories = ["Storytelling", "Sports", "Business", 'News', "Crime", "Fiction", "Comedy", "Science", "Documentary", "Chatting", "Politics", "Music", "Technology", "Design", "History"];
 const allLanguages = ["English", "German", "French", "Spanish", "Swedish", "Italian", "Norwegian", "Danish", "Finnish", "Russian", "Dutch", "Portuguese"]
 
 const Label = styled.Text`
@@ -65,7 +65,6 @@ const CreatePodcastWithRSS = ({navigation}) => {
       .then((responseData) => rssParser.parse(responseData))
       .then((rss) => {
         setData({...rss, rss_url: url})
-        console.log(rss)
         setFetched(true)
       });
 

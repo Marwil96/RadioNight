@@ -38,13 +38,6 @@ const Header = styled.TouchableOpacity`
   border: 0;
   padding: 8px 12px;
   margin-bottom: 4px;
-
-  svg {
-    height: 6px;
-    path {
-      background-color: #fff;
-    }
-  }
 `;
 
 const Item = styled.View`

@@ -72,10 +72,10 @@ const PodcastCard = ({onPress, title, image, subtitle, desc, meta1, meta2, style
           </TitleContainer>
         </CardHeader>
         {desc !== undefined && <Span style={{ fontSize: 14, marginBottom: 16 }}>{desc.length > 150 ? `${desc.slice(0, 150)}...` : desc}</Span>}
-        {meta1 !== undefined && meta2 !== undefined && <BottomRow>
-          <MetaItem>{meta1}</MetaItem>
-          <MetaItem>{meta2}</MetaItem>
-        </BottomRow>}
+         <BottomRow>
+         { meta1 !== undefined && <MetaItem>{meta1}</MetaItem>}
+         { meta2 !== undefined && <MetaItem>{meta2}</MetaItem> }
+        </BottomRow>
       </Content>
     </Wrapper>
   );

@@ -1,14 +1,17 @@
+import { useNavigation } from "@react-navigation/core";
 import React from "react";
 import { useState } from "react";
+import { View } from "react-native";
 import styled from "styled-components/native";
 import colors from "../variables/color";
+import CategoryTag from "./CategoryTag";
 import { Span } from "./Span";
 import StyledButton from "./StyledButton";
 
 const Wrapper = styled.View`
   padding: 0 16px;
   margin-bottom: 32px;
-  background-color: ${props => props.bgColor};
+  /* background-color: ${props => props.bgColor}; */
 `;
 
 const Content = styled.View`
@@ -66,9 +69,12 @@ const PodcastDetailsHeader = ({
   bgColor,
   textColor,
   onButtonPress,
+  categories
 }) => {
 
   const [followingPodcast, setFollowingPodcast] = useState(isFollowed);
+  const navigation = useNavigation();
+
   return (
     <Wrapper onPress={onPress} style={style} bgColor={bgColor} textColor={textColor}>
       <Content>
@@ -90,6 +96,19 @@ const PodcastDetailsHeader = ({
             {followingPodcast ? "Following Podcast" : "Follow Podcast"}
           </StyledButton>
         </BottomRow>
+        <View 
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            flexWrap: "wrap",
+            justifyContent: "flex-start",
+            paddingLeft: 0,
+            paddingRight: 16,
+            marginBottom: 6,
+            paddingTop: 16
+          }}>
+          {categories.map((category) => <CategoryTag onPress={() =>  navigation.navigate("DiscoverStack", { screen: 'Discover', params:{filter: category}})}>{category}</CategoryTag>)}
+        </View >
       </Content>
     </Wrapper>
   );

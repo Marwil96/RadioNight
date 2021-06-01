@@ -24,7 +24,7 @@ const PodcastDetails = ({ route, navigation }) => {
   const [liveEpisodes, setLiveEpisodes] = useState([]);
   const [pastEpisodes, setPastEpisodes] = useState([]);
   const [rssFeedLimit, setRssFeedLimit] = useState(20);
-  const { title, rss_url, image, id, authors, desc } = route.params;
+  const { title, rss_url, image, id, authors, desc, categories } = route.params;
   
 
   useEffect(() => {
@@ -50,6 +50,7 @@ const PodcastDetails = ({ route, navigation }) => {
         bgColor={colors.background}
         textColor={colors.text}
         title={title}
+        categories={categories}
         image={image}
         isFollowed={user_data?.followed_podcasts.includes(id)}
         // subtitle="Business & Comedy"

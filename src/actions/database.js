@@ -496,26 +496,48 @@ export const StopFollowingPodcast = (podcastId) => {
 }
 
 
-export const GetAllPodcasts = async () => {
-  const result = await Promise.all( 
-    await db
-    .collection("podcasts")
-    .get()
-    .then((querySnapshot) => {
-      const podcasts = [];
-      querySnapshot.forEach((doc) => {
-        // doc.data() is never undefined for query doc snapshots
-        const data = doc.data()
-        podcasts.push(data);
-      });
+export const GetAllPodcasts = async (filter) => {
+  const result =
+    filter !== false && filter !== undefined
+      ? await Promise.all(
+          await db
+            .collection("podcasts")
+            .where("categories", "array-contains", filter)
+            .get()
+            .then((querySnapshot) => {
+              const podcasts = [];
+              querySnapshot.forEach((doc) => {
+                // doc.data() is never undefined for query doc snapshots
+                const data = doc.data();
+                podcasts.push(data);
+              });
 
-      return podcasts;
-    })
-    .catch((error) => {
-      console.log("Error getting document:", error);
-      return false
-    })
-  )
+              return podcasts;
+            })
+            .catch((error) => {
+              console.log("Error getting document:", error);
+              return false;
+            })
+        )
+      : await Promise.all(
+          await db
+            .collection("podcasts")
+            .get()
+            .then((querySnapshot) => {
+              const podcasts = [];
+              querySnapshot.forEach((doc) => {
+                // doc.data() is never undefined for query doc snapshots
+                const data = doc.data();
+                podcasts.push(data);
+              });
+
+              return podcasts;
+            })
+            .catch((error) => {
+              console.log("Error getting document:", error);
+              return false;
+            })
+        );
   return result
 };
 

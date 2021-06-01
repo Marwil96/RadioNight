@@ -80,7 +80,7 @@ const [searchTerm, setSearchTerm] = useState("");
 
 useEffect(() => {
   const FetchData = async () => {
-    const response = await GetAllPodcasts();
+    const response = await GetAllPodcasts(false);
     setAllPodcasts(response);
     setSearchResults(response);
   };
