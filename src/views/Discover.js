@@ -69,8 +69,8 @@ const Discover = ({navigation, route}) => {
         <StyledButton style={{paddingBottom: 12, paddingTop: 12}} onPress={() => setSelectedCategory(false)}>Remove Category Filter</StyledButton>
       </Wrapper>}
       {selectedCategory === false && searchTerm.length < 1 && <Wrapper style={{display: 'flex', marginBottom: 24, flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'space-between'}}>
-        {allCategories.map((category) => 
-          <CategoryCard onPress={() => setSelectedCategory(category)}>
+        {allCategories.map((category, index) => 
+          <CategoryCard key={index} onPress={() => setSelectedCategory(category)}>
             <Title style={{marginBottom: 0, fontSize: 16}}>{category}</Title>
           </CategoryCard> 
         )}

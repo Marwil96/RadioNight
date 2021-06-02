@@ -1,6 +1,7 @@
 import { AntDesign } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import { Button, View } from 'react-native';
+import { Button, Dimensions, View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/native';
 import { OpenEpisodePlayer } from '../actions/globalActions';
@@ -101,6 +102,8 @@ const PremiereAdmin = ({route, navigation}) => {
 
   return (
     <MainContainer>
+      <KeyboardAwareScrollView>
+        <View style={{display: 'flex', flexDirection: 'column', background:'blue', height: toggleMode === 'Chat' ? Dimensions.get('window').height - 10 : '100%'}}>
       <TopBar>
         <ButtonContainer onPress={() => navigation.goBack()}>
           <AntDesign
@@ -119,7 +122,8 @@ const PremiereAdmin = ({route, navigation}) => {
       />
       {toggleMode === 'Details' && <DetailsMode dispatch={dispatch} episode={route.params} episodeTitle={title} podcastTitle={podcast_name} hostMessage={hostMessage} setHostMessage={setHostMessage} episodeId={episode_id}/>}
       {toggleMode ==='Chat' && <ChatMode official={official} episodeId={episode_id} podcastId={podcast_id} owner={owner} userId={user_data.user_id} userName={user_data.user_name} />}
-      
+      </View>
+     </KeyboardAwareScrollView>
     </MainContainer>
   );
 }

@@ -57,7 +57,7 @@ const BottomNav = ({ state, descriptors, navigation }) => {
             });
 
             if (!isFocused && !event.defaultPrevented) {
-              navigation.navigate(route.name, { screen: options.screen });
+              navigation.navigate(route.name, { screen: options.screen, params: {filter: false} });
             }
           };
 

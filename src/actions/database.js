@@ -215,6 +215,17 @@ export const AddChatMessage = async ({isMod, message, episodeId, messageAuthor})
   return result
 }
 
+export const RemoveChatMessage = async ({episodeId, messageId}) => {
+
+  const result = await db.collection("episodes").doc(episodeId).collection('chat').doc(messageId).delete().then(() => { 
+      return true
+    }).catch((error) => {
+      return false
+    })
+    
+  return result
+}
+
 export const GetChatMessages = ({episodeId}) => {
   console.log('GETCHATMESSAGE', episodeId )
   return (dispatch) => {

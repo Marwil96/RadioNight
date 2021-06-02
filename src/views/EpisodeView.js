@@ -13,8 +13,9 @@ import LottieView from "lottie-react-native";
 import { FetchEpisode, FetchPodcastData } from "../actions";
 import { useDispatch, useSelector } from 'react-redux';
 import { OpenEpisodePlayer } from '../actions/globalActions';
-import { TouchableOpacity } from 'react-native';
+import { Dimensions, TouchableOpacity, View } from 'react-native';
 import { Span } from '../components/Span';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 const TopBar = styled.View`
   width: 100%;
@@ -191,59 +192,93 @@ const EpisodeView = ({ podcast, fetchEpisodeProgressStorage, episode, playSound,
   
   return (
     <MainContainer loading={loading}>
-      <Wrapper>
-        <TopBar>
-          <ButtonContainer
-            onPress={() =>
-              dispatch(
-                OpenEpisodePlayer({ data: { ...episodeData }, state: false })
+      <KeyboardAwareScrollView>
+        <View style={{display: 'flex', flexDirection: 'column', background:'blue', height: Dimensions.get('window').height - 10}}>
+          <Wrapper>
+            <TopBar>
+              <ButtonContainer
+                onPress={() =>
+                  dispatch(
+                    OpenEpisodePlayer({
+                      data: { ...episodeData },
+                      state: false,
+                    })
+                  )
+                }
+              >
+                <AntDesign
+                  style={{ marginRight: 12 }}
+                  name="back"
+                  size={24}
+                  color="white"
+                />
+                <Title style={{ fontSize: 16 }}>Go Back</Title>
+              </ButtonContainer>
+              <TouchableOpacity
+                onPress={() =>
+                  displayMode === "player"
+                    ? setDisplayMode("message_from_host")
+                    : setDisplayMode("player")
+                }
+              >
+                <Title style={{ fontSize: 16 }}>
+                  {displayMode === "player"
+                    ? "Message from Host"
+                    : "See Player"}
+                </Title>
+              </TouchableOpacity>
+            </TopBar>
+          </Wrapper>
+          {episodeData?.episode_is_running === true
+            ? displayMode === "player" && (
+                <Wrapper
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: "100%",
+                  }}
+                >
+                  <LottieView
+                    autoPlay
+                    loop
+                    style={{
+                      width: 80,
+                      height: 120,
+                      // backgroundColor: "#eee",
+                    }}
+                    source={require("../assets/sound.json")}
+                  />
+                </Wrapper>
               )
-            }
-          >
-            <AntDesign
-              style={{ marginRight: 12 }}
-              name="back"
-              size={24}
-              color="white"
-            />
-            <Title style={{ fontSize: 16 }}>Go Back</Title>
-          </ButtonContainer>
-          <TouchableOpacity
-            onPress={() =>
-              displayMode === "player"
-                ? setDisplayMode("message_from_host")
-                : setDisplayMode("player")
-            }
-          >
-            <Title style={{ fontSize: 16 }}>
-              {displayMode === "player" ? "Message from Host" : "See Player"}
-            </Title>
-          </TouchableOpacity>
-        </TopBar>
-      </Wrapper>
-      {episodeData?.episode_is_running === true
-        ? displayMode === "player" && (
-            <Wrapper
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: "100%",
-              }}
-            >
-              <LottieView
-                autoPlay
-                loop
-                style={{
-                  width: 80,
-                  height: 120,
-                  // backgroundColor: "#eee",
-                }}
-                source={require("../assets/sound.json")}
-              />
-            </Wrapper>
-          )
-        : displayMode === "player" && (
+            : displayMode === "player" && (
+                <Wrapper
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    width: "100%",
+                  }}
+                >
+                  <Span style={{ fontSize: 18, marginBottom: 8 }}>
+                    Time Left:
+                  </Span>
+                  <Title style={{ fontSize: 64, color: colors.primary }}>{`${
+                    countDown.hours > 9
+                      ? countDown.hours
+                      : `0${countDown.hours}`
+                  }:${
+                    countDown.minutes > 9
+                      ? countDown.minutes
+                      : `0${countDown.minutes}`
+                  }:${
+                    countDown.seconds > 9
+                      ? countDown.seconds
+                      : `0${countDown.seconds}`
+                  }`}</Title>
+                </Wrapper>
+              )}
+
+          {displayMode === "message_from_host" && (
             <Wrapper
               style={{
                 display: "flex",
@@ -251,41 +286,18 @@ const EpisodeView = ({ podcast, fetchEpisodeProgressStorage, episode, playSound,
                 width: "100%",
               }}
             >
-              <Span style={{ fontSize: 18, marginBottom: 8 }}>Time Left:</Span>
-              <Title style={{ fontSize: 64, color: colors.primary }}>{`${
-                countDown.hours > 9 ? countDown.hours : `0${countDown.hours}`
-              }:${
-                countDown.minutes > 9
-                  ? countDown.minutes
-                  : `0${countDown.minutes}`
-              }:${
-                countDown.seconds > 9
-                  ? countDown.seconds
-                  : `0${countDown.seconds}`
-              }`}</Title>
+              <Span style={{ fontSize: 18, marginBottom: 8 }}>
+                Message from Host
+              </Span>
+              <Title style={{ lineHeight: 38, color: colors.primary }}>
+                {episode.host_message}
+              </Title>
             </Wrapper>
           )}
 
-      {displayMode === "message_from_host" && (
-        <Wrapper
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            width: "100%",
-          }}
-        >
-          <Span style={{ fontSize: 18, marginBottom: 8 }}>
-            Message from Host
-          </Span>
-          <Title style={{ lineHeight: 38, color: colors.primary }}>
-            {episode.host_message}
-          </Title>
-        </Wrapper>
-      )}
+          {/* <MiniPlayerStyle runningEpisode={runningEpisode} pauseSound={pauseSound} episode={episode} dispatch={dispatch} playSound={playSound} playing={playing} restartSound={restartSound}/> */}
 
-      {/* <MiniPlayerStyle runningEpisode={runningEpisode} pauseSound={pauseSound} episode={episode} dispatch={dispatch} playSound={playSound} playing={playing} restartSound={restartSound}/> */}
-
-      {/* <MiniPlayer
+          {/* <MiniPlayer
         style={{
           position: "relative",
           background: colors.smoothBlacks,
@@ -297,7 +309,7 @@ const EpisodeView = ({ podcast, fetchEpisodeProgressStorage, episode, playSound,
         subtitle="99% Invisible"
         image="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTy7v2Vrnp5LhNS7JoKB12kyK9_gxyCjbGFdDf7MkMmXEfvo8XY"
       /> */}
-      {/* <PodcastDetailsHeader
+          {/* <PodcastDetailsHeader
         bgColor={colors.text}
         style={{ paddingTop: 16, paddingBottom: 16, marginBottom: 0 }}
         textColor={"#000"}
@@ -306,26 +318,30 @@ const EpisodeView = ({ podcast, fetchEpisodeProgressStorage, episode, playSound,
         subtitle="Business & Comedy"
         desc={`The economy explained. Imagine you could call up a friend and say, "Meet me at the bar and tell me what's going on with the economy." Now imagine that's actually a fun evening.`}
       /> */}
-      <PodcastPanel
-        bgColor={colors.text}
-        style={{ paddingTop: 16, paddingBottom: 16, marginBottom: 0 }}
-        textColor={"#000"}
-        title={episode.title}
-        image={episode.image}
-        subtitle={episode.podcast_name}
-        desc={episode.desc}
-        isFollowed={user_data?.followed_podcasts.includes(episode.podcast_id)}
-        podcastId={episode.podcast_id}
-        owner={episode.owner}
-      />
-      <EpisodeChat
-        episodeId={episode.episode_id}
-        podcastId={episode.podcast_id}
-        userId={user_data?.user_id}
-        userName={user_data?.user_name}
-        officialBroadCast={episode.official}
-        owner={episode.owner}
-      />
+          <PodcastPanel
+            bgColor={colors.text}
+            style={{ paddingTop: 16, paddingBottom: 16, marginBottom: 0 }}
+            textColor={"#000"}
+            title={episode.title}
+            image={episode.image}
+            subtitle={episode.podcast_name}
+            desc={episode.desc}
+            isFollowed={user_data?.followed_podcasts.includes(
+              episode.podcast_id
+            )}
+            podcastId={episode.podcast_id}
+            owner={episode.owner}
+          />
+          <EpisodeChat
+            episodeId={episode.episode_id}
+            podcastId={episode.podcast_id}
+            userId={user_data?.user_id}
+            userName={user_data?.user_name}
+            officialBroadCast={episode.official}
+            owner={episode.owner}
+          />
+        </View>
+      </KeyboardAwareScrollView>
     </MainContainer>
   );
 };

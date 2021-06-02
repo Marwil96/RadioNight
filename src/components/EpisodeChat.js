@@ -4,7 +4,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import styled from "styled-components/native";
 import InputField from "./InputField";
 import { ScrollView, TouchableOpacity, View } from "react-native";
-import { AddChatMessage, FetchPodcastData, GetChatMessages, AddUserToBanList, FetchUserData } from "../actions";
+import { AddChatMessage, FetchPodcastData, GetChatMessages, AddUserToBanList, FetchUserData, RemoveChatMessage } from "../actions";
 import { useDispatch, useSelector } from "react-redux";
 import { Title } from "./Title";
 import { Span } from "./Span";
@@ -21,10 +21,10 @@ const Wrapper = styled.View`
   bottom: 0;
   flex-shrink: 1;
   /* min-height: 100%; */
-  min-height: 350px;
-  max-height: 100%;
+  flex-grow: 1;
+  /* max-height: 100%; */
   height: 100%;
-`
+`;
 
 const ChatHeaderTitle = styled.Text`
   font-size: 18px;
@@ -36,7 +36,7 @@ const ChatWrapper = styled.View`
   background-color: #f6f6f6;
   /* background-color: #D7D7D7; */
   width: 100%;
-  max-height: 500px;
+  /* max-height: 500px; */
   height: 100%;
   flex-shrink: 1;
   padding: 16px 16px;
@@ -145,7 +145,8 @@ const EpisodeChat = ({episodeId, podcastId, officialBroadCast, owner}) => {
     return (
       <Wrapper style={{ padding: 16 }}>
         <Title>Mod Controls</Title>
-        <StyledButton style={{marginBottom: 16}} primary onPress={() => {AddUserToBanList({
+        <StyledButton  style={{marginBottom: 16}} primary onPress={() =>{RemoveChatMessage({episodeId: episodeId, messageId: modControls.chat_id }); openModControls({ state: false, user: false })}}>Remove Message</StyledButton>
+        <StyledButton style={{marginBottom: 16}} onPress={() => {AddUserToBanList({
           collection: officialBroadCast ? "podcasts" : "users",
           user_id: modControls.user.user_id,
           podcast_id: officialBroadCast ? podcastData.id : owner,
@@ -166,10 +167,10 @@ const EpisodeChat = ({episodeId, podcastId, officialBroadCast, owner}) => {
               {chatMessages !== undefined &&
                 chatMessages.length > 0 &&
                 chatMessages.map(
-                  ({ message, message_author, isMod }, index) => (
+                  ({ message, message_author, chat_id, isMod }, index) => (
                     <Message
                       onNamePress={() =>
-                        openModControls({ state: true, user: message_author })
+                        openModControls({ state: true, user: message_author, chat_id: chat_id })
                       }
                       message={message}
                       isMod={isMod}
