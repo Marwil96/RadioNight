@@ -99,7 +99,7 @@ const UserSettings = ({ navigation, route }) => {
         >
           Community
         </ActionButton>
-        <ActionButton action="Open">Settings</ActionButton>
+        {/* <ActionButton action="Open">Settings</ActionButton> */}
         <ActionButton action="Edit" onPress={() => navigation.navigate("EditUser")}>Edit Profile</ActionButton>
         {/* <ActionButton action="Change">Change Email</ActionButton>
         <ActionButton action="Change">Change Password</ActionButton> */}

@@ -6,6 +6,8 @@ import {
   View,
   ActivityIndicator,
   RefreshControl,
+  SafeAreaView,
+  StatusBar,
 } from "react-native";
 import colors from "../variables/color";
 import MiniPlayer from "./MiniPlayer";
@@ -59,7 +61,7 @@ const MainContainer = ({ children, noAuth, style, player, loading }) => {
   useScrollToTop(ref);
 
   return (
-    <View>
+    <SafeAreaView style={{ flex: 1, backgroundColor: 'black' }}>
       <MainContainerStyle
         style={{ ...style }}
         ref={ref}
@@ -92,7 +94,7 @@ const MainContainer = ({ children, noAuth, style, player, loading }) => {
           children
         )}
       </MainContainerStyle>
-    </View>
+    </SafeAreaView>
   );
 };
 

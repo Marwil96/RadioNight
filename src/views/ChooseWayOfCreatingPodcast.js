@@ -13,7 +13,7 @@ const ChooseWayOfCreatingPodcast = ({navigation}) => {
       <Wrapper>
         <Title>Create Podcast</Title>
         <ActionButton onPress={() => navigation.navigate('CreatePodcastWithRSS')} primary>With RSS</ActionButton>
-        <ActionButton>With MP3/Audio files</ActionButton>
+        {/* <ActionButton>With MP3/Audio files</ActionButton> */}
       </Wrapper>
     </MainContainer>
   );

@@ -4,6 +4,7 @@ import React from 'react';
 import styled from "styled-components/native";
 import colors from "../variables/color";
 import ProfileTag from './ProfileTag';
+import { Title } from "./Title";
 
 const Wrapper = styled.View`
   margin-bottom: 32px;
@@ -25,13 +26,26 @@ const IconWrapper = styled.TouchableOpacity`
  margin-left: 16px;
 `
 
-const TopNav = ({onRefresh}) => {
+const ButtonContainer = styled.TouchableOpacity`
+  display: flex;
+  flex-direction: row;
+`;
+
+const TopNav = ({onRefresh, goBack}) => {
   const navigation = useNavigation();
 
   return (
     <Wrapper>
       <Content>
-        <ProfileTag onPress={() =>  navigation.navigate("UserSettings")} />
+        {goBack ?  <ButtonContainer onPress={() => navigation.goBack()}>
+            <AntDesign
+              style={{ marginRight: 12 }}
+              name="back"
+              size={24}
+              color="white"
+            />
+            <Title style={{ fontSize: 16 }}>Go back</Title>
+          </ButtonContainer>: <ProfileTag onPress={() =>  navigation.navigate("UserSettings")} />}
         <RightColumn>
           {onRefresh !== undefined && <IconWrapper onPress={onRefresh}>
             <MaterialIcons name="refresh" size={25} color="white" />

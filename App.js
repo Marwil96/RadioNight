@@ -22,6 +22,7 @@ import SetupProfile from './src/views/SetupProfile';
 import Discover from './src/views/Discover';
 import Following from './src/views/Following';
 import PodcastDetails from './src/views/PodcastDetails';
+import EpisodeDetails from "./src/views/EpisodeDetails";
 import EpisodeView from './src/views/EpisodeView';
 import ChooseWayOfCreatingPodcast from './src/views/ChooseWayOfCreatingPodcast';
 import CreatePodcastWithRSS from './src/views/CreatePodcastWithRSS';
@@ -518,6 +519,10 @@ const App = () => {
             <NavigationStack.Screen
               name="PodcastDetails"
               component={PodcastDetails}
+            />
+            <NavigationStack.Screen
+              name="EpisodeDetails"
+              component={EpisodeDetails}
             />
             <NavigationStack.Screen
               name="EpisodeView"

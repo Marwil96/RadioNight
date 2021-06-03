@@ -10,7 +10,7 @@ import StyledButton from "./StyledButton";
 
 const Wrapper = styled.View`
   padding: 0 16px;
-  margin-bottom: 32px;
+  margin-bottom: -12px;
   /* background-color: ${props => props.bgColor}; */
 `;
 
@@ -41,7 +41,7 @@ const TitleContainer = styled.View`
 const Title = styled.Text`
   font-size: 24px;
   font-family: "Manrope_500Medium";
-  margin-bottom: 8px;
+  margin-bottom: 1px;
   color: ${props => props.textColor};
   flex-shrink: 1;
 `;
@@ -57,6 +57,12 @@ const BottomRow = styled.View`
   justify-content: space-between;
 `;
 
+const ReadMore = styled.Text`
+  color: #ffffff;
+  font-size: 16px;
+  font-family: "Manrope_700Bold";
+`;
+
 
 const PodcastDetailsHeader = ({
   onPress,
@@ -69,10 +75,12 @@ const PodcastDetailsHeader = ({
   bgColor,
   textColor,
   onButtonPress,
-  categories
+  categories,
+  official
 }) => {
 
   const [followingPodcast, setFollowingPodcast] = useState(isFollowed);
+  const [descLimit, setDescLimit] = useState(150);
   const navigation = useNavigation();
 
   return (
@@ -82,10 +90,11 @@ const PodcastDetailsHeader = ({
           <CoverArt source={{ uri: image }} />
           <TitleContainer>
             <Title textColor={textColor}>{title}</Title>
-            {subtitle !== undefined && <Subtitle textColor={textColor}>{subtitle}</Subtitle>}
+            {official  ? <Subtitle textColor={colors.primary}>Official</Subtitle> : <Subtitle textColor={textColor}>Community Managed</Subtitle>}
           </TitleContainer>
         </CardHeader>
-        <Span style={{ fontSize: 16, marginBottom: 16, lineHeight: 24, color:textColor }}>{desc} </Span>
+        <Span style={{ fontSize: 16, marginBottom: 16, lineHeight: 24, color:textColor }}>{desc.slice(0, descLimit)}{descLimit < 151 && desc.length > 150 && '...'}  { desc.length > 150 ? descLimit < 151 ? <ReadMore onPress={() => setDescLimit(10000)}>Read More</ReadMore> :  <ReadMore onPress={() => setDescLimit(150)}>Read Less</ReadMore> : '' } </Span>
+        
         <BottomRow>
           <StyledButton
             style={{ paddingTop: 10, paddingBottom: 10 }}
@@ -107,7 +116,7 @@ const PodcastDetailsHeader = ({
             marginBottom: 6,
             paddingTop: 16
           }}>
-          {categories.map((category) => <CategoryTag onPress={() =>  navigation.navigate("DiscoverStack", { screen: 'Discover', params:{filter: category}})}>{category}</CategoryTag>)}
+          {categories.map((category, index) => <CategoryTag key={index} onPress={() =>  navigation.navigate("DiscoverStack", { screen: 'Discover', params:{filter: category}})}>{category}</CategoryTag>)}
         </View >
       </Content>
     </Wrapper>

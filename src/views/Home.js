@@ -50,7 +50,7 @@ const Home = ({ navigation }) => {
   return (
     <MainContainer player loading={loading}>
       <TopNav onRefresh={() => FetchData()} />
-      {liveEpisodes.length === 0 && upcomingEpisodes.length === 0 && pastEpisodes.length === 0 && notFollowedLiveEpisodes.length === 0 && <EmptyState title='Start following a Podcast.' subtitle='Look through our collection of podcasts and see if something fits you...' buttonText='Search' onPress={() => navigation.navigate("DiscoverStack", { screen: 'Discover' })} imageUrl='https://firebasestorage.googleapis.com/v0/b/radionight-5dc07.appspot.com/o/images%2FFollow_podcast.png?alt=media&token=1125f71a-c466-4c81-9c9d-d9c14479a2b3' />}
+      {liveEpisodes.length === 0 && upcomingEpisodes.length === 0 && pastEpisodes.length === 0 && notFollowedLiveEpisodes.length === 0 && <EmptyState title='Start following a Podcast.' subtitle='Look through our collection of podcasts and see if something fits you...' buttonText='Search' onPress={() => navigation.navigate("DiscoverStack", { screen: 'Discover', params: {filter: false} })} imageUrl='https://firebasestorage.googleapis.com/v0/b/radionight-5dc07.appspot.com/o/images%2FFollow_podcast.png?alt=media&token=1125f71a-c466-4c81-9c9d-d9c14479a2b3' />}
       {user_data !== undefined && user_data?.invited_to_mod.length > 0 && (
         <View>
           <Title style={{ marginLeft: 16, marginBottom: 24 }}>
@@ -162,9 +162,7 @@ const Home = ({ navigation }) => {
               meta1={`${new Date(episode.start_date).getFullYear()}-${new Date(
                 episode.start_date
               ).getMonth()}-${new Date(episode.start_date).getDate()}`}
-              meta2={`${new Date(episode.start_date).getHours()}:${new Date(
-                episode.start_date
-              ).getMinutes()}:00`}
+              meta2='Replay'
             />
           ))}
       </ScrollView>

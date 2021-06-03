@@ -95,7 +95,7 @@ const Discover = ({navigation, route}) => {
             );
           }
         })}
-        {searchResults.length === 0 && <Card />}
+        {searchResults.length < 6 && <Card />}
       </View> : <View><ActivityIndicator size="large" color={colors.primary} /></View>}
     </MainContainer>
   );

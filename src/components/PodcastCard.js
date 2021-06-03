@@ -1,3 +1,4 @@
+import { AntDesign } from '@expo/vector-icons';
 import React from 'react';
 import styled from "styled-components/native";
 import colors from "../variables/color";
@@ -60,7 +61,11 @@ const MetaItem = styled.Text`
   color: ${colors.text};
 `;
 
-const PodcastCard = ({onPress, title, image, subtitle, desc, meta1, meta2, style }) => {
+const PlayButtonWrapper = styled.TouchableOpacity`
+
+`
+
+const PodcastCard = ({onPress, title, image, subtitle, desc, meta1, meta2, style, playButton }) => {
   return (
     <Wrapper onPress={onPress} style={style}>
       <Content>
@@ -75,6 +80,7 @@ const PodcastCard = ({onPress, title, image, subtitle, desc, meta1, meta2, style
          <BottomRow>
          { meta1 !== undefined && <MetaItem>{meta1}</MetaItem>}
          { meta2 !== undefined && <MetaItem>{meta2}</MetaItem> }
+         { playButton !== undefined && <PlayButtonWrapper onPress={playButton}><AntDesign name="play" size={24} color="white" /></PlayButtonWrapper> }
         </BottomRow>
       </Content>
     </Wrapper>

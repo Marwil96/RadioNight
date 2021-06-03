@@ -508,6 +508,7 @@ export const StopFollowingPodcast = (podcastId) => {
 
 
 export const GetAllPodcasts = async (filter) => {
+  const {languages} = await db.collection("users").doc(user.currentUser.uid).get().then((doc) => doc.data())
   const result =
     filter !== false && filter !== undefined
       ? await Promise.all(
@@ -520,8 +521,10 @@ export const GetAllPodcasts = async (filter) => {
               querySnapshot.forEach((doc) => {
                 // doc.data() is never undefined for query doc snapshots
                 const data = doc.data();
-                podcasts.push(data);
-              });
+                if(data.lang === undefined || languages.includes(data.lang)) {
+                  podcasts.push(data);
+                }
+                });
 
               return podcasts;
             })
@@ -539,7 +542,9 @@ export const GetAllPodcasts = async (filter) => {
               querySnapshot.forEach((doc) => {
                 // doc.data() is never undefined for query doc snapshots
                 const data = doc.data();
-                podcasts.push(data);
+                if(data.lang === undefined || languages.includes(data.lang)){
+                  podcasts.push(data);
+                };
               });
 
               return podcasts;

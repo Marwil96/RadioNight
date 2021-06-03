@@ -24,7 +24,7 @@ const PodcastDetails = ({ route, navigation }) => {
   const [liveEpisodes, setLiveEpisodes] = useState([]);
   const [pastEpisodes, setPastEpisodes] = useState([]);
   const [rssFeedLimit, setRssFeedLimit] = useState(20);
-  const { title, rss_url, image, id, authors, desc, categories } = route.params;
+  const { title, rss_url, image, id, authors, desc, categories, verified_ownership } = route.params;
   
 
   useEffect(() => {
@@ -45,13 +45,14 @@ const PodcastDetails = ({ route, navigation }) => {
 
   return (
     <MainContainer loading={user_data?.followed_podcasts === undefined}>
-      <TopNav />
+      <TopNav goBack />
       <PodcastDetailsHeader
         bgColor={colors.background}
         textColor={colors.text}
         title={title}
         categories={categories}
         image={image}
+        official={verified_ownership}
         isFollowed={user_data?.followed_podcasts.includes(id)}
         // subtitle="Business & Comedy"
         onButtonPress={(isFollowed) => {
@@ -69,6 +70,7 @@ const PodcastDetails = ({ route, navigation }) => {
           style={{
             marginLeft: 16,
             fontSize: 20,
+            marginTop: 24,
             fontFamily: "Manrope_400Regular",
           }}
         >
@@ -88,7 +90,9 @@ const PodcastDetails = ({ route, navigation }) => {
                 OpenEpisodePlayer({ data: { ...episode }, state: true })
               );
             }}
-            meta1={episode.official ? 'Official Broadcast' : 'Community Broadcast'}
+            meta1={
+              episode.official ? "Official Broadcast" : "Community Broadcast"
+            }
             meta2={"LIVE"}
           />
         ))}
@@ -97,6 +101,7 @@ const PodcastDetails = ({ route, navigation }) => {
           style={{
             marginLeft: 16,
             fontSize: 20,
+            marginTop: 24,
             fontFamily: "Manrope_400Regular",
           }}
         >
@@ -126,6 +131,7 @@ const PodcastDetails = ({ route, navigation }) => {
           style={{
             marginLeft: 16,
             fontSize: 20,
+            marginTop: 24,
             fontFamily: "Manrope_400Regular",
           }}
         >
@@ -157,14 +163,15 @@ const PodcastDetails = ({ route, navigation }) => {
         <ActivityIndicator color={colors.primary} size="large" />
       ) : (
         rssEpisodes.map((episode, index) => {
+          const publishedDate = new Date(episode.published);
           if (index < rssFeedLimit) {
             return (
               <PodcastCard
                 title={episode.title}
                 subtitle={title}
                 key={index}
-                // onPress={() => navigation.navigate('RssPlayer', {episode: {...episode}, podcast: {...route.params}, mode:'rss'})}
-                onPress={() =>
+                meta1={`${publishedDate.getDate()}-${publishedDate.getMonth()}-${publishedDate.getFullYear()}`}
+                playButton={() =>
                   dispatch(
                     OpenRssPlayer({
                       data: {
@@ -174,6 +181,13 @@ const PodcastDetails = ({ route, navigation }) => {
                       state: true,
                     })
                   )
+                }
+                // onPress={() => navigation.navigate('RssPlayer', {episode: {...episode}, podcast: {...route.params}, mode:'rss'})}
+                onPress={() =>
+                  navigation.navigate("EpisodeDetails", {
+                    episode: { ...episode },
+                    podcast: { ...route.params },
+                  })
                 }
                 desc={
                   episode.itunes.summary !== undefined && episode.itunes.summary
