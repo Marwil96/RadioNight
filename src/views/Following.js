@@ -42,8 +42,8 @@ const Following = ({navigation}) => {
 
   const FetchData = async () => {
     setLoading(true)
-    if(user_data.followed_podcasts.length > 0) {
-      const response = await GetFollowedPremieres(user_data.followed_podcasts);
+    if(user_data?.followed_podcasts.length > 0) {
+      const response = await GetFollowedPremieres(user_data?.followed_podcasts);
       setUpcomingEpisodes(response.upcomingEpisodes);
       setLiveEpisodes(response.liveEpisodes);
       setPastEpisodes(response.pastEpisodes);

@@ -217,14 +217,14 @@ const YourPodcast = ({ navigation, route }) => {
       </ScrollView>
 
       <Wrapper style={{ paddingBottom: 200 }}>
-        <StyledButton
+        {/* <StyledButton
           onPress={() =>
             navigation.navigate("CreatePodcastPremiere", { ...route.params })
           }
         >
           {" "}
           Schedule Episode Premiere{" "}
-        </StyledButton>
+        </StyledButton> */}
       </Wrapper>
     </MainContainer>
   );

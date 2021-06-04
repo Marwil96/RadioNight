@@ -66,6 +66,11 @@ const CreatePodcastWithRSS = ({navigation}) => {
       .then((rss) => {
         setData({...rss, rss_url: url})
         setFetched(true)
+      })
+      .catch(() => {
+        setData({})
+        setFetched(false)
+        setRssUrl('')
       });
 
       setFetching(false)
@@ -118,7 +123,7 @@ const CreatePodcastWithRSS = ({navigation}) => {
               onChangeText={(text) => setRssUrl(text)}
               placeholder="RSS Feed"
             />
-            <StyledButton primary onPress={() => FetchPodcast(rssUrl)}>
+            <StyledButton primary={rssUrl.length > 1 && true} onPress={() => {rssUrl.length > 1 && FetchPodcast(rssUrl)}}>
               Fetch Details
             </StyledButton>
           </Wrapper>

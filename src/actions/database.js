@@ -394,6 +394,15 @@ export const CreatePodcast = ({ title, description, image, authors, categories, 
               },
               { merge: true }
             );
+        } else {
+            db.collection("users")
+            .doc(user.currentUser.uid)
+            .set(
+              {
+                followed_podcasts: firebase.firestore.FieldValue.arrayUnion(podcastId),
+              },
+              { merge: true }
+            );
         }
 
         if (official) {
