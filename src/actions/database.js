@@ -408,8 +408,8 @@ export const CreatePodcast = ({ title, description, image, authors, categories, 
         if (official) {
           var formdata = new FormData();
           formdata.append("podcast_id", podcastId);
-          // formdata.append("email", data.itunes.owner.email);
-          formdata.append("email", "william_martinsson@hotmail.com");
+          formdata.append("email", data.itunes.owner.email);
+          // formdata.append("email", "william_martinsson@hotmail.com");
           formdata.append("podcast_name", title);
 
           var requestOptions = {
@@ -476,8 +476,8 @@ export const AddOwnershipToPodcast = ({ title, description, image, authors, cate
         if (official) {
           var formdata = new FormData();
           formdata.append("podcast_id", podcast_id);
-          // formdata.append("email", data.itunes.owner.email);
-          formdata.append("email", "william_martinsson@hotmail.com");
+          formdata.append("email", data.itunes.owner.email);
+          // formdata.append("email", "william_martinsson@hotmail.com");
           formdata.append("podcast_name", title);
 
           var requestOptions = {
