@@ -7,7 +7,7 @@
     "name": "RadioNight",
     "slug": "RadioNight",
     "privacy": "public",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "splash": {
       "image": "./src/assets/splash.png",
       "resizeMode": "cover"
