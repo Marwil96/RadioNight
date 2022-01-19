@@ -24,6 +24,7 @@ const Home = ({ navigation }) => {
   const FetchData = async () => {
     setLoading(true)
     const allEpisodes = await GetCurrentlyLiveEpisodes(user_data.followed_podcasts);
+    console.log('ALL EPISODES', allEpisodes)
     setNotFollowedLiveEpisodes([...allEpisodes.liveEpisodes])
     
     if(user_data.followed_podcasts.length > 1 ) {
@@ -31,6 +32,7 @@ const Home = ({ navigation }) => {
       setUpcomingEpisodes(response.upcomingEpisodes);
       setLiveEpisodes(response.liveEpisodes);
       setPastEpisodes(response.pastEpisodes);
+       console.log('old episodes', response);
     }
     setLoading(false);
   }
