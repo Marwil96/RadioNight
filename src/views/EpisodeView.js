@@ -16,6 +16,7 @@ import { OpenEpisodePlayer } from '../actions/globalActions';
 import { Dimensions, TouchableOpacity, View } from 'react-native';
 import { Span } from '../components/Span';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import ReactionChat from '../components/ReactionChat';
 
 const TopBar = styled.View`
   width: 100%;
@@ -193,7 +194,14 @@ const EpisodeView = ({ podcast, fetchEpisodeProgressStorage, episode, playSound,
   return (
     <MainContainer loading={loading}>
       <KeyboardAwareScrollView>
-        <View style={{display: 'flex', flexDirection: 'column', background:'blue', height: Dimensions.get('window').height - 10}}>
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            background: "blue",
+            height: Dimensions.get("window").height - 10,
+          }}
+        >
           <Wrapper>
             <TopBar>
               <ButtonContainer
@@ -239,7 +247,7 @@ const EpisodeView = ({ podcast, fetchEpisodeProgressStorage, episode, playSound,
                     width: "100%",
                   }}
                 >
-                  <LottieView
+                  {/* <LottieView
                     autoPlay
                     loop
                     style={{
@@ -248,7 +256,7 @@ const EpisodeView = ({ podcast, fetchEpisodeProgressStorage, episode, playSound,
                       // backgroundColor: "#eee",
                     }}
                     source={require("../assets/sound.json")}
-                  />
+                  /> */}
                 </Wrapper>
               )
             : displayMode === "player" && (
@@ -277,7 +285,6 @@ const EpisodeView = ({ podcast, fetchEpisodeProgressStorage, episode, playSound,
                   }`}</Title>
                 </Wrapper>
               )}
-
           {displayMode === "message_from_host" && (
             <Wrapper
               style={{
@@ -294,9 +301,7 @@ const EpisodeView = ({ podcast, fetchEpisodeProgressStorage, episode, playSound,
               </Title>
             </Wrapper>
           )}
-
-          {/* <MiniPlayerStyle runningEpisode={runningEpisode} pauseSound={pauseSound} episode={episode} dispatch={dispatch} playSound={playSound} playing={playing} restartSound={restartSound}/> */}
-
+          <MiniPlayerStyle runningEpisode={runningEpisode} pauseSound={pauseSound} episode={episode} dispatch={dispatch} playSound={playSound} playing={playing} restartSound={restartSound}/>
           {/* <MiniPlayer
         style={{
           position: "relative",
@@ -318,7 +323,7 @@ const EpisodeView = ({ podcast, fetchEpisodeProgressStorage, episode, playSound,
         subtitle="Business & Comedy"
         desc={`The economy explained. Imagine you could call up a friend and say, "Meet me at the bar and tell me what's going on with the economy." Now imagine that's actually a fun evening.`}
       /> */}
-          <PodcastPanel
+          {/* <PodcastPanel
             bgColor={colors.text}
             style={{ paddingTop: 16, paddingBottom: 16, marginBottom: 0 }}
             textColor={"#000"}
@@ -331,14 +336,23 @@ const EpisodeView = ({ podcast, fetchEpisodeProgressStorage, episode, playSound,
             )}
             podcastId={episode.podcast_id}
             owner={episode.owner}
-          />
-          <EpisodeChat
+          /> */}
+
+          {/* <EpisodeChat
             episodeId={episode.episode_id}
             podcastId={episode.podcast_id}
             userId={user_data?.user_id}
-            userName={user_data?.user_name}
             officialBroadCast={episode.official}
             owner={episode.owner}
+            userName={user_data?.user_name}
+          /> */}
+          <ReactionChat
+            episodeId={episode.episode_id}
+            podcastId={episode.podcast_id}
+            userId={user_data?.user_id}
+            officialBroadCast={episode.official}
+            owner={episode.owner}
+            userName={user_data?.user_name}
           />
         </View>
       </KeyboardAwareScrollView>

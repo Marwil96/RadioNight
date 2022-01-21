@@ -151,7 +151,7 @@ useEffect(() => {
     };
 
     await fetch(
-      "http://radionight.receptsamlingen.website/start-stream",
+      "http://radionight.radionight.xyz/start-stream",
       requestOptions
     )
       .then((response) => response.text())

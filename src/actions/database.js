@@ -1,4 +1,4 @@
-import { CREATE_USER, LOGIN_USER, SIGN_OUT_USER, CREATE_PODCAST, FETCH_ALL_USER_DATA, FETCH_EPISODE, GET_CHAT_MESSAGES} from "./constables";
+import { CREATE_USER, LOGIN_USER, SIGN_OUT_USER, CREATE_PODCAST, FETCH_ALL_USER_DATA, FETCH_EPISODE, GET_CHAT_MESSAGES, GET_NEW_CHAT_MESSAGE} from "./constables";
 import firebase from "firebase";
 import { firebaseConfig } from "../../firebaseConfig";
 
@@ -229,19 +229,70 @@ export const RemoveChatMessage = async ({episodeId, messageId}) => {
 export const GetChatMessages = ({episodeId}) => {
   console.log('GETCHATMESSAGE', episodeId )
   return (dispatch) => {
-    dispatch({type: GET_CHAT_MESSAGES, payload: {loading: true, chat_messages: []}})
+    // dispatch({type: GET_CHAT_MESSAGES, payload: {loading: true, chat_messages: []}})
+    dispatch({type: GET_NEW_CHAT_MESSAGE, payload: {loading: true, chat_message: {isMod: false, message: '', message_author: {user_id: 'gjl2bgBFz4PwEGctK209aws2Lxt1', user_name: 'marwil96'}, chat_id:'1313131', time_stamp: 1642679560000 }}})
     db.collection('episodes').doc(episodeId).collection('chat').onSnapshot((querySnapshot) => {
+
+      //  querySnapshot.docChanges().forEach((change) => {
+      //    if (change.type === "added") {
+      //       const data = change.doc.data();
+      //       const currentTime = Date.now();
+      //       const currentTimeinSeconds = Math.floor(currentTime / 1000);
+      //       const timeStampInSeconds = Math.floor(data.time_stamp / 1000);
+      //       const timeDifference = currentTimeinSeconds - timeStampInSeconds;
+      //       if (timeDifference < 6) {
+      //         dispatch({
+      //           type: GET_NEW_CHAT_MESSAGE,
+      //           payload: { loading: false, chat_message: change.doc.data() },
+      //         });
+      //       }
+      //    }
+      //  });
       const messages = [];
       querySnapshot.forEach((doc) => {
-        messages.push(doc.data());
+        const data = doc.data();
+        const currentTime = Date.now();
+        const currentTimeinSeconds = Math.floor(currentTime / 1000);
+        const timeStampInSeconds = Math.floor(data.time_stamp / 1000);
+        const timeDifference = currentTimeinSeconds - timeStampInSeconds;
+        if(timeDifference < 6) {
+          messages.push({...doc.data()});
+        }
       });
 
-      console.log(messages)
+      // console.log(messages)
 
       dispatch({type: GET_CHAT_MESSAGES, payload: {loading: false, chat_messages: messages }})
     })
   }
 }
+
+
+export const GetChatMessagesFunc = async ({episodeId}) => {
+  console.log('GETCHATMESSAGE', episodeId )
+  const messages = [];
+
+    // dispatch({type: GET_CHAT_MESSAGES, payload: {loading: true, chat_messages: []}})
+    db.collection('episodes').doc(episodeId).collection('chat').onSnapshot((querySnapshot) => {      
+      querySnapshot.docChanges().forEach((change) => {
+         if (change.type === "added") {
+          //  console.log("New city: ", change.doc.data());
+          messages.push({ ...change.doc.data() });
+         }
+       });
+    // const messages = [];
+      // querySnapshot.forEach((doc) => {
+      //   messages.push({...doc.data()});
+      // });
+
+      // console.log(messages)
+
+      // dispatch({type: GET_CHAT_MESSAGES, payload: {loading: false, chat_messages: messages }})
+    })
+
+    return messages
+}
+
 
 export const GetPodcastPremieres = async (id) => {
   const result = await Promise.all(
@@ -419,7 +470,7 @@ export const CreatePodcast = ({ title, description, image, authors, categories, 
           };
 
           fetch(
-            "http://radionight.receptsamlingen.website/sendmail",
+            "http://radionight.radionight.xyz/sendmail",
             requestOptions
           )
             .then((response) => response.text())
@@ -487,7 +538,7 @@ export const AddOwnershipToPodcast = ({ title, description, image, authors, cate
           };
 
           fetch(
-            "http://radionight.receptsamlingen.website/sendmail",
+            "http://radionight.radionight.xyz/sendmail",
             requestOptions
           )
             .then((response) => response.text())

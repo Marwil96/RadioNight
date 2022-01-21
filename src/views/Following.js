@@ -135,7 +135,7 @@ const Following = ({navigation}) => {
                 key={index}
                 desc={episode.desc}
                 onPress={() => dispatch(OpenRssPlayer({data: {episode: {title: episode.title, itunes: {image: episode.image}, enclosures:[{url: episode.play_link}]}, podcast: {title: episode.podcast_name, image: episode.image}}, state: true}))}
-                image={episode.image}
+                image={episode?.image}
                 meta1={`${new Date(episode.start_date).getFullYear()}-${new Date(
                   episode.start_date
                 ).getMonth()}-${new Date(episode.start_date).getDate()}`}

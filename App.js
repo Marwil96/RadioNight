@@ -296,7 +296,7 @@ const DataContainer = ({children}) => {
     };
 
    const result = fetch(
-      `http://radionight.receptsamlingen.website/episode-progress/${episodeId}`,
+      `http://radionight.radionight.xyz/episode-progress/${episodeId}`,
       requestOptions
     )
       .then((response) => response.json())

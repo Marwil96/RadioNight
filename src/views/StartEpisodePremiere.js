@@ -130,7 +130,7 @@ const StartEpisodePremiere = ({ navigation, route }) => {
     };
 
     await fetch(
-      "http://radionight.receptsamlingen.website/start-stream",
+      "http://radionight.radionight.xyz/start-stream",
       requestOptions
     )
       .then((response) => response.text())
@@ -201,7 +201,7 @@ const StartEpisodePremiere = ({ navigation, route }) => {
     };
 
     await fetch(
-      "http://radionight.receptsamlingen.website/start-stream",
+      "http://radionight.radionight.xyz/start-stream",
       requestOptions
     )
       .then((response) => response.text())

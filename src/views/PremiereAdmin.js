@@ -41,7 +41,7 @@ const StopStream = async (episodeId) => {
   };
 
   await fetch(
-    "http://radionight.receptsamlingen.website/stop-stream",
+    "http://radionight.radionight.xyz/stop-stream",
     requestOptions
   )
     .then((response) => response.text())
